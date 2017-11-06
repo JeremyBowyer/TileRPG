@@ -259,3 +259,18 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/Build
+/Library
+/old scripts
+/ProjectSettings
+/Temp
+/Assets/Materials
+/Assets/Models/Materials
+/Assets/Prefabs
+/Assets/Scenes
+/TileStrategy.sln
+/TileStrategy.Editor.csproj
+/TileStrategy.csproj
+/BattleState.cs
+/Assembly-CSharp.csproj
+/Assembly-CSharp-Editor.csproj
