@@ -21,7 +21,7 @@ public class Pathfinding : MonoBehaviour {
         return _path.Count > 0;
     }
 
-    public void FindRange(Vector3 startPos, int _limit)
+    public List<Node> FindRange(Vector3 startPos, int _limit)
     {
         List<Node> nodesInRange = new List<Node>();
         Node startNode = grid.NodeFromWorldPoint(startPos);
@@ -45,7 +45,7 @@ public class Pathfinding : MonoBehaviour {
                 validNodesInRange.Add(node);
             }
         }
-        grid.range = validNodesInRange;
+        return validNodesInRange;
 
     }
 

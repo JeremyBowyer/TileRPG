@@ -5,30 +5,41 @@ using System.Collections.Generic;
 public class MoveTargetState : BattleState
 {
     List<Tile> tiles;
+    List<Node> moveRange;
 
     public override void Enter()
     {
         base.Enter();
-        Movement mover = owner.currentUnit.GetComponent<Movement>();
-        tiles = mover.GetTilesInRange(board);
-        board.SelectTiles(tiles);
+        Movement mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
+        moveRange = mover.GetNodesInRange(owner.currentCharacter.stats.moveRange);
+        grid.SelectTiles(moveRange);
     }
 
     public override void Exit()
     {
         base.Exit();
-        board.DeSelectTiles(tiles);
-        tiles = null;
+        grid.DeSelectTiles(moveRange);
+        moveRange = null;
     }
 
-    protected override void OnMove(object sender, InfoEventArgs<Point> e)
+    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
-        SelectTile(e.info + pos);
+        if (e.info.GetComponent<Tile>())
+        {
+            if (moveRange.Contains(e.info.GetComponent<Tile>().node))
+            {
+                owner.currentTile = e.info.GetComponent<Tile>();
+                owner.ChangeState<MoveSequenceState>();
+            }
+            else
+            {
+                Debug.Log("Select a valid tile.");
+            }
+        }
+        else
+        {
+            Debug.Log("Select a tile.");
+        }
     }
 
-    protected override void OnFire(object sender, InfoEventArgs<int> e)
-    {
-        if (tiles.Contains(owner.currentTile))
-            owner.ChangeState<MoveSequenceState>();
-    }
 }

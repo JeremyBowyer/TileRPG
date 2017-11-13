@@ -9,20 +9,20 @@ public class CameraController : MonoBehaviour {
 	public BoxCollider2D Bounds;
 	public bool isFollowing;
 	private Vector3 _min, _max;
-    private BattleMaster bm;
+    private BattleController bc;
 
 	// Use this for initialization
 	void Start () {
-        bm = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<BattleMaster>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
 		isFollowing = true;
 	}
 
 
     public void LateUpdate(){
 
-        if(bm.curPlayer != null)
+        if(bc.currentCharacter != null)
         {
-            _target = bm.curPlayer.transform;
+            _target = bc.currentCharacter.transform;
 
             var x = transform.position.x;
             var y = transform.position.y;

@@ -1,7 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+
 public class InitBattleState : BattleState
 {
+    private List<GameObject> startingTilesPlayer;
+    private List<GameObject> startingTilesEnemy;
+    private List<GameObject> players = new List<GameObject>();
+    private List<GameObject> enemies = new List<GameObject>();
+
+
     public override void Enter()
     {
         base.Enter();
@@ -10,7 +19,37 @@ public class InitBattleState : BattleState
     IEnumerator Init()
     {
         grid.CreateGrid();
+
+        players = new List<GameObject>(GameObject.FindGameObjectsWithTag("Player"));
+        startingTilesPlayer = new List<GameObject>(GameObject.FindGameObjectsWithTag("StartingTilePlayer"));
+        startingTilesEnemy = new List<GameObject>(GameObject.FindGameObjectsWithTag("StartingTileEnemy"));
+
+        // Place players on starting tiles
+        for (int i = 0; i < startingTilesPlayer.Count; i++)
+        {
+            GameObject player = players[i];
+            characters.Add(player.GetComponent<Player>());
+            Tile tile = startingTilesPlayer[i].GetComponent<Tile>();
+            player.GetComponent<Player>().Place(tile);
+            tile.GetComponent<Tile>().occupant = player;
+        }
+
+        // Place players on starting tiles
+        for (int i = 0; i < startingTilesEnemy.Count; i++)
+        {
+            GameObject enemy = Instantiate(owner.enemyPrefab) as GameObject;
+            enemies.Add(enemy);
+            characters.Add(enemy.GetComponent<Enemy>());
+            Tile tile = startingTilesPlayer[i].GetComponent<Tile>();
+            enemy.GetComponent<Enemy>().Place(tile);
+            tile.GetComponent<Tile>().occupant = enemy;
+        }
+        owner.players = players;
+        owner.enemies = enemies;
+        owner.characters = characters;
+        owner.currentCharacter = players[0].GetComponent<Player>();
         yield return null;
+        //owner.currentCharacter = players[0];
         owner.ChangeState<MoveTargetState>();
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterUIController : MonoBehaviour
+public class CommandSelectionState : BattleState
 {
-
+    
 }

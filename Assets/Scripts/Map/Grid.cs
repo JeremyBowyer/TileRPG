@@ -16,50 +16,30 @@ public class Grid : MonoBehaviour {
 
 	public MapGenerator mapGenerator;
 
-	void Awake() {
-		nodeDiameter = nodeRadius * 2;
-		mapGenerator = GameObject.FindGameObjectWithTag ("Map").GetComponent<MapGenerator> ();
-		gridWorldSize = mapGenerator.mapSize;
-		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+    void Awake()
+    {
+        nodeDiameter = nodeRadius * 2;
+        mapGenerator = GameObject.FindGameObjectWithTag("Map").GetComponent<MapGenerator>();
+        gridWorldSize = mapGenerator.mapSize;
+        gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
+        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
 
-		CreateGrid ();
+        CreateGrid();
+
+        // Color tiles for prototype
+        foreach (Node n in grid)
+        {
+            GameObject go = TileFromNode(n).gameObject;
+            if (LayerMask.LayerToName(go.layer) == "Unwalkable")
+            {
+                go.GetComponent<Renderer>().material.color = Color.red;
+            }
+            else if (go.tag == "StartingTilePlayer")
+            {
+                go.GetComponent<Renderer>().material.color = Color.green;
+            }
+        }
     }
-
-	void Update() {
-		if (grid != null) {
-			foreach (Node n in grid) {
-				GameObject go = TileFromNode (n);
-                go.GetComponent<Renderer>().material.color = Color.white;
-
-                if (range != null)
-                {
-                    if (range.Contains(n))
-                    {
-                        go.GetComponent<Renderer>().material.color = Color.cyan;
-                    }
-                }
-
-                if(path != null)
-                {
-                    if (path.Contains(n))
-                    {
-                        go.GetComponent<Renderer>().material.color = Color.black;
-                    }
-                }
-
-                if (LayerMask.LayerToName(go.layer) == "Unwalkable")
-                {
-                    go.GetComponent<Renderer>().material.color = Color.red;
-                }
-                else if (go.tag == "StartingTile")
-                {
-                    go.GetComponent<Renderer>().material.color = Color.green;
-                }
-
-			}
-		}
-	}
 
 	public int MaxSize {
 		get {
@@ -75,10 +55,31 @@ public class Grid : MonoBehaviour {
 			for (int y = 0; y < gridSizeY; y++) {
 				Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
 				bool walkable = !(Physics.CheckSphere (worldPoint, nodeRadius, unwalkableMask));
-				grid [x, y] = new Node (walkable, worldPoint, x, y);
-			}
+				Node node = new Node (walkable, worldPoint, x, y);
+                TileFromNode(node).node = node;
+                grid[x, y] = node;
+
+            }
 		}
 	}
+
+    public void SelectTiles(List<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            GameObject go = TileFromNode(node).gameObject;
+            go.GetComponent<Renderer>().material.color = Color.cyan;
+        }
+    }
+
+    public void DeSelectTiles(List<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            GameObject go = TileFromNode(node).gameObject;
+            go.GetComponent<Renderer>().material.color = Color.white;
+        }
+    }
 
     public void ResetRange()
     {
@@ -124,12 +125,12 @@ public class Grid : MonoBehaviour {
 		return grid [x, y];
 	}
 
-	public GameObject TileFromNode(Node node) {
+	public Tile TileFromNode(Node node) {
 		int x = node.gridX;
 		int y = node.gridY;
 		string goName = "(" + x.ToString () + " , " + y.ToString () + ")";
-		GameObject go = GameObject.Find (goName);
-		return go;
+		Tile tile = GameObject.Find (goName).GetComponent<Tile>();
+		return tile;
 	}
 		
 	void OnDrawGizmos() {

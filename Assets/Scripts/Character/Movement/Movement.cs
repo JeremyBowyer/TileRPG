@@ -4,27 +4,23 @@ using System.Collections.Generic;
 
 public abstract class Movement : MonoBehaviour
 {
-    public int range;
-    public int jumpHeight;
-    protected Unit unit;
-    protected Transform jumper;
+    public int limit;
+    protected Character character;
+    protected Pathfinding pathfinder;
 
     protected virtual void Awake()
     {
-        unit = GetComponent<Unit>();
-        jumper = transform.FindChild("Jumper");
+        character = GetComponent<Character>();
+        pathfinder = GameObject.Find("Pathfinder").GetComponent<Pathfinding>();
     }
 
-    public virtual List<Tile> GetTilesInRange(Board board)
+    public virtual List<Node> GetNodesInRange(int limit)
     {
-        List<Tile> retValue = board.Search(unit.tile, ExpandSearch);
-        Filter(retValue);
+        List<Node> retValue = pathfinder.FindRange(transform.position, limit);
         return retValue;
     }
 
-    protected virtual bool ExpandSearch(Tile from, Tile to)
-    {
-        return (from.distance + 1) <= range;
-    }
+    public abstract IEnumerator Traverse(Tile tile);
+
 
 }

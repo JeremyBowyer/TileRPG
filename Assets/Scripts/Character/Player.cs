@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : Character {
 
     public string playerName;
     public BaseAbility curAbility;
@@ -10,9 +10,7 @@ public class Player : MonoBehaviour {
     public PlayerStats stats = new PlayerStats();
 
     // References
-    private BattleMaster bm;
-    private Pathfinding pathfinder;
-    private Grid grid;
+    private BattleController bc;
     private StatusIndicator statusIndicator;
 
     [System.Serializable]
@@ -59,70 +57,27 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     void Start () {
         stats.Init();
-        bm = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<BattleMaster>();
-        pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
-        grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
         statusIndicator = transform.Find("CameraAngleTarget").Find("StatusIndicator").GetComponent<StatusIndicator>();
         curAbility = new AttackAbility();
     }
 	
 	// Update is called once per frame
 	void Update () {
-		if(this == bm.curPlayer)
-        {
-            transform.Find("CameraAngleTarget").Find("StatusIndicator").gameObject.SetActive(false);
-        }
-        else
-        {
-            transform.Find("CameraAngleTarget").Find("StatusIndicator").gameObject.SetActive(true);
-        }
+
 	}
-
-    public bool PlayerMove(Tile targetTile)
-    {
-
-        float _height = targetTile.gameObject.GetComponent<BoxCollider>().bounds.extents.z * 2;
-        Vector3 _targetPos = targetTile.transform.position;
-        List<Node> _path = pathfinder.FindPath(gameObject.transform.position, _targetPos, stats.moveRange);
-        Node _node = grid.NodeFromWorldPoint(targetTile.transform.position);
-
-        if (_path.Count > 0 && _path.Contains(_node) && targetTile.occupant == null)
-        {
-            grid.TileFromNode(grid.NodeFromWorldPoint(transform.position)).GetComponent<Tile>().occupant = null;
-            targetTile.occupant = gameObject;
-            transform.position = targetTile.transform.position + new Vector3(0, _height, 0);
-            stats.curAP -= _node.gCost;
-            bm.statusIndicator.SetAP(stats.curAP, stats.maxAP);
-            if (stats.curAP <= 0)
-            {
-                bm.NextPlayer();
-            }
-            else
-            {
-                bm.PlayerMove();
-            }
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-
-    }
 
     public void PlayerAttack(Player _target, BaseAbility _ability)
     {
         if (stats.curAP >= _ability.AbilityCost)
         {
             stats.curAP -= _ability.AbilityCost;
-            bm.statusIndicator.SetAP(stats.curAP, stats.maxAP);
-
             _target.Damage(_ability.AbilityPower);
         }
 
         if (stats.curAP <= 0)
         {
-            bm.NextPlayer();
+            
         }
     }
 
@@ -138,7 +93,7 @@ public class Player : MonoBehaviour {
 
     public void Die()
     {
-        bm.players.Remove(this.gameObject);
+        bc.players.Remove(this.gameObject);
         Destroy(this.gameObject);
     }
 
