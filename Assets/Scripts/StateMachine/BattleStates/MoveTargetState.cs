@@ -29,7 +29,7 @@ public class MoveTargetState : BattleState
             if (moveRange.Contains(e.info.GetComponent<Tile>().node))
             {
                 owner.currentTile = e.info.GetComponent<Tile>();
-                owner.ChangeState<MoveSequenceState>();
+                owner.ChangeState<CommandSelectionState>();
             }
             else
             {
@@ -39,6 +39,19 @@ public class MoveTargetState : BattleState
         else
         {
             Debug.Log("Select a tile.");
+        }
+    }
+
+    protected override void OnFire(object sender, InfoEventArgs<int> e)
+    {
+        if (e.info == 0)
+        {
+            if (tiles.Contains(owner.currentTile))
+                owner.ChangeState<MoveSequenceState>();
+        }
+        else
+        {
+            owner.ChangeState<CommandSelectionState>();
         }
     }
 

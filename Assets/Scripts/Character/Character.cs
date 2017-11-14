@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour {
+public abstract class Character : MonoBehaviour {
 
     public Tile tile;
 
@@ -13,4 +13,7 @@ public class Character : MonoBehaviour {
         transform.position = targetTile.transform.position + new Vector3(0, _height, 0);
         tile = targetTile;
     }
+
+    public abstract void Damage(int dmg);
+
 }

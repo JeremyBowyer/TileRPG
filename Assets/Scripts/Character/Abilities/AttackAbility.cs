@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackAbility : BaseAbility {
+public class AttackAbility : BaseAbility
+{
 
     public AttackAbility()
     {

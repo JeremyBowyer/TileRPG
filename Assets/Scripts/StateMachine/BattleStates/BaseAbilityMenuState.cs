@@ -6,6 +6,7 @@ public abstract class BaseAbilityMenuState : BattleState
 {
     protected string menuTitle;
     protected List<string> menuOptions;
+
     public override void Enter()
     {
         base.Enter();

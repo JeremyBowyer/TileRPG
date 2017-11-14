@@ -67,7 +67,7 @@ public class Player : Character {
 
 	}
 
-    public void PlayerAttack(Player _target, BaseAbility _ability)
+    public void PlayerAttack(Character _target, BaseAbility _ability)
     {
         if (stats.curAP >= _ability.AbilityCost)
         {
@@ -81,7 +81,7 @@ public class Player : Character {
         }
     }
 
-    public void Damage(int amt)
+    public override void Damage(int amt)
     {
         stats.curHealth -= amt;
         statusIndicator.SetHealth(stats.curHealth, stats.maxHealth);
