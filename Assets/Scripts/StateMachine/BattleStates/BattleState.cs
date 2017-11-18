@@ -11,8 +11,8 @@ public abstract class BattleState : State
     public Node node { get { return owner.node; } set { owner.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return owner.abilityMenuPanelController; } }
     public Turn turn { get { return owner.turn; } }
-    public List<Character> characters { get { return owner.characters; } }
-    
+    public List<Player> characters { get { return owner.characters; } }
+
     protected virtual void Awake()
     {
         owner = GetComponent<BattleController>();

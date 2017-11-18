@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,18 +97,18 @@ public class AbilityMenuPanelController : MonoBehaviour
         menuEntries.Clear();
     }
 
-    public void Show(string title, List<string> options)
+    public void Show(string title, Dictionary<string, UnityAction> options)
     {
         canvas.SetActive(true);
         Clear();
         titleLabel.text = title;
-        for (int i = 0; i < options.Count; ++i)
+        foreach(KeyValuePair<string, UnityAction> option in options)
         {
             AbilityMenuEntry entry = Dequeue();
-            entry.Title = options[i];
+            entry.Title = option.Key;
+            entry.setOnClick(option.Value);
             menuEntries.Add(entry);
         }
-        SetSelection(0);
         TogglePos(ShowKey);
     }
 

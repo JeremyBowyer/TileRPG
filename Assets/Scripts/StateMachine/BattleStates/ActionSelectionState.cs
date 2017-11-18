@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ public class ActionSelectionState : BaseAbilityMenuState
     protected override void LoadMenu()
     {
         if (menuOptions == null)
-            menuOptions = new List<string>(3);
+            menuOptions = new Dictionary<string, UnityAction>(3);
         if (category == 0)
         {
             menuTitle = "White Magic";
@@ -36,6 +37,8 @@ public class ActionSelectionState : BaseAbilityMenuState
     {
         menuOptions.Clear();
         for (int i = 0; i < options.Length; ++i)
-            menuOptions.Add(options[i]);
+        {
+            //menuOptions.Add(options[i]);
+        }
     }
 }

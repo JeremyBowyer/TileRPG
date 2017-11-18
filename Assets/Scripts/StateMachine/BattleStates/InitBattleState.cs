@@ -21,8 +21,19 @@ public class InitBattleState : BattleState
         grid.CreateGrid();
 
         players = new List<GameObject>(GameObject.FindGameObjectsWithTag("Player"));
+        enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
         startingTilesPlayer = new List<GameObject>(GameObject.FindGameObjectsWithTag("StartingTilePlayer"));
         startingTilesEnemy = new List<GameObject>(GameObject.FindGameObjectsWithTag("StartingTileEnemy"));
+
+        if(players.Count > startingTilesPlayer.Count)
+        {
+            Debug.LogError("Not enough starting tiles for players.");
+        }
+
+        if (enemies.Count > startingTilesEnemy.Count)
+        {
+            Debug.LogError("Not enough starting tiles for enemies.");
+        }
 
         // Place players on starting tiles
         for (int i = 0; i < startingTilesPlayer.Count; i++)
@@ -30,7 +41,7 @@ public class InitBattleState : BattleState
             GameObject player = players[i];
             characters.Add(player.GetComponent<Player>());
             Tile tile = startingTilesPlayer[i].GetComponent<Tile>();
-            player.GetComponent<Player>().Place(tile);
+            player.GetComponent<Player>().Place(tile, 0);
             tile.GetComponent<Tile>().occupant = player;
         }
 
@@ -39,9 +50,9 @@ public class InitBattleState : BattleState
         {
             GameObject enemy = Instantiate(owner.enemyPrefab) as GameObject;
             enemies.Add(enemy);
-            characters.Add(enemy.GetComponent<Enemy>());
+            //characters.Add(enemy.GetComponent<Enemy>());
             Tile tile = startingTilesPlayer[i].GetComponent<Tile>();
-            enemy.GetComponent<Enemy>().Place(tile);
+            enemy.GetComponent<Enemy>().Place(tile, 0);
             tile.GetComponent<Tile>().occupant = enemy;
         }
         owner.players = players;
@@ -50,6 +61,6 @@ public class InitBattleState : BattleState
         owner.currentCharacter = players[0].GetComponent<Player>();
         yield return null;
         //owner.currentCharacter = players[0];
-        owner.ChangeState<MoveTargetState>();
+        owner.ChangeState<SelectUnitState>();
     }
 }

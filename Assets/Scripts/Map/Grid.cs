@@ -18,8 +18,11 @@ public class Grid : MonoBehaviour {
 
     void Awake()
     {
+        if(mapGenerator == null)
+        {
+            Debug.LogError("Please assign map generator to Grid script.");
+        }
         nodeDiameter = nodeRadius * 2;
-        mapGenerator = GameObject.FindGameObjectWithTag("Map").GetComponent<MapGenerator>();
         gridWorldSize = mapGenerator.mapSize;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);

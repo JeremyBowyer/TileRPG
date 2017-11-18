@@ -12,7 +12,7 @@ public class SelectUnitState : BattleState
     IEnumerator ChangeCurrentUnit()
     {
         index = (index + 1) % characters.Count;
-        turn.Change(characters[index]);
+        owner.ChangePlayer(characters[index]);
         yield return null;
         owner.ChangeState<CommandSelectionState>();
     }

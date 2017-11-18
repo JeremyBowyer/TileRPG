@@ -6,23 +6,15 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour {
 
 	public GameObject PauseUI;
-	private BattleMaster bm;
-
-	private bool paused = false;
+	public bool paused = false;
 
 	void Start() {
-		bm = GameObject.FindGameObjectWithTag ("GameMaster").GetComponent<BattleMaster>();
 		PauseUI.SetActive (false);
 	
 	}
 
 	void Update(){
 		
-		if(Input.GetButtonDown("Pause")){
-			paused = !paused;
-			bm.paused = paused;
-		}
-
 		if (paused) {
 			PauseUI.SetActive (true);
 			Time.timeScale = 0;
@@ -37,7 +29,6 @@ public class PauseMenu : MonoBehaviour {
 
 	public void Resume() { 
 		paused = false;
-		bm.paused = false;
 	}
 
 	public void Restart() {

@@ -10,13 +10,21 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<int>> fireEvent;
     private RaycastHit hit;
     private Camera _camera;
+    public PauseMenu pauseMenu;
     string[] _buttons = new string[] { "Fire1", "Fire2", "Fire3" };
 
     private void Awake()
     {
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
+
     }
     void Update() {
+
+        // Pause Button
+        if (Input.GetButtonDown("Pause"))
+        {
+            pauseMenu.paused = !pauseMenu.paused;
+        }
 
         // Click Event
         if (Input.GetMouseButtonDown(0))

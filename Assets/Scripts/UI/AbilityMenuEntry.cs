@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Collections;
 
 public class AbilityMenuEntry : MonoBehaviour
 {
-    [SerializeField] Image bullet;
-    [SerializeField] Sprite normalSprite;
-    [SerializeField] Sprite selectedSprite;
-    [SerializeField] Sprite disabledSprite;
     [SerializeField] Text label;
-    Outline outline;
+    [SerializeField] Button button;
 
     public string Title
     {
@@ -58,21 +55,15 @@ public class AbilityMenuEntry : MonoBehaviour
 
             if (IsLocked)
             {
-                bullet.sprite = disabledSprite;
                 label.color = Color.gray;
-                outline.effectColor = new Color32(20, 36, 44, 255);
             }
             else if (IsSelected)
             {
-                bullet.sprite = selectedSprite;
-                label.color = new Color32(249, 210, 118, 255);
-                outline.effectColor = new Color32(255, 160, 72, 255);
+                //label.color = new Color32(249, 210, 118, 255);
             }
             else
             {
-                bullet.sprite = normalSprite;
-                label.color = Color.white;
-                outline.effectColor = new Color32(20, 36, 44, 255);
+                //label.color = Color.white;
             }
         }
     }
@@ -82,7 +73,12 @@ public class AbilityMenuEntry : MonoBehaviour
 
     void Awake()
     {
-        outline = label.GetComponent<Outline>();
+    }
+
+    public void setOnClick(UnityAction action)
+    {
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(action);
     }
 
     public void Reset()

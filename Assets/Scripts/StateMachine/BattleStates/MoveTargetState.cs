@@ -11,7 +11,8 @@ public class MoveTargetState : BattleState
     {
         base.Enter();
         Movement mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
-        moveRange = mover.GetNodesInRange(owner.currentCharacter.stats.moveRange);
+        Player player = owner.currentCharacter as Player;
+        moveRange = mover.GetNodesInRange(player.stats.moveRange);
         grid.SelectTiles(moveRange);
     }
 
@@ -29,7 +30,7 @@ public class MoveTargetState : BattleState
             if (moveRange.Contains(e.info.GetComponent<Tile>().node))
             {
                 owner.currentTile = e.info.GetComponent<Tile>();
-                owner.ChangeState<CommandSelectionState>();
+                owner.ChangeState<MoveSequenceState>();
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,10 +10,10 @@ public class CategorySelectionState : BaseAbilityMenuState
         if (menuOptions == null)
         {
             menuTitle = "Action";
-            menuOptions = new List<string>(3);
-            menuOptions.Add("Attack");
-            menuOptions.Add("White Magic");
-            menuOptions.Add("Black Magic");
+            menuOptions = new Dictionary<string, UnityAction>(3);
+            menuOptions.Add("Attack", delegate { });
+            menuOptions.Add("White Magic", delegate { });
+            menuOptions.Add("Black Magic", delegate { });
         }
 
         abilityMenuPanelController.Show(menuTitle, menuOptions);

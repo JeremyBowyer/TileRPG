@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 
 public abstract class BaseAbilityMenuState : BattleState
 {
     protected string menuTitle;
-    protected List<string> menuOptions;
+    protected Dictionary<string, UnityAction> menuOptions;
 
     public override void Enter()
     {

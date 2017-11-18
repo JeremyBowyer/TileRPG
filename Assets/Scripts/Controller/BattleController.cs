@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,12 +11,13 @@ public class BattleController : StateMachine
     public Node node;
     public GameObject playerPrefab;
     public GameObject enemyPrefab;
-    public Player currentCharacter;
+    public Character currentCharacter;
     public Tile currentTile;
     public List<GameObject> players;
     public List<GameObject> enemies;
-    public List<Character> characters = new List<Character>();
-
+    public List<Player> characters = new List<Player>();
+    public Text playerName;
+    public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public Turn turn = new Turn();
 
@@ -26,4 +28,20 @@ public class BattleController : StateMachine
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         ChangeState<InitBattleState>();
     }
+
+    void LoadStats(Character _character)
+    {
+        Player _player = _character as Player;
+        playerName.text = _player.playerName;
+        statusIndicator.SetHealth(_player.stats.curHealth, _player.stats.maxHealth);
+        statusIndicator.SetAP(_player.stats.curAP, _player.stats.maxAP);
+        statusIndicator.SetMP(_player.stats.curMP, _player.stats.maxMP);
+    }
+
+    public void ChangePlayer(Character character)
+    {
+        currentCharacter = character;
+        LoadStats(character);
+    }
+
 }

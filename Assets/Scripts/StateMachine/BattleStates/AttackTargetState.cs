@@ -29,7 +29,8 @@ public class AttackTargetState : BattleState
         {
             if (attackRange.Contains(e.info.GetComponent<Tile>().node))
             {
-                owner.currentCharacter.PlayerAttack(e.info.GetComponent<Enemy>(), attackAbility);
+                Player player = owner.currentCharacter as Player;
+                player.PlayerAttack(e.info.GetComponent<Enemy>(), attackAbility);
                 owner.ChangeState<MoveSequenceState>();
             }
             else
