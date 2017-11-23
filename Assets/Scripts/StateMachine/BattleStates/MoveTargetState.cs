@@ -9,6 +9,7 @@ public class MoveTargetState : BattleState
     Player player;
     Movement mover;
 
+
     public override void Enter()
     {
         base.Enter();
@@ -55,7 +56,9 @@ public class MoveTargetState : BattleState
     {
         if(moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
         {
-            grid.SelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, true));
+            List<Node> path = pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, true);
+            grid.SelectPath(path);
+            uiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
         }
     }
 
@@ -64,6 +67,7 @@ public class MoveTargetState : BattleState
         if (moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
         {
             grid.DeSelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, true));
+            uiController.SetApCost();
         }
     }
 

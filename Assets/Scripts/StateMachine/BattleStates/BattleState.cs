@@ -6,6 +6,7 @@ public abstract class BattleState : State
 {
     protected BattleController owner;
     public CameraController cameraRig { get { return owner.cameraRig; } }
+    public UIController uiController { get { return owner.uiController; } }
     public Grid grid { get { return owner.grid; } }
     public Pathfinding pathfinder { get { return owner.pathfinder; } }
     public Node node { get { return owner.node; } set { owner.node = value; } }

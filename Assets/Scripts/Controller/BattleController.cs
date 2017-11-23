@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class BattleController : StateMachine
 {
     public CameraController cameraRig;
+    public UIController uiController;
     public Grid grid;
     public Pathfinding pathfinder;
     public Node node;
@@ -26,6 +27,9 @@ public class BattleController : StateMachine
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
+
+        if (uiController == null)
+            Debug.LogError("UIController not assigned to " + gameObject.name);
         ChangeState<InitBattleState>();
     }
 
