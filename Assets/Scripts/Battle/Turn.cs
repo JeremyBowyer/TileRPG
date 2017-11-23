@@ -6,7 +6,7 @@ public class Turn
 {
     public Character actor;
     public bool lockMove;
-    Tile startTile;
+    public Tile startTile;
 
     public void Change(Character current)
     {

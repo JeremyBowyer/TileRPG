@@ -58,7 +58,7 @@ public class InitBattleState : BattleState
         owner.players = players;
         owner.enemies = enemies;
         owner.characters = characters;
-        owner.currentCharacter = players[0].GetComponent<Player>();
+        owner.currentCharacter = players[0].GetComponent<Character>();
         yield return null;
         //owner.currentCharacter = players[0];
         owner.ChangeState<SelectUnitState>();

@@ -22,7 +22,6 @@ public abstract class BaseAbilityMenuState : BattleState
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
         Debug.Log("Base Ability Menu State Click");
-        Debug.Log(e.info.name);
     }
 
     protected override void OnFire(object sender, InfoEventArgs<int> e)

@@ -120,34 +120,34 @@ public class BattleMaster : MonoBehaviour {
         statusIndicator.SetMP(_player.stats.curMP, _player.stats.maxMP);
     }
 
-    public void CheckMoveRange(Player _player)
+    public void CheckMoveRange(Player _player, bool diag)
     {
         Transform _transform = _player.gameObject.transform;
         int _limit = _player.stats.moveRange;
         grid.path = null;
         grid.range = null;
-        pathfinder.FindRange(_transform.position, _limit);
+        pathfinder.FindRange(_transform.position, _limit, diag);
     }
 
-    public void CheckAttackRange(Player _player, BaseAbility _ability)
+    public void CheckAttackRange(Player _player, BaseAbility _ability, bool diag)
     {
         Transform _transform = _player.gameObject.transform;
         int _limit = _ability.AbilityRange;
         grid.path = null;
         grid.range = null;
-        pathfinder.FindRange(_transform.position, _limit);
+        pathfinder.FindRange(_transform.position, _limit, diag);
     }
 
     public void PlayerMove()
     {
         currentState = BattleState.PLAYERMOVE;
-        CheckMoveRange(curPlayer);
+        CheckMoveRange(curPlayer, false);
     }
 
     public void PlayerAttack()
     {
         currentState = BattleState.PLAYERATTACK;
-        CheckAttackRange(curPlayer, curPlayer.curAbility);
+        CheckAttackRange(curPlayer, curPlayer.curAbility, false);
     }
 
 }

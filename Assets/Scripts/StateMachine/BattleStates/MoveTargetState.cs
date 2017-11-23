@@ -6,21 +6,29 @@ public class MoveTargetState : BattleState
 {
     List<Tile> tiles;
     List<Node> moveRange;
+    Player player;
+    Movement mover;
 
     public override void Enter()
     {
         base.Enter();
-        Movement mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
-        Player player = owner.currentCharacter as Player;
-        moveRange = mover.GetNodesInRange(player.stats.moveRange);
-        grid.SelectTiles(moveRange);
+        mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
+        player = owner.currentCharacter as Player;
+        moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag);
+        grid.SelectRange(moveRange);
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectTiles(moveRange);
+        grid.DeSelectRange(moveRange);
         moveRange = null;
+    }
+
+    protected override void AddListeners()
+    {
+        base.AddListeners();
+        UserInputController.mouseLayer = LayerMask.NameToLayer("Map");
     }
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
@@ -40,6 +48,22 @@ public class MoveTargetState : BattleState
         else
         {
             Debug.Log("Select a tile.");
+        }
+    }
+
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        if(moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
+        {
+            grid.SelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, true));
+        }
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        if (moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
+        {
+            grid.DeSelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, true));
         }
     }
 

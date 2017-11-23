@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class Node : IHeapItem<Node> {
 
-	public bool walkable;
+    public Tile tile;
+	public bool walkable
+    {
+        get
+        {
+            return tile.isWalkable;
+        }
+    }
 	public Vector3 worldPosition;
 	public int gridX;
 	public int gridY;
@@ -16,8 +23,7 @@ public class Node : IHeapItem<Node> {
 
 	public Node parent;
 
-	public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY) {
-		walkable = _walkable;
+	public Node(Vector3 _worldPos, int _gridX, int _gridY) {
 		worldPosition = _worldPos;
 		gridX = _gridX;
 		gridY = _gridY;

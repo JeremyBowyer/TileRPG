@@ -11,6 +11,7 @@ public class BaseAbility {
     private int abilityPower;
     private int abilityCost;
     private int abilityRange;
+    public bool diag;
 
     public string AbilityName
     {

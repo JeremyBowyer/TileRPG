@@ -6,9 +6,14 @@ using System;
 public class UserInputController : MonoBehaviour {
 
     public static event EventHandler<InfoEventArgs<GameObject>> clickEvent;
+    public static event EventHandler<InfoEventArgs<GameObject>> hoverEnterEvent;
+    public static event EventHandler<InfoEventArgs<GameObject>> hoverExitEvent;
     public static event EventHandler<InfoEventArgs<Point>> moveEvent;
     public static event EventHandler<InfoEventArgs<int>> fireEvent;
+    public static LayerMask mouseLayer;
     private RaycastHit hit;
+    private GameObject lastHit;
+    private GameObject currentHit;
     private Camera _camera;
     public PauseMenu pauseMenu;
     string[] _buttons = new string[] { "Fire1", "Fire2", "Fire3" };
@@ -26,14 +31,33 @@ public class UserInputController : MonoBehaviour {
             pauseMenu.paused = !pauseMenu.paused;
         }
 
-        // Click Event
-        if (Input.GetMouseButtonDown(0))
+        /* ---------------- */
+        /* - Mouse Events - */
+        /* ---------------- */
+        Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+        bool wasHit = Physics.Raycast(ray, out hit, 40f, 1 << mouseLayer);
+
+        if (wasHit)
         {
-            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 20f))
+            currentHit = hit.collider.gameObject;
+            if (currentHit != lastHit)
             {
-                clickEvent(this, new InfoEventArgs<GameObject>(hit.collider.gameObject));
+                if(lastHit != null)
+                    hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
+                hoverEnterEvent(this, new InfoEventArgs<GameObject>(currentHit)); // Enter should run after Exit, if highlighting tiles
+                lastHit = currentHit;
             }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                clickEvent(this, new InfoEventArgs<GameObject>(currentHit));
+            }
+        }
+        else
+        {
+            if (lastHit != null)
+                hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
+            lastHit = null;
         }
 
 

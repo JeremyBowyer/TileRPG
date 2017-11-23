@@ -57,16 +57,18 @@ public class Grid : MonoBehaviour {
 		for (int x = 0; x < gridSizeX; x++) {
 			for (int y = 0; y < gridSizeY; y++) {
 				Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
-				bool walkable = !(Physics.CheckSphere (worldPoint, nodeRadius, unwalkableMask));
-				Node node = new Node (walkable, worldPoint, x, y);
-                TileFromNode(node).node = node;
+				//bool walkable = !(Physics.CheckSphere (worldPoint, nodeRadius, unwalkableMask));
+				Node node = new Node (worldPoint, x, y);
+                Tile tile = TileFromNode(node);
+                tile.node = node;
+                node.tile = tile;
                 grid[x, y] = node;
 
             }
 		}
 	}
 
-    public void SelectTiles(List<Node> nodes)
+    public void SelectRange(List<Node> nodes)
     {
         foreach (Node node in nodes)
         {
@@ -75,12 +77,30 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public void DeSelectTiles(List<Node> nodes)
+    public void DeSelectRange(List<Node> nodes)
     {
         foreach (Node node in nodes)
         {
             GameObject go = TileFromNode(node).gameObject;
             go.GetComponent<Renderer>().material.color = Color.white;
+        }
+    }
+
+    public void SelectPath(List<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            GameObject go = TileFromNode(node).gameObject;
+            go.GetComponent<Renderer>().material.color = Color.black;
+        }
+    }
+
+    public void DeSelectPath(List<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            GameObject go = TileFromNode(node).gameObject;
+            go.GetComponent<Renderer>().material.color = Color.cyan;
         }
     }
 
@@ -98,12 +118,12 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public List<Node> GetNeighbors(Node node) {
+    public List<Node> GetNeighbors(Node node, bool diag) {
 		List<Node> neighbors = new List<Node> ();
 
 		for (int x = -1; x <= 1; x++) {
 			for (int y = -1; y <= 1; y++) {
-				if (x == 0 && y == 0 || Mathf.Abs(x) == Mathf.Abs(y))
+				if (x == 0 && y == 0 || (Mathf.Abs(x) == Mathf.Abs(y) && !diag))
 					continue;
 				int checkX = node.gridX + x;
 				int checkY = node.gridY + y;
@@ -135,7 +155,8 @@ public class Grid : MonoBehaviour {
 		Tile tile = GameObject.Find (goName).GetComponent<Tile>();
 		return tile;
 	}
-		
+	
+    /*
 	void OnDrawGizmos() {
 		Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
 		if (grid != null) {
@@ -145,4 +166,5 @@ public class Grid : MonoBehaviour {
 			}
 		}
 	}
+    */
 }

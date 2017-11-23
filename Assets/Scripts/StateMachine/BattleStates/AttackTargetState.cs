@@ -12,14 +12,14 @@ public class AttackTargetState : BattleState
     {
         base.Enter();
         Movement mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
-        attackRange = mover.GetNodesInRange(attackAbility.AbilityRange);
-        grid.SelectTiles(attackRange);
+        attackRange = mover.GetNodesInRange(attackAbility.AbilityRange, attackAbility.diag);
+        grid.SelectRange(attackRange);
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectTiles(attackRange);
+        grid.DeSelectRange(attackRange);
         attackRange = null;
     }
 
@@ -30,7 +30,7 @@ public class AttackTargetState : BattleState
             if (attackRange.Contains(e.info.GetComponent<Tile>().node))
             {
                 Player player = owner.currentCharacter as Player;
-                player.PlayerAttack(e.info.GetComponent<Enemy>(), attackAbility);
+                player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
                 owner.ChangeState<MoveSequenceState>();
             }
             else

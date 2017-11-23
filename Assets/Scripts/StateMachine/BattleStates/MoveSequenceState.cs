@@ -12,7 +12,15 @@ public class MoveSequenceState : BattleState
     {
         Movement m = owner.currentCharacter.GetComponent<TeleportMovement>();
         yield return StartCoroutine(m.Traverse(owner.currentTile));
-        owner.ChangeState<CommandSelectionState>();
+        if (m.nextTurn)
+        {
+            m.nextTurn = false;
+            owner.ChangeState<SelectUnitState>();
+        }
+        else
+        {
+            owner.ChangeState<CommandSelectionState>();
+        }
     }
 
 }

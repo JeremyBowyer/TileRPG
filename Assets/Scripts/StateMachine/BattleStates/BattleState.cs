@@ -11,7 +11,7 @@ public abstract class BattleState : State
     public Node node { get { return owner.node; } set { owner.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return owner.abilityMenuPanelController; } }
     public Turn turn { get { return owner.turn; } }
-    public List<Player> characters { get { return owner.characters; } }
+    public List<Character> characters { get { return owner.characters; } }
 
     protected virtual void Awake()
     {
@@ -21,16 +21,30 @@ public abstract class BattleState : State
     protected override void AddListeners()
     {
         UserInputController.clickEvent += OnClick;
+        UserInputController.hoverEnterEvent += OnHoverEnter;
+        UserInputController.hoverExitEvent += OnHoverExit;
     }
 
     protected override void RemoveListeners()
     {
         UserInputController.clickEvent -= OnClick;
+        UserInputController.hoverEnterEvent -= OnHoverEnter;
+        UserInputController.hoverExitEvent -= OnHoverExit;
     }
 
     protected virtual void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
         Debug.Log("Battle State Click");
+    }
+
+    protected virtual void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+
+    }
+
+    protected virtual void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+
     }
 
     protected virtual void OnMove(object sender, InfoEventArgs<Point> e)

@@ -15,7 +15,7 @@ public class BattleController : StateMachine
     public Tile currentTile;
     public List<GameObject> players;
     public List<GameObject> enemies;
-    public List<Player> characters = new List<Player>();
+    public List<Character> characters = new List<Character>();
     public Text playerName;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
@@ -41,6 +41,7 @@ public class BattleController : StateMachine
     public void ChangePlayer(Character character)
     {
         currentCharacter = character;
+        currentCharacter.fillAP();
         LoadStats(character);
     }
 
