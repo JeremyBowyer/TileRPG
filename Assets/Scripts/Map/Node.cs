@@ -12,6 +12,13 @@ public class Node : IHeapItem<Node> {
             return tile.isWalkable;
         }
     }
+    public GameObject occupant
+    {
+        get
+        {
+            return tile.occupant;
+        }
+    }
 	public Vector3 worldPosition;
 	public int gridX;
 	public int gridY;

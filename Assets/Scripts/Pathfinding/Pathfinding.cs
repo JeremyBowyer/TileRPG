@@ -14,14 +14,14 @@ public class Pathfinding : MonoBehaviour {
 
 	}
 
-    public bool CheckRange(Vector3 startPos, Vector3 targetPos, int _limit, bool diag)
+    public bool CheckRange(Vector3 startPos, Vector3 targetPos, int _limit, bool diag, bool ignoreOccupant)
     {
-        List<Node> _path = FindPath(startPos, targetPos, _limit, diag);
+        List<Node> _path = FindPath(startPos, targetPos, _limit, diag, ignoreOccupant);
 
         return _path.Count > 0;
     }
 
-    public List<Node> FindRange(Vector3 startPos, int _limit, bool diag)
+    public List<Node> FindRange(Vector3 startPos, int _limit, bool diag, bool ignoreOccupant)
     {
         List<Node> nodesInRange = new List<Node>();
         Node startNode = grid.NodeFromWorldPoint(startPos);
@@ -39,7 +39,7 @@ public class Pathfinding : MonoBehaviour {
         for (int i = 0; i < nodesInRange.Count; i++)
         {
             Node node = nodesInRange[i];
-            List<Node> _path = FindPath(startPos, node.worldPosition, _limit, diag);
+            List<Node> _path = FindPath(startPos, node.worldPosition, _limit, diag, ignoreOccupant);
             if (_path.Contains(node))
             {
                 validNodesInRange.Add(node);
@@ -49,7 +49,7 @@ public class Pathfinding : MonoBehaviour {
 
     }
 
-	public List<Node> FindPath(Vector3 startPos, Vector3 targetPos, int _limit, bool diag) {
+	public List<Node> FindPath(Vector3 startPos, Vector3 targetPos, int _limit, bool diag, bool ignoreOccupant) {
 
         grid.ResetCosts();
 
@@ -70,7 +70,7 @@ public class Pathfinding : MonoBehaviour {
 				return RetracePath(startNode, currentNode, _limit);
             }
 
-			foreach (Node neighbor in grid.GetNeighbors(currentNode, diag)) {
+			foreach (Node neighbor in grid.GetNeighbors(currentNode, diag, ignoreOccupant)) {
 				if (!neighbor.walkable || closedSet.Contains(neighbor)) {
 					continue;
 				}

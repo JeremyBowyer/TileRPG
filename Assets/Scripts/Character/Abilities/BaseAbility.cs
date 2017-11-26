@@ -49,5 +49,4 @@ public class BaseAbility {
         set { abilityRange = value; }
     }
 
-
 }

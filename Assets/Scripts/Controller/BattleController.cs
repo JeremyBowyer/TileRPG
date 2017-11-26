@@ -33,7 +33,7 @@ public class BattleController : StateMachine
         ChangeState<InitBattleState>();
     }
 
-    void LoadStats(Character _character)
+    public void LoadStats(Character _character)
     {
         Player _player = _character as Player;
         playerName.text = _player.playerName;

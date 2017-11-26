@@ -19,6 +19,20 @@ public abstract class BattleState : State
         owner = GetComponent<BattleController>();
     }
 
+    public override void Enter()
+    {
+        base.Enter();
+        if(owner.currentCharacter != null)
+            owner.LoadStats(owner.currentCharacter);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        if (owner.currentCharacter != null)
+            owner.LoadStats(owner.currentCharacter);
+    }
+
     protected override void AddListeners()
     {
         UserInputController.clickEvent += OnClick;

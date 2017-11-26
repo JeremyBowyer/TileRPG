@@ -118,9 +118,8 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public List<Node> GetNeighbors(Node node, bool diag) {
+    public List<Node> GetNeighbors(Node node, bool diag, bool ignoreOccupant) {
 		List<Node> neighbors = new List<Node> ();
-
 		for (int x = -1; x <= 1; x++) {
 			for (int y = -1; y <= 1; y++) {
 				if (x == 0 && y == 0 || (Mathf.Abs(x) == Mathf.Abs(y) && !diag))
@@ -129,7 +128,10 @@ public class Grid : MonoBehaviour {
 				int checkY = node.gridY + y;
 
 				if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
-					neighbors.Add (grid [checkX, checkY]);
+                    Node neighbor = grid[checkX, checkY];
+                    if (neighbor.occupant != null && !ignoreOccupant)
+                        continue;
+					neighbors.Add (neighbor);
 				}
 			}
 		}

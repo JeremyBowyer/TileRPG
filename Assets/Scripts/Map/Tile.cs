@@ -18,7 +18,7 @@ public class Tile : MonoBehaviour {
     {
         get
         {
-            return (occupant == null && LayerMask.LayerToName(gameObject.layer) != "Unwalkable");
+            return LayerMask.LayerToName(gameObject.layer) != "Unwalkable";
         }
     }
 

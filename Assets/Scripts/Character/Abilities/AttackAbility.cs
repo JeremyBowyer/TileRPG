@@ -13,5 +13,7 @@ public class AttackAbility : BaseAbility
         AbilityPower = 50;
         AbilityCost = 10;
         AbilityRange = 10;
+        diag = false;
     }
+
 }

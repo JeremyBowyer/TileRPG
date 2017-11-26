@@ -15,7 +15,7 @@ public class MoveTargetState : BattleState
         base.Enter();
         mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
         player = owner.currentCharacter as Player;
-        moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag);
+        moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag, false);
         grid.SelectRange(moveRange);
     }
 
@@ -56,7 +56,7 @@ public class MoveTargetState : BattleState
     {
         if(moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
         {
-            List<Node> path = pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag);
+            List<Node> path = pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag, false);
             grid.SelectPath(path);
             uiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
         }
@@ -66,7 +66,7 @@ public class MoveTargetState : BattleState
     {
         if (moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
         {
-            grid.DeSelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag));
+            grid.DeSelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag, false));
             uiController.SetApCost();
         }
     }

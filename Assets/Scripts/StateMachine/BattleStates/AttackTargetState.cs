@@ -11,8 +11,7 @@ public class AttackTargetState : BattleState
     public override void Enter()
     {
         base.Enter();
-        Movement mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
-        attackRange = mover.GetNodesInRange(attackAbility.AbilityRange, attackAbility.diag);
+        attackRange = pathfinder.FindRange(owner.currentCharacter.transform.position, attackAbility.AbilityRange, attackAbility.diag, true);
         grid.SelectRange(attackRange);
     }
 
@@ -23,11 +22,18 @@ public class AttackTargetState : BattleState
         attackRange = null;
     }
 
+    protected override void AddListeners()
+    {
+        base.AddListeners();
+        UserInputController.mouseLayer = LayerMask.NameToLayer("Character");
+    }
+
+
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
         if (e.info.tag == "Enemy")
         {
-            if (attackRange.Contains(e.info.GetComponent<Tile>().node))
+            if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
             {
                 Player player = owner.currentCharacter as Player;
                 player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
@@ -40,6 +46,7 @@ public class AttackTargetState : BattleState
         }
         else
         {
+            Debug.Log(e.info.tag);
             Debug.Log("Select an enemy.");
         }
     }

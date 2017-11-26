@@ -64,7 +64,7 @@ public abstract class Character : MonoBehaviour {
     public void Place (Tile targetTile, int cost)
     {
         stats.curAP -= cost;
-        statusIndicator.SetAP(stats.curAP, stats.maxAP);
+        //statusIndicator.SetAP(stats.curAP, stats.maxAP);
         float _height = targetTile.gameObject.GetComponent<BoxCollider>().bounds.extents.z * 2;
         Vector3 _targetPos = targetTile.transform.position;
         transform.position = targetTile.transform.position + new Vector3(0, _height, 0);

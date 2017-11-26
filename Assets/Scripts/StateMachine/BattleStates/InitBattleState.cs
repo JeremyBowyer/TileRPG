@@ -48,10 +48,9 @@ public class InitBattleState : BattleState
         // Place players on starting tiles
         for (int i = 0; i < startingTilesEnemy.Count; i++)
         {
-            GameObject enemy = Instantiate(owner.enemyPrefab) as GameObject;
-            enemies.Add(enemy);
+            GameObject enemy = enemies[i];
             //characters.Add(enemy.GetComponent<Enemy>());
-            Tile tile = startingTilesPlayer[i].GetComponent<Tile>();
+            Tile tile = startingTilesEnemy[i].GetComponent<Tile>();
             enemy.GetComponent<Enemy>().Place(tile, 0);
             tile.GetComponent<Tile>().occupant = enemy;
         }

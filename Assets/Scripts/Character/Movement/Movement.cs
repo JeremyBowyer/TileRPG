@@ -16,9 +16,9 @@ public abstract class Movement : MonoBehaviour
         pathfinder = GameObject.Find("Pathfinder").GetComponent<Pathfinding>();
     }
 
-    public virtual List<Node> GetNodesInRange(int limit, bool diag)
+    public virtual List<Node> GetNodesInRange(int limit, bool diag, bool ignoreOccupant)
     {
-        List<Node> retValue = pathfinder.FindRange(transform.position, limit, diag);
+        List<Node> retValue = pathfinder.FindRange(transform.position, limit, diag, ignoreOccupant);
         return retValue;
     }
 
