@@ -22,14 +22,7 @@ public abstract class BattleState : State
     public override void Enter()
     {
         base.Enter();
-        if(owner.currentCharacter != null)
-            owner.LoadStats(owner.currentCharacter);
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
-        if (owner.currentCharacter != null)
+        if(owner.currentCharacter is Player)
             owner.LoadStats(owner.currentCharacter);
     }
 

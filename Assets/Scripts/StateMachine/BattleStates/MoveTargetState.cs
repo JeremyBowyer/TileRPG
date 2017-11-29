@@ -24,6 +24,7 @@ public class MoveTargetState : BattleState
         base.Exit();
         grid.DeSelectRange(moveRange);
         moveRange = null;
+        uiController.SetApCost();
     }
 
     protected override void AddListeners()

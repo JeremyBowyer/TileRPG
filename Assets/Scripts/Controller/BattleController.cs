@@ -30,6 +30,10 @@ public class BattleController : StateMachine
 
         if (uiController == null)
             Debug.LogError("UIController not assigned to " + gameObject.name);
+
+        if (statusIndicator == null)
+            Debug.LogError("StatusIndicator not assigned to " + gameObject.name);
+
         ChangeState<InitBattleState>();
     }
 
@@ -46,7 +50,7 @@ public class BattleController : StateMachine
     {
         currentCharacter = character;
         currentCharacter.fillAP();
-        LoadStats(character);
+        Debug.Log(currentCharacter.gameObject.name);
     }
 
 }

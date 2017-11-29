@@ -49,7 +49,7 @@ public class InitBattleState : BattleState
         for (int i = 0; i < startingTilesEnemy.Count; i++)
         {
             GameObject enemy = enemies[i];
-            //characters.Add(enemy.GetComponent<Enemy>());
+            characters.Add(enemy.GetComponent<Enemy>());
             Tile tile = startingTilesEnemy[i].GetComponent<Tile>();
             enemy.GetComponent<Enemy>().Place(tile, 0);
             tile.GetComponent<Tile>().occupant = enemy;
@@ -59,7 +59,6 @@ public class InitBattleState : BattleState
         owner.characters = characters;
         owner.currentCharacter = players[0].GetComponent<Character>();
         yield return null;
-        //owner.currentCharacter = players[0];
         owner.ChangeState<SelectUnitState>();
     }
 }

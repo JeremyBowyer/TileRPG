@@ -37,7 +37,7 @@ public class AttackTargetState : BattleState
             {
                 Player player = owner.currentCharacter as Player;
                 player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
-                owner.ChangeState<MoveSequenceState>();
+                owner.ChangeState<CommandSelectionState>();
             }
             else
             {

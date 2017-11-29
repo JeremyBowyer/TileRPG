@@ -15,9 +15,10 @@ public class StatusIndicator : MonoBehaviour {
     void Start()
 	{
 		if (healthBarRect == null) {
-			Debug.LogError ("STATUS INDICATOR: No health bar object referenced!");
+			Debug.LogError ("STATUS INDICATOR: No health bar object assigned to " + gameObject.name);
 		}
-	}
+
+    }
 
     public void SetHealth(int _cur, int _max)
     {
@@ -29,7 +30,6 @@ public class StatusIndicator : MonoBehaviour {
     public void SetAP(int _cur, int _max)
     {
         float _value = (float)_cur / _max;
-
         apBarRect.localScale = new Vector3(_value, apBarRect.localScale.y, healthBarRect.localScale.z);
     }
 
@@ -37,7 +37,7 @@ public class StatusIndicator : MonoBehaviour {
     {
         float _value = (float)_cur / _max;
 
-        apBarRect.localScale = new Vector3(_value, mpBarRect.localScale.y, healthBarRect.localScale.z);
+        mpBarRect.localScale = new Vector3(_value, mpBarRect.localScale.y, healthBarRect.localScale.z);
     }
 
 }

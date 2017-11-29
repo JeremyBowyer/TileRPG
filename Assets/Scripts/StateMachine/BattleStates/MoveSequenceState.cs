@@ -17,7 +17,7 @@ public class MoveSequenceState : BattleState
             m.nextTurn = false;
             owner.ChangeState<SelectUnitState>();
         }
-        else
+        else                         
         {
             owner.ChangeState<CommandSelectionState>();
         }

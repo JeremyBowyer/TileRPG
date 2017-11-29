@@ -14,6 +14,13 @@ public class SelectUnitState : BattleState
         index = (index + 1) % characters.Count;
         owner.ChangePlayer(characters[index]);
         yield return null;
-        owner.ChangeState<CommandSelectionState>();
+        if(owner.currentCharacter is Player)
+        {
+            owner.ChangeState<CommandSelectionState>();
+        }
+        else if(owner.currentCharacter is Enemy)
+        {
+            owner.ChangeState<EnemyTurnState>();
+        }
     }
 }
