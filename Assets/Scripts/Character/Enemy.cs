@@ -5,19 +5,21 @@ using UnityEngine;
 public class Enemy : Character {
 
     public string enemyName;
-    public BaseAbility curAbility;
-    
-    // Use this for initialization
+
     void Start()
     {
         stats.Init();
-        curAbility = new AttackAbility();
+        attackAbility = new AttackAbility(this);
+        movementAbility = new TeleportMovement(this, gc);
     }
 
     public override void Die()
     {
-        bc.enemies.Remove(this.gameObject);
-        bc.characters.Remove(this);
+        gc.worldEnemies.Remove(this.gameObject);
+        gc.enemies.Remove(this.gameObject);
+        gc.characters.Remove(this);
         Destroy(this.gameObject);
+
+        base.Die();
     }
 }

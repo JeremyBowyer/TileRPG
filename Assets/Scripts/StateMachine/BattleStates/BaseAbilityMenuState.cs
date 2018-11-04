@@ -21,7 +21,7 @@ public abstract class BaseAbilityMenuState : BattleState
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
-        Debug.Log("Base Ability Menu State Click");
+
     }
 
     protected override void OnFire(object sender, InfoEventArgs<int> e)
@@ -29,7 +29,7 @@ public abstract class BaseAbilityMenuState : BattleState
         if (e.info == 0)
             Confirm();
         else
-            Cancel();
+            OnCancel(sender, e);
     }
     protected override void OnMove(object sender, InfoEventArgs<Point> e)
     {
@@ -40,5 +40,4 @@ public abstract class BaseAbilityMenuState : BattleState
     }
     protected abstract void LoadMenu();
     protected abstract void Confirm();
-    protected abstract void Cancel();
 }

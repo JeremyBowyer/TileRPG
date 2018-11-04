@@ -11,16 +11,17 @@ public class SelectUnitState : BattleState
     }
     IEnumerator ChangeCurrentUnit()
     {
-        index = (index + 1) % characters.Count;
-        owner.ChangePlayer(characters[index]);
+        index = (index + 1) % gc.characters.Count;
+        gc.ChangePlayer(gc.characters[index]);
         yield return null;
-        if(owner.currentCharacter is Player)
+
+        if(gc.currentCharacter is Player)
         {
-            owner.ChangeState<CommandSelectionState>();
+            gc.ChangeState<CommandSelectionState>();
         }
-        else if(owner.currentCharacter is Enemy)
+        else if(gc.currentCharacter is Enemy)
         {
-            owner.ChangeState<EnemyTurnState>();
+            gc.ChangeState<EnemyTurnState>();
         }
     }
 }

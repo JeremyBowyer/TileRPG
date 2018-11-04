@@ -10,17 +10,22 @@ public class MoveSequenceState : BattleState
 
     IEnumerator Sequence()
     {
-        Movement m = owner.currentCharacter.GetComponent<TeleportMovement>();
-        yield return StartCoroutine(m.Traverse(owner.currentTile));
-        if (m.nextTurn)
+        Character character = gc.currentCharacter;
+        character.Move(gc.currentTile);
+        while (character.movementAbility.isMoving)
+            yield return null;
+        while (gc._inTransition)
+            yield return null;
+        if (character.movementAbility.nextTurn)
         {
-            m.nextTurn = false;
-            owner.ChangeState<SelectUnitState>();
+            character.movementAbility.nextTurn = false;
+            gc.ChangeState<SelectUnitState>();
         }
-        else                         
+        else
         {
-            owner.ChangeState<CommandSelectionState>();
+            gc.ChangeState<CommandSelectionState>();
         }
+        yield break;
     }
 
 }

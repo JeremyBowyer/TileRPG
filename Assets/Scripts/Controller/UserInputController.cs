@@ -10,6 +10,7 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<GameObject>> hoverExitEvent;
     public static event EventHandler<InfoEventArgs<Point>> moveEvent;
     public static event EventHandler<InfoEventArgs<int>> fireEvent;
+    public static event EventHandler<InfoEventArgs<int>> cancelEvent;
     public static LayerMask mouseLayer;
     private RaycastHit hit;
     private GameObject lastHit;
@@ -31,20 +32,27 @@ public class UserInputController : MonoBehaviour {
             pauseMenu.paused = !pauseMenu.paused;
         }
 
+        // Escape (cancel)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            cancelEvent(this, new InfoEventArgs<int>(1));
+        }
+
         /* ---------------- */
         /* - Mouse Events - */
         /* ---------------- */
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         bool wasHit = Physics.Raycast(ray, out hit, 40f, 1 << mouseLayer);
 
-        if (wasHit)
+        if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null))
         {
             currentHit = hit.collider.gameObject;
             if (currentHit != lastHit)
             {
-                if(lastHit != null)
+                if(lastHit != null && hoverExitEvent != null)
                     hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
-                hoverEnterEvent(this, new InfoEventArgs<GameObject>(currentHit)); // Enter should run after Exit, if highlighting tiles
+                if(hoverEnterEvent != null)
+                    hoverEnterEvent(this, new InfoEventArgs<GameObject>(currentHit)); // Enter should run after Exit, if highlighting tiles
                 lastHit = currentHit;
             }
 
@@ -55,7 +63,7 @@ public class UserInputController : MonoBehaviour {
         }
         else
         {
-            if (lastHit != null)
+            if (lastHit != null && hoverExitEvent != null)
                 hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
             lastHit = null;
         }
@@ -64,6 +72,7 @@ public class UserInputController : MonoBehaviour {
         // Move Event
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
+
         if (x != 0 || y != 0)
         {
             if (moveEvent != null)

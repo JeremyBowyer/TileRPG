@@ -17,7 +17,8 @@ public class FaceCamera : MonoBehaviour {
 
     void Update()
     {
-        cameraTarget = _camera.GetComponent<CameraController>()._target;
+        CameraController camcon = _camera.GetComponent<CameraController>();
+        cameraTarget = camcon._target;
         if(cameraTarget != null)
         {
             if (cameraTarget.position == transform.position)

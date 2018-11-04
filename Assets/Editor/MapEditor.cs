@@ -11,7 +11,7 @@ public class MapEditor : Editor {
 
 		MapGenerator map = target as MapGenerator;
 
-		if(GUILayout.Button("Generate Grid"))
+		if(GUILayout.Button("Generate Map"))
 		{
 			map.GenerateMap ();
 		}

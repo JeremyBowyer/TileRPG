@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// explanation: https://www.youtube.com/watch?v=-L-WgKMFuhE&list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW
+// Note: this script is a modified example of the above tutorial. Not everything in this script will
+// be explained in the above video/tutorial.
+
 public class Pathfinding : MonoBehaviour {
 
 	Grid grid;
@@ -14,32 +18,34 @@ public class Pathfinding : MonoBehaviour {
 
 	}
 
-    public bool CheckRange(Vector3 startPos, Vector3 targetPos, int _limit, bool diag, bool ignoreOccupant)
+    public bool CheckRange(Node startNode, Node targetNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable)
     {
-        List<Node> _path = FindPath(startPos, targetPos, _limit, diag, ignoreOccupant);
+        List<Node> _path = FindPath(startNode, targetNode, _limit, diag, ignoreOccupant, ignoreUnwalkable);
 
         return _path.Count > 0;
     }
 
-    public List<Node> FindRange(Vector3 startPos, int _limit, bool diag, bool ignoreOccupant)
+    public List<Node> FindRange(Node startNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable)
     {
         List<Node> nodesInRange = new List<Node>();
-        Node startNode = grid.NodeFromWorldPoint(startPos);
+        //Node startNode = grid.NodeFromWorldPoint(startPos);
 
+        // First pass. Are nodes even close enough to consider?
         foreach (Node node in grid.grid)
         {
             int distance = GetDistance(startNode, node);
-            if(distance <= _limit)
+            if (distance <= _limit)
             {
                 nodesInRange.Add(node);
             }
         }
 
+        // Second pass. 
         List<Node> validNodesInRange = new List<Node>();
         for (int i = 0; i < nodesInRange.Count; i++)
         {
             Node node = nodesInRange[i];
-            List<Node> _path = FindPath(startPos, node.worldPosition, _limit, diag, ignoreOccupant);
+            List<Node> _path = FindPath(startNode, node, _limit, diag, ignoreOccupant, ignoreUnwalkable);
             if (_path.Contains(node))
             {
                 validNodesInRange.Add(node);
@@ -49,12 +55,12 @@ public class Pathfinding : MonoBehaviour {
 
     }
 
-	public List<Node> FindPath(Vector3 startPos, Vector3 targetPos, int _limit, bool diag, bool ignoreOccupant) {
+	public List<Node> FindPath(Node startNode, Node targetNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable) {
 
-        grid.ResetCosts();
+        ResetCosts();
 
-		Node startNode = grid.NodeFromWorldPoint (startPos);
-		Node targetNode = grid.NodeFromWorldPoint (targetPos);
+		//Node startNode = grid.NodeFromWorldPoint (startPos);
+		//Node targetNode = grid.NodeFromWorldPoint (targetPos);
 
         Heap<Node> openSet = new Heap<Node> (grid.MaxSize);
 		HashSet<Node> closedSet = new HashSet<Node> ();
@@ -71,7 +77,7 @@ public class Pathfinding : MonoBehaviour {
             }
 
 			foreach (Node neighbor in grid.GetNeighbors(currentNode, diag, ignoreOccupant)) {
-				if (!neighbor.walkable || closedSet.Contains(neighbor)) {
+				if ((!neighbor.walkable && !ignoreUnwalkable) || closedSet.Contains(neighbor)) {
 					continue;
 				}
 
@@ -128,5 +134,10 @@ public class Pathfinding : MonoBehaviour {
 
 		return 14 * distX + 10 * (distY - distX);
 	}
+
+    public void ResetCosts()
+    {
+        grid.ResetCosts();
+    }
 
 }

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// http://theliquidfire.com/2015/06/22/tactics-rpg-anchored-ui/
+
 [RequireComponent(typeof(RectTransform))]
 public class LayoutAnchor : MonoBehaviour
 {

@@ -2,6 +2,10 @@
 using System.Collections;
 using System;
 
+// explanation: https://www.youtube.com/watch?v=3Dw5d7PlcTM&list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW&index=4
+// Note: this script is a modified example of the above tutorial. Not everything in this script will
+// be explained in the above video/tutorial.
+
 public class Heap<T> where T : IHeapItem<T> {
 
 	T[] items;

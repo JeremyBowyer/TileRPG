@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Node : IHeapItem<Node> {
 
-    public Tile tile;
+    public Tile tile = null;
 	public bool walkable
     {
         get
@@ -32,9 +32,9 @@ public class Node : IHeapItem<Node> {
 
 	public Node(Vector3 _worldPos, int _gridX, int _gridY) {
 		worldPosition = _worldPos;
-		gridX = _gridX;
-		gridY = _gridY;
-	}
+        gridX = _gridX;
+        gridY = _gridY;
+    }
 
 	public int HeapIndex {
 		get {

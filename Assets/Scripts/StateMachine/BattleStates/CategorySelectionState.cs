@@ -23,8 +23,8 @@ public class CategorySelectionState : BaseAbilityMenuState
         switch (abilityMenuPanelController.selection)
         {
             case 0:
-                AttackTargetState.attackAbility = new AttackAbility();
-                owner.ChangeState<AttackTargetState>();
+                AttackTargetState.attackAbility = gc.currentCharacter.attackAbility;
+                gc.ChangeState<AttackTargetState>();
                 break;
             case 1:
                 SetCategory(0);
@@ -35,14 +35,14 @@ public class CategorySelectionState : BaseAbilityMenuState
         }
     }
 
-    protected override void Cancel()
+    protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        owner.ChangeState<CommandSelectionState>();
+        gc.ChangeState<CommandSelectionState>();
     }
 
     void SetCategory(int index)
     {
         ActionSelectionState.category = index;
-        owner.ChangeState<ActionSelectionState>();
+        gc.ChangeState<ActionSelectionState>();
     }
 }

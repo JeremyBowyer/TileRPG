@@ -23,27 +23,24 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     }
 
-    protected override void Cancel()
+    protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        owner.ChangeState<ExploreState>();
+        gc.ChangeState<ExploreState>();
     }
 
     protected void Move()
     {
-        owner.ChangeState<MoveTargetState>();
+        gc.ChangeState<MoveTargetState>();
     }
 
     protected void Attack()
     {
-        Debug.Log("Attack");
-        AttackTargetState.attackAbility = new AttackAbility();
-        owner.ChangeState<AttackTargetState>();
+        gc.ChangeState<AttackTargetState>();
     }
 
     protected void EndTurn()
     {
-        Debug.Log("End Turn");
-        owner.ChangeState<SelectUnitState>();
+        gc.ChangeState<SelectUnitState>();
     }
 
 }

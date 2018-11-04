@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class BaseAbility {
+public abstract class BaseAbility {
 
     private string abilityName;
     private string abilityDescription;
@@ -11,7 +11,9 @@ public class BaseAbility {
     private int abilityPower;
     private int abilityCost;
     private int abilityRange;
+    public Character character;
     public bool diag;
+    public bool isAttacking;
 
     public string AbilityName
     {
@@ -48,5 +50,7 @@ public class BaseAbility {
         get { return abilityRange; }
         set { abilityRange = value; }
     }
+
+    public abstract IEnumerator Initiate(Character target);
 
 }

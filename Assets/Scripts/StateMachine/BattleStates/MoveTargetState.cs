@@ -13,16 +13,18 @@ public class MoveTargetState : BattleState
     public override void Enter()
     {
         base.Enter();
-        mover = owner.currentCharacter.gameObject.GetComponent<TeleportMovement>();
-        player = owner.currentCharacter as Player;
+        mover = gc.currentCharacter.movementAbility;
+        player = gc.currentCharacter as Player;
         moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag, false);
-        grid.SelectRange(moveRange);
+        grid.HighlightNodes(moveRange, Color.cyan);
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectRange(moveRange);
+        grid.UnHighlightNodes(moveRange);
+        //grid.SelectNodes(moveRange, Color.grey);
+        grid.DeSelectNodes();
         moveRange = null;
         uiController.SetApCost();
     }
@@ -30,44 +32,63 @@ public class MoveTargetState : BattleState
     protected override void AddListeners()
     {
         base.AddListeners();
-        UserInputController.mouseLayer = LayerMask.NameToLayer("Map");
+        UserInputController.mouseLayer = LayerMask.NameToLayer("Grid");
     }
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
-        if (e.info.GetComponent<Tile>())
+        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
+
+        if (tile == null)
         {
-            if (moveRange.Contains(e.info.GetComponent<Tile>().node))
-            {
-                owner.currentTile = e.info.GetComponent<Tile>();
-                owner.ChangeState<MoveSequenceState>();
-            }
-            else
-            {
-                Debug.Log("Select a valid tile.");
-            }
+            Debug.Log("Select a tile.");
+            return;
+        }
+
+        if (moveRange.Contains(tile.node))
+        {
+            gc.currentTile = tile;
+            gc.ChangeState<MoveSequenceState>();
         }
         else
         {
-            Debug.Log("Select a tile.");
+            Debug.Log("Select a valid tile.");
         }
     }
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        if(moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
+        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
+
+        if (tile == null)
+            return;
+
+        if(moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag, false);
-            grid.SelectPath(path);
+            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.stats.moveRange, mover.diag, false, mover.ignoreUnwalkable);
+            if (player.movementAbility.isPath)
+            {
+                grid.SelectNodes(path, Color.black);
+            }
+            else
+            {
+                grid.SelectNodes(path[path.Count - 1], Color.black);
+            }
+            
             uiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
         }
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-        if (moveRange.Contains(e.info.gameObject.GetComponent<Tile>().node))
+        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
+
+        if (tile == null)
+            return;
+
+        if (moveRange.Contains(tile.node))
         {
-            grid.DeSelectPath(pathfinder.FindPath(player.transform.position, e.info.gameObject.transform.position, player.stats.moveRange, mover.diag, false));
+            grid.DeSelectNodes();
             uiController.SetApCost();
         }
     }
@@ -76,13 +97,18 @@ public class MoveTargetState : BattleState
     {
         if (e.info == 0)
         {
-            if (tiles.Contains(owner.currentTile))
-                owner.ChangeState<MoveSequenceState>();
+            if (tiles.Contains(gc.currentTile))
+                gc.ChangeState<MoveSequenceState>();
         }
         else
         {
-            owner.ChangeState<CommandSelectionState>();
+            gc.ChangeState<CommandSelectionState>();
         }
+    }
+
+    protected override void OnCancel(object sender, InfoEventArgs<int> e)
+    {
+        gc.ChangeState<CommandSelectionState>();
     }
 
 }

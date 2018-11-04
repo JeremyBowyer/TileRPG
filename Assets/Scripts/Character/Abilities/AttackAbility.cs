@@ -5,7 +5,7 @@ using UnityEngine;
 public class AttackAbility : BaseAbility
 {
 
-    public AttackAbility()
+    public AttackAbility(Character _character)
     {
         AbilityName = "Phyiscal Attack";
         AbilityDescription = "A character's base physical attack.";
@@ -13,7 +13,13 @@ public class AttackAbility : BaseAbility
         AbilityPower = 50;
         AbilityCost = 10;
         AbilityRange = 10;
+        character = _character;
         diag = false;
+    }
+
+    public override IEnumerator Initiate(Character target)
+    {
+        yield break;
     }
 
 }

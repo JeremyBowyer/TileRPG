@@ -4,31 +4,31 @@ using System.Collections.Generic;
 
 public abstract class BattleState : State
 {
-    protected BattleController owner;
-    public CameraController cameraRig { get { return owner.cameraRig; } }
-    public UIController uiController { get { return owner.uiController; } }
-    public Grid grid { get { return owner.grid; } }
-    public Pathfinding pathfinder { get { return owner.pathfinder; } }
-    public Node node { get { return owner.node; } set { owner.node = value; } }
-    public AbilityMenuPanelController abilityMenuPanelController { get { return owner.abilityMenuPanelController; } }
-    public Turn turn { get { return owner.turn; } }
-    public List<Character> characters { get { return owner.characters; } }
+    protected GameController gc;
+    public CameraController cameraRig { get { return gc.cameraRig; } }
+    public BattleUIController uiController { get { return gc.uiController; } }
+    public Grid grid { get { return gc.grid; } }
+    public Pathfinding pathfinder { get { return gc.pathfinder; } }
+    public Node node { get { return gc.node; } set { gc.node = value; } }
+    public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
+    public List<Character> characters { get { return gc.characters; } }
 
     protected virtual void Awake()
     {
-        owner = GetComponent<BattleController>();
+        gc = GetComponent<GameController>();
     }
 
     public override void Enter()
     {
         base.Enter();
-        if(owner.currentCharacter is Player)
-            owner.LoadStats(owner.currentCharacter);
+        if(gc.currentCharacter is Player)
+            gc.LoadStats(gc.currentCharacter);
     }
 
     protected override void AddListeners()
     {
         UserInputController.clickEvent += OnClick;
+        UserInputController.cancelEvent += OnCancel;
         UserInputController.hoverEnterEvent += OnHoverEnter;
         UserInputController.hoverExitEvent += OnHoverExit;
     }
@@ -36,6 +36,7 @@ public abstract class BattleState : State
     protected override void RemoveListeners()
     {
         UserInputController.clickEvent -= OnClick;
+        UserInputController.cancelEvent -= OnCancel;
         UserInputController.hoverEnterEvent -= OnHoverEnter;
         UserInputController.hoverExitEvent -= OnHoverExit;
     }
@@ -63,6 +64,11 @@ public abstract class BattleState : State
     protected virtual void OnFire(object sender, InfoEventArgs<int> e)
     {
         Debug.Log("Battle State Fire");
+    }
+
+    protected virtual void OnCancel(object sender, InfoEventArgs<int> e)
+    {
+        Debug.Log("Battle State Cancel");
     }
 
 }

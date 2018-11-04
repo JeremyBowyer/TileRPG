@@ -32,6 +32,6 @@ public class CameraRotate : MonoBehaviour {
 			_cameraSize -= 1;
 		}
 
-		_camera.orthographicSize = Mathf.Clamp (_cameraSize, 3, 9);
+		_camera.orthographicSize = Mathf.Clamp (_cameraSize, 3, 20);
 	}
 }

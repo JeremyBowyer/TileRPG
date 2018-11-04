@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+// http://theliquidfire.com/2015/07/13/ability-menu/
+
 public class AbilityMenuPanelController : MonoBehaviour
 {
     const string ShowKey = "Show";
@@ -20,7 +22,7 @@ public class AbilityMenuPanelController : MonoBehaviour
 
     void Awake()
     {
-        GameObjectPoolController.AddEntry(EntryPoolKey, entryPrefab, MenuCount, int.MaxValue);
+
     }
 
     void Start()
@@ -74,26 +76,10 @@ public class AbilityMenuPanelController : MonoBehaviour
         }
     }
 
-    AbilityMenuEntry Dequeue()
-    {
-        Poolable p = GameObjectPoolController.Dequeue(EntryPoolKey);
-        AbilityMenuEntry entry = p.GetComponent<AbilityMenuEntry>();
-        entry.transform.SetParent(panel.transform, false);
-        entry.transform.localScale = Vector3.one;
-        entry.gameObject.SetActive(true);
-        entry.Reset();
-        return entry;
-    }
-    void Enqueue(AbilityMenuEntry entry)
-    {
-        Poolable p = entry.GetComponent<Poolable>();
-        GameObjectPoolController.Enqueue(p);
-    }
-
     void Clear()
     {
-        for (int i = menuEntries.Count - 1; i >= 0; --i)
-            Enqueue(menuEntries[i]);
+        foreach (AbilityMenuEntry entry in menuEntries)
+            Destroy(entry.gameObject);
         menuEntries.Clear();
     }
 
@@ -104,7 +90,12 @@ public class AbilityMenuPanelController : MonoBehaviour
         titleLabel.text = title;
         foreach(KeyValuePair<string, UnityAction> option in options)
         {
-            AbilityMenuEntry entry = Dequeue();
+            GameObject goEntry = Instantiate(Resources.Load("Prefabs/Ability Menu Entry")) as GameObject;
+            goEntry.transform.SetParent(panel.transform, false);
+            goEntry.transform.localScale = Vector3.one;
+            goEntry.SetActive(true);
+            AbilityMenuEntry entry = goEntry.GetComponent<AbilityMenuEntry>();
+            entry.Reset();
             entry.Title = option.Key;
             entry.setOnClick(option.Value);
             menuEntries.Add(entry);

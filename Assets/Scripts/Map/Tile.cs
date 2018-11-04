@@ -9,9 +9,12 @@ public class Tile : MonoBehaviour {
 	// References
 	//private BattleController bc;
 	//private Pathfinding pathfinder;
-    private Grid grid;
+    public Grid grid;
     //private GameObject apCost;
     public Node node;
+    public Vector3 worldPosition { get { return node.worldPosition;  } }
+    public float worldX { get { return node.worldPosition.x; } }
+    public float worldY { get { return node.worldPosition.y; } }
 
     public GameObject occupant;
     public bool isWalkable
@@ -23,11 +26,7 @@ public class Tile : MonoBehaviour {
     }
 
 	void Start() {
-		//bc = GameObject.Find ("BattleController").GetComponent<BattleController>();
-        //pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
-        //apCost = GameObject.Find("APCost");
-        node = grid.NodeFromWorldPoint(transform.position);
     }
 
 }

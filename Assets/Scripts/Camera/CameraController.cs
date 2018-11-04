@@ -4,25 +4,24 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-	public Transform _target;
+	public Transform _target = null;
 	public Vector3 Margin, Smoothing;
 	public BoxCollider2D Bounds;
 	public bool isFollowing;
 	private Vector3 _min, _max;
-    private BattleController bc;
+    private GameController gc;
 
 	// Use this for initialization
 	void Start () {
-        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
 		isFollowing = true;
 	}
 
 
     public void LateUpdate(){
 
-        if(bc.currentCharacter != null)
+        if(_target != null)
         {
-            _target = bc.currentCharacter.transform;
+            //_target = gc.currentCharacter.transform;
 
             var x = transform.position.x;
             var y = transform.position.y;

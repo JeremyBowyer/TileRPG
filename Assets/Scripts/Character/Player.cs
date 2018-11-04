@@ -5,22 +5,24 @@ using UnityEngine;
 public class Player : Character {
 
     public string playerName;
-    public BaseAbility curAbility;
-    public Movement moveAbility;
 
-    // Use this for initialization
     void Start () {
         stats.Init();
-        curAbility = new AttackAbility();
-
-        if (moveAbility == null)
-            Debug.LogError("No Movement Ability assigned to " + gameObject.name);
+        attackAbility = new ArrowAbility(this);
+        movementAbility = new WalkMovement(this, gc);
     }
 
     public override void Die()
     {
-        bc.players.Remove(this.gameObject);
-        bc.characters.Remove(this);
+        gc.players.Remove(this.gameObject);
+        gc.characters.Remove(this);
         Destroy(this.gameObject);
+
+        base.Die();
+    }
+
+    private void Update()
+    {
+        Debug.DrawRay(transform.position, transform.rotation * Vector3.right);
     }
 }

@@ -27,11 +27,11 @@ public class ActionSelectionState : BaseAbilityMenuState
     }
     protected override void Confirm()
     {
-        owner.ChangeState<CommandSelectionState>();
+        gc.ChangeState<CommandSelectionState>();
     }
-    protected override void Cancel()
+    protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        owner.ChangeState<CategorySelectionState>();
+        gc.ChangeState<CategorySelectionState>();
     }
     void SetOptions(string[] options)
     {

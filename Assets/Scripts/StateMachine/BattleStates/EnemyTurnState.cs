@@ -13,6 +13,6 @@ public class EnemyTurnState : BattleState
     IEnumerator EnemyAI()
     {
         yield return null;
-        owner.ChangeState<SelectUnitState>();
+        gc.ChangeState<SelectUnitState>();
     }
 }

@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class AttackTargetState : BattleState
 {
-    List<Tile> tiles;
     List<Node> attackRange;
     public static BaseAbility attackAbility;
 
     public override void Enter()
     {
         base.Enter();
-        attackRange = pathfinder.FindRange(owner.currentCharacter.transform.position, attackAbility.AbilityRange, attackAbility.diag, true);
-        grid.SelectRange(attackRange);
+        attackAbility = gc.currentCharacter.attackAbility;
+        attackRange = pathfinder.FindRange(gc.currentCharacter.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true);
+        grid.HighlightNodes(attackRange, Color.cyan);
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectRange(attackRange);
+        grid.UnHighlightNodes(attackRange);
         attackRange = null;
     }
 
@@ -35,9 +35,9 @@ public class AttackTargetState : BattleState
         {
             if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
             {
-                Player player = owner.currentCharacter as Player;
+                Player player = gc.currentCharacter as Player;
                 player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
-                owner.ChangeState<CommandSelectionState>();
+                gc.ChangeState<CommandSelectionState>();
             }
             else
             {
@@ -49,5 +49,10 @@ public class AttackTargetState : BattleState
             Debug.Log(e.info.tag);
             Debug.Log("Select an enemy.");
         }
+    }
+
+    protected override void OnCancel(object sender, InfoEventArgs<int> e)
+    {
+        gc.ChangeState<CommandSelectionState>();
     }
 }

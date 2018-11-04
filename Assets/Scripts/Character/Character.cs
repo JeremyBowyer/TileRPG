@@ -6,16 +6,18 @@ public abstract class Character : MonoBehaviour {
 
     public Tile tile;
     public CharacterStats stats = new CharacterStats();
+    public BaseAbility attackAbility;
+    public Movement movementAbility;
 
     // References
-    public BattleController bc;
+    public GameController gc;
     public StatusIndicator statusIndicator;
 
     [System.Serializable]
     public class CharacterStats
     {
         public int maxHealth = 100;
-        public int maxAP = 100;
+        public int maxAP = 1000;
         public int maxMP = 100;
 
         private int _curHealth;
@@ -41,7 +43,7 @@ public abstract class Character : MonoBehaviour {
 
         public int moveRange
         {
-            get { return _curAP; }
+            get { return _curAP / 2; }
         }
 
         public void Init()
@@ -54,29 +56,41 @@ public abstract class Character : MonoBehaviour {
 
     public void Awake()
     {
-        if (bc == null)
-            Debug.LogError("Battle controller not assigned to " + gameObject.name);
+        gc = GameObject.Find("GameController").GetComponent<GameController>();
 
-        if (statusIndicator == null)
-            Debug.LogError("Status Indicator not assigned to " + gameObject.name);
     }
 
-    public void Place (Tile targetTile, int cost)
+    public void Place(Tile targetTile)
     {
-        stats.curAP -= cost;
-        //statusIndicator.SetAP(stats.curAP, stats.maxAP);
-        float _height = targetTile.gameObject.GetComponent<BoxCollider>().bounds.extents.z * 2;
+
+        float _height = targetTile.gameObject.GetComponent<BoxCollider>().bounds.extents.y + gameObject.GetComponent<BoxCollider>().bounds.extents.y;
+
         Vector3 _targetPos = targetTile.transform.position;
         transform.position = targetTile.transform.position + new Vector3(0, _height, 0);
-        if(tile != null)
-            tile.occupant = null;
-        targetTile.occupant = gameObject;
+
         tile = targetTile;
-        
-        if (stats.curAP <= 0)
-        {
-            bc.ChangeState<SelectUnitState>();
-        }
+        targetTile.occupant = gameObject;
+    }
+
+    public void Move (Tile targetTile)
+    {
+        gc.pathfinder.FindPath(tile.node, targetTile.node, stats.moveRange, movementAbility.diag, false, movementAbility.ignoreUnwalkable); // This assigns proper costs to tiles
+        if (stats.curAP >= targetTile.node.gCost)
+            StartCoroutine(movementAbility.Traverse(targetTile));
+            stats.curAP -= targetTile.node.gCost;
+            //statusIndicator.SetAP(stats.curAP, stats.maxAP);
+
+            if(tile != null)
+                tile.occupant = null;
+
+            targetTile.occupant = gameObject;
+            tile = targetTile;
+
+            if (stats.curAP <= 0)
+            {
+                movementAbility.nextTurn = true;
+            }
+
     }
 
     public void Attack(Character _target, BaseAbility _ability)
@@ -84,10 +98,10 @@ public abstract class Character : MonoBehaviour {
         if (stats.curAP >= _ability.AbilityCost)
         {
             stats.curAP -= _ability.AbilityCost;
-            _target.Damage(_ability.AbilityPower);
+            StartCoroutine(_ability.Initiate(_target));
         }
 
-        if (stats.curAP <= 0)
+        if (stats.curAP < attackAbility.AbilityCost)
         {
 
         }
@@ -103,7 +117,10 @@ public abstract class Character : MonoBehaviour {
         }
     }
 
-    public abstract void Die();
+    public virtual void Die()
+    {
+        gc.CheckEndCondition();
+    }
 
     public void fillAP(int amt)
     {
