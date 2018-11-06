@@ -36,7 +36,7 @@ public class WalkMovement : Movement
                 float frameValue = (endValue - startValue) * EasingEquations.EaseInOutQuad(0.0f, 1.0f, currentTime) + startValue;
                 float newX = startingX + xDist * frameValue;
                 float newZ = startingZ + zDist * frameValue;
-                character.transform.position = new Vector3(newX, node.worldPosition.y, newZ);
+                character.transform.position = new Vector3(newX, node.worldPosition.y + character.gameObject.GetComponent<BoxCollider>().bounds.extents.y, newZ);
                 yield return new WaitForEndOfFrame();
             }
         }

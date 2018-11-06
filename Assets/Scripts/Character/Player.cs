@@ -15,7 +15,7 @@ public class Player : Character {
     public override void Die()
     {
         gc.players.Remove(this.gameObject);
-        gc.characters.Remove(this);
+        gc.characters.Remove(this.gameObject);
         Destroy(this.gameObject);
 
         base.Die();

@@ -12,6 +12,7 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<int>> fireEvent;
     public static event EventHandler<InfoEventArgs<int>> cancelEvent;
     public static LayerMask mouseLayer;
+    public GameController gc;
     private RaycastHit hit;
     private GameObject lastHit;
     private GameObject currentHit;
@@ -23,8 +24,12 @@ public class UserInputController : MonoBehaviour {
     {
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
 
+        gc = GameObject.Find("GameController").GetComponent<GameController>();
     }
     void Update() {
+
+        if (Input.GetKeyDown("f"))
+            Debug.Log(gc.protag.transform.rotation);
 
         // Pause Button
         if (Input.GetButtonDown("Pause"))

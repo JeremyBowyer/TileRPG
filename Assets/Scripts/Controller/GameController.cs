@@ -19,7 +19,7 @@ public class GameController : StateMachine
     public List<GameObject> players;
     public List<GameObject> enemies;
     public List<GameObject> worldEnemies;
-    public List<Character> characters = new List<Character>();
+    public List<GameObject> characters;
     public Text playerName;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
@@ -36,7 +36,17 @@ public class GameController : StateMachine
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
             worldEnemies.Add(enemy);
+            characters.Add(enemy);
         }
+
+        foreach(GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            players.Add(player);
+            characters.Add(player);
+        }
+
+        players.Add(protag.gameObject);
+        characters.Add(protag.gameObject);
 
         if (uiController == null)
             Debug.LogError("UIController not assigned to " + gameObject.name);

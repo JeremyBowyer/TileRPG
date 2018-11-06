@@ -11,7 +11,7 @@ public abstract class BattleState : State
     public Pathfinding pathfinder { get { return gc.pathfinder; } }
     public Node node { get { return gc.node; } set { gc.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
-    public List<Character> characters { get { return gc.characters; } }
+    public List<GameObject> characters { get { return gc.characters; } }
 
     protected virtual void Awake()
     {

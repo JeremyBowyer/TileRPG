@@ -12,10 +12,9 @@ public class SelectUnitState : BattleState
     IEnumerator ChangeCurrentUnit()
     {
         index = (index + 1) % gc.characters.Count;
-        gc.ChangePlayer(gc.characters[index]);
+        gc.ChangePlayer(gc.characters[index].GetComponent<Character>());
         yield return null;
-
-        if(gc.currentCharacter is Player)
+        if (gc.currentCharacter is Player)
         {
             gc.ChangeState<CommandSelectionState>();
         }

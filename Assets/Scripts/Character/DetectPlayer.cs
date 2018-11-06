@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DetectPlayer : MonoBehaviour {
 
-    public float sphereRadius;
+    public float sphereRadius = 5f;
     public LayerMask layerMask;
     public GameObject[] enemies;
     public GameController gc;
@@ -12,7 +12,6 @@ public class DetectPlayer : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        sphereRadius = 8f;
         layerMask = LayerMask.NameToLayer("Protag");
         gc = GetComponent<Character>().gc;
     }

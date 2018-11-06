@@ -15,7 +15,6 @@ public class Grid : MonoBehaviour {
     public List<GameObject> highlightedTiles;
 	public List<Node> path;
     public List<Node> range;
-    public Terrain terrain;
 
     // Directions
     public Vector3 rightDirection;
@@ -29,9 +28,8 @@ public class Grid : MonoBehaviour {
     void Awake()
     {
         gc = GameObject.Find("GameController").GetComponent<GameController>();
-        terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
-        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Map"));
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Grid"));
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("GridClick"));
     }
 
 	public int MaxSize
@@ -40,47 +38,6 @@ public class Grid : MonoBehaviour {
 			return gridSizeX * gridSizeY;
 		}
 	}
-
-    public void CreateGridDep()
-    {
-        nodeDiameter = nodeRadius * 2;
-
-        gridWorldSize = new Vector2(10f, 10f);
-        gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
-
-        rightDirection = gc.protag.transform.rotation * Vector3.right;
-        forwardDirection = gc.protag.transform.rotation * Vector3.forward;
-
-        grid = new Node[gridSizeX, gridSizeY];
-
-        GameObject tileGO = Resources.Load("Prefabs/TileDecal") as GameObject;
-
-        Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius;
-        Vector3 cellPoint;
-        for (int x = 0; x < gridSizeX; x++)
-        {
-            for (int y = 0; y < gridSizeY; y++)
-            {
-                cellPoint = bottomRight + leftDirection * x + forwardDirection * y;
-
-                Node node = new Node(cellPoint, x, y);
-
-                EasyDecal decalInstance = EasyDecal.ProjectAt(tileGO, terrain.gameObject, cellPoint, Quaternion.identity);
-                decalInstance.gameObject.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-                decalInstance.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-                decalInstance.gameObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-                Tile tile = decalInstance.gameObject.GetComponent<Tile>();
-
-                tiles.Add(decalInstance.gameObject);
-                tile.grid = gc.grid;
-                tile.node = node;
-                node.tile = tile;
-                grid[x, y] = node;
-            }
-        }
-
-    }
 
     public void CreateGrid()
     {
@@ -106,9 +63,11 @@ public class Grid : MonoBehaviour {
         }
         List<Vector3> pathDirections = GetPathDirections(cellPath);
 
-        GameObject tileGO = Resources.Load("Prefabs/TileDecal") as GameObject;
-        Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius + rightDirection * nodeRadius ;
+        GameObject tileGO = Resources.Load("Prefabs/GridTile") as GameObject;
+        Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius + rightDirection * nodeRadius;
+        bottomRight += -Vector3.up * gc.protag.GetComponent<BoxCollider>().bounds.extents.y;
         Vector3 cellPoint = bottomRight;
+        cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
 
         for (int i = 0; i < cellPath.Count; i++)
         {
@@ -118,19 +77,28 @@ public class Grid : MonoBehaviour {
             int y = Mathf.RoundToInt(cell.y);
 
             Node node = new Node(cellPoint, x, y);
-
-            EasyDecal decalInstance = EasyDecal.ProjectAt(tileGO, terrain.gameObject, cellPoint, Quaternion.identity);
-            decalInstance.gameObject.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-            decalInstance.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            decalInstance.gameObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+            GameObject decalInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+            decalInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
+            decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+            decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
             Tile tile = decalInstance.gameObject.GetComponent<Tile>();
 
-            cellPoint = MoveAlongTerrain(cellPoint, pathDirections[i], nodeDiameter);
+            tiles.Add(decalInstance.gameObject);
+            tile.grid = gc.grid;
+            tile.node = node;
+            node.tile = tile;
+            grid[x, y] = node;
+
+            if (i >= pathDirections.Count)
+                break;
+            //cellPoint = MoveAlongTerrain(cellPoint, pathDirections[i], nodeDiameter);
+            cellPoint = cellPoint + pathDirections[i] * nodeDiameter;
+            cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
         }
 
     }
 
-    public Vector3 MoveAlongTerrain(Vector3 startPoint, Vector3 direction, float distance = 10f, int steps = 4)
+    public Vector3 MoveAlongTerrain(Vector3 startPoint, Vector3 direction, float distance = 1f, int steps = 4)
     {
         float step = distance / steps;
         float stepSquared = step * step;
@@ -140,7 +108,8 @@ public class Grid : MonoBehaviour {
         for (int i = 0; i < steps; i++)
         {
             endPoint = endPoint + direction * step;
-            float height = terrain.SampleHeight(endPoint) + nodeRadius;
+            //float height = terrain.SampleHeight(endPoint) + nodeRadius;
+            float height = FindHeightPoint(endPoint) + nodeRadius;
             float verticalDistance = Mathf.Abs(endPoint.y - height);
 
             endPoint.y = height;
@@ -156,6 +125,41 @@ public class Grid : MonoBehaviour {
                 break;
         }
         return endPoint;
+    }
+
+    public float FindHeightPoint(Vector3 point)
+    {
+        int layerMask = (1 << LayerMask.NameToLayer("Grid"));
+        layerMask |= (1 << LayerMask.NameToLayer("GridClick"));
+        layerMask = ~layerMask;
+
+        RaycastHit hit;
+        if(Physics.Raycast(point+Vector3.up*5f, -Vector3.up, out hit, 100f, layerMask))
+        {
+            if(hit.collider.tag == "Map")
+            {
+                return hit.point.y;
+            }
+        }
+        return point.y;
+    }
+
+    public float FindHeightClear(Vector3 point, float radius)
+    {
+        Vector3 br = point + rightDirection * radius + backwardDirection * radius;
+        Vector3 bl = point + leftDirection * radius + backwardDirection * radius;
+        Vector3 fr = point + rightDirection * radius + forwardDirection * radius;
+        Vector3 fl = point + leftDirection * radius + forwardDirection * radius;
+
+        float maxHeight = FindHeightPoint(point);
+        foreach(Vector3 corner in new Vector3[] { br, bl, fr, fl })
+        {
+            float _height = FindHeightPoint(corner);
+            if (_height > maxHeight)
+                maxHeight = _height;
+        }
+
+        return maxHeight;
     }
 
     private List<Vector3> GetPathDirections(List<Point> cellPath)
@@ -219,15 +223,15 @@ public class Grid : MonoBehaviour {
     {
         foreach (Node node in nodes)
         {
-            GameObject highlightedGO = Resources.Load("Prefabs/HighlightDecal") as GameObject;
-            EasyDecal highlightedDecal = highlightedGO.GetComponent<EasyDecal>();
+            GameObject highlightedGO = Resources.Load("Prefabs/HighlightTile") as GameObject;
 
-            EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, terrain.gameObject, node.worldPosition, Quaternion.identity);
-            //decalInstance.gameObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-            decalInstance.gameObject.layer = LayerMask.NameToLayer("Grid");
-            decalInstance.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            highlightedTiles.Add(decalInstance.gameObject);
-            
+            //EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, map, node.worldPosition, Quaternion.identity);
+            GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
+            decalInstance.layer = LayerMask.NameToLayer("Grid");
+            decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+            highlightedTiles.Add(decalInstance);
+
         }
     }
 
@@ -236,11 +240,12 @@ public class Grid : MonoBehaviour {
         GameObject highlightedGO = Resources.Load("Prefabs/HighlightDecal") as GameObject;
         EasyDecal highlightedDecal = highlightedGO.GetComponent<EasyDecal>();
 
-        EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, terrain.gameObject, node.worldPosition, Quaternion.identity);
-        //decalInstance.gameObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-        decalInstance.gameObject.layer = LayerMask.NameToLayer("Grid");
-        decalInstance.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-        highlightedTiles.Add(decalInstance.gameObject);
+        //EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, map, node.worldPosition, Quaternion.identity);
+        GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+        //decalInstance.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+        decalInstance.layer = LayerMask.NameToLayer("Grid");
+        decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+        highlightedTiles.Add(decalInstance);
     }
 
     public void DeSelectNodes()

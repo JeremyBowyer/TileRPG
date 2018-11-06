@@ -11,7 +11,7 @@ public class WorldExploreState : State
     public Pathfinding pathfinder { get { return gc.pathfinder; } }
     public Node node { get { return gc.node; } set { gc.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
-    public List<Character> characters { get { return gc.characters; } }
+    public List<GameObject> characters { get { return gc.characters; } }
 
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
@@ -51,6 +51,18 @@ public class WorldExploreState : State
         gc.cameraRig._target = gc.protag.transform;
         battleUIController.gameObject.SetActive(false);
         gc.protag.statusIndicator.gameObject.SetActive(false);
+
+        foreach (GameObject character in gc.characters)
+        {
+            Rigidbody rb = character.GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.useGravity = true;
+            }
+
+        }
 
         foreach (GameObject enemy in gc.worldEnemies)
         {

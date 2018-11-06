@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 114320835529762446}
   - component: {fileID: 114686744981968650}
   - component: {fileID: 65238781053905470}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: TileDecal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 33793337506129510}
   - component: {fileID: 23905099643151452}
   - component: {fileID: 65223485607895078}
-  m_Layer: 12
+  m_Layer: 13
   m_Name: TargetObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,7 +270,7 @@ MonoBehaviour:
     transform: {fileID: 4066145450740168}
   Mask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 1024
   mode: 0
   source: 0
   aspectCorrectionMode: 0
@@ -284,7 +284,7 @@ MonoBehaviour:
   smoothNormals: 0
   normalSmoothFactor: 0
   normalSmoothThreshold: 0
-  resolution: 4
+  resolution: 1
   multiMeshEnabled: 0
   cullInvisible: 0
   cullUnreachable: 0
@@ -331,7 +331,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   surfaceRotation: 0
-  quality: 1
+  quality: 0
   sharedMesh: {fileID: 0}
   instanceID: -13566208
 --- !u!114 &114686744981968650

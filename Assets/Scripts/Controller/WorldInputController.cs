@@ -16,7 +16,7 @@ public class WorldInputController : MonoBehaviour {
     public CameraController cameraController;
     public GameController gc;
 
-    public Terrain terrain;
+    public GameObject map;
 
     void Start () {
         gc = GetComponent<GameController>();
@@ -24,8 +24,6 @@ public class WorldInputController : MonoBehaviour {
         cameraController = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         rb = GameObject.Find("Protag").GetComponent<Rigidbody>();
         jump = false;
-
-        terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
     }
 
 	void Update () {
@@ -38,11 +36,7 @@ public class WorldInputController : MonoBehaviour {
             //Vector3 deltaMovement = new Vector3(x, 0, y);
             gc.protag.transform.position += deltaMovement * Time.deltaTime * walkSpeed;
         }
-
-        if (Input.GetKeyDown("f"))
-        {
-            gc.grid.CreateGrid();
-        }
+        
         //if (Input.GetButtonDown("Jump") && !jump)
         //    StartCoroutine(Jump());
     }

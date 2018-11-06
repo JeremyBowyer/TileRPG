@@ -32,13 +32,13 @@ public class MoveTargetState : BattleState
     protected override void AddListeners()
     {
         base.AddListeners();
-        UserInputController.mouseLayer = LayerMask.NameToLayer("Grid");
+        UserInputController.mouseLayer = LayerMask.NameToLayer("GridClick");
     }
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
-        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
-
+        Tile tile = e.info.gameObject.GetComponent<Tile>();
+        Debug.Log(e.info.gameObject.name);
         if (tile == null)
         {
             Debug.Log("Select a tile.");
@@ -58,7 +58,7 @@ public class MoveTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
+        Tile tile = e.info.gameObject.GetComponent<Tile>();
 
         if (tile == null)
             return;
@@ -81,7 +81,7 @@ public class MoveTargetState : BattleState
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-        Tile tile = e.info.gameObject.transform.parent.GetComponent<Tile>();
+        Tile tile = e.info.gameObject.transform.GetComponent<Tile>();
 
         if (tile == null)
             return;

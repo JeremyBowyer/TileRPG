@@ -109,7 +109,7 @@ Transform:
   m_GameObject: {fileID: 1948207434569554}
   m_LocalRotation: {x: 0.000000018456559, y: -0.0000020633988, z: -0.00000019987976,
     w: 1}
-  m_LocalPosition: {x: 115.98642, y: 1.4499999, z: 248.5424}
+  m_LocalPosition: {x: 36.9, y: 7.1, z: -1.6999998}
   m_LocalScale: {x: 0.75, y: 1, z: 0.75}
   m_Children:
   - {fileID: 4541800089726880}
@@ -185,7 +185,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!65 &65946574549140092
 BoxCollider:
@@ -224,10 +224,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a16ad0a9fdf6fc4eb53da21517be9f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereRadius: 8
+  sphereRadius: 5
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  enemies: []
+  gc: {fileID: 0}
 --- !u!114 &114164455407651868
 MonoBehaviour:
   m_ObjectHideFlags: 1

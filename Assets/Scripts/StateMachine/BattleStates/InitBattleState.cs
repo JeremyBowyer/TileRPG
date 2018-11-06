@@ -18,7 +18,19 @@ public class InitBattleState : BattleState
 
     IEnumerator Init()
     {
-        gc.protag.transform.LookAt(gc.battleInitiator.transform);
+        foreach(GameObject character in gc.characters)
+        {
+            Rigidbody rb = character.GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+            }
+            
+        }
+
+        gc.protag.transform.LookAt(new Vector3(gc.battleInitiator.transform.position.x, gc.protag.transform.position.y, gc.battleInitiator.transform.position.z));
         gc.currentCharacter = gc.protag;
         grid.CreateGrid();
         uiController.gameObject.SetActive(true);
@@ -34,15 +46,10 @@ public class InitBattleState : BattleState
                 enemy.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.backwardDirection, Vector3.up);
                 enemy.GetComponent<Enemy>().Place(node.tile);
                 gc.enemies.Add(enemy);
-                gc.characters.Add(enemy.GetComponent<Enemy>());
             }
         }
-
-        gc.players.Add(gc.protag.gameObject);
-        gc.characters.Add(gc.protag.GetComponent<Player>());
         Node protagNode = gc.grid.FindNearestNode(gc.protag.transform.position);
         gc.currentCharacter.Place(protagNode.tile);
-
         yield return null;
         gc.ChangeState<SelectUnitState>();
     }

@@ -53,7 +53,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4785909626208974}
   - component: {fileID: 114241306306152722}
-  m_Layer: 0
+  - component: {fileID: 65882999480437166}
+  m_Layer: 12
   m_Name: HighlightDecal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,6 +144,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1863778755433008}
   m_Mesh: {fileID: 0}
+--- !u!65 &65882999480437166
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1866946909459816}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114241306306152722
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -158,7 +171,7 @@ MonoBehaviour:
   bakeOnAwake: 0
   flipNormals: 0
   backfaceCulling: 0
-  distance: 0.01
+  distance: 0.1
   angleConstraint: 180
   technique: 0
   deferredFlags: 0
@@ -170,7 +183,7 @@ MonoBehaviour:
     transform: {fileID: 4785909626208974}
   Mask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 1024
   mode: 0
   source: 0
   aspectCorrectionMode: 0
