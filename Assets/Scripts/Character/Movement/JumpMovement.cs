@@ -15,15 +15,6 @@ public class JumpMovement : Movement
     private float jumpHeight;
     private float jumpSpeed;
 
-    Func<float, float, float, float> jumpEquation;
-
-    private float startingX;
-    private float startingY;
-    private float startingZ;
-
-    private float xDist;
-    private float zDist;
-
     public JumpMovement(Character _character, GameController _gc) : base(_character, _gc)
     {
 
@@ -32,9 +23,10 @@ public class JumpMovement : Movement
     public override IEnumerator Traverse(Tile tile)
     {
         isMoving = true;
-        float _height = tile.gameObject.GetComponent<BoxCollider>().bounds.extents.z + character.gameObject.GetComponent<BoxCollider>().bounds.extents.z;
         Vector3 startingPos = character.transform.position;
-        Vector3 endingPos = tile.transform.position + new Vector3(0, _height, 0);
+        Vector3 endingPos = tile.transform.position + new Vector3(0, character.height/2, 0);
+        //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
+        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         currentTime = 0f;
         jumpHeight = Vector3.Distance(startingPos, endingPos) / 2;
         jumpSpeed = speed + speed / jumpHeight;
@@ -42,7 +34,7 @@ public class JumpMovement : Movement
         while (!Mathf.Approximately(currentTime, 1.0f))
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * jumpSpeed));
-            Vector3 framePos = MathParabola.Parabola(startingPos, endingPos, jumpHeight, currentTime);
+            Vector3 framePos = MathCurves.Parabola(startingPos, endingPos, jumpHeight, currentTime);
             character.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }

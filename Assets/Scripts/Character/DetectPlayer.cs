@@ -10,13 +10,11 @@ public class DetectPlayer : MonoBehaviour {
     public GameController gc;
     private Vector3 origin;
 
-	// Use this for initialization
 	void Start () {
         layerMask = LayerMask.NameToLayer("Protag");
         gc = GetComponent<Character>().gc;
     }
 	
-	// Update is called once per frame
 	void Update () {
 
         //origin = transform.position;
@@ -29,19 +27,23 @@ public class DetectPlayer : MonoBehaviour {
         //    }
         //}
 
-
-        origin = transform.position;
-        Collider[] alertColliders = Physics.OverlapSphere(origin, sphereRadius, layerMask, QueryTriggerInteraction.UseGlobal);
-        foreach(Collider col in alertColliders)
+        if(gc.CurrentState.GetType().Name == "WorldExploreState" && !gc._inTransition)
         {
-            if (col.tag == "Protag")
+            origin = transform.position;
+            Collider[] alertColliders = Physics.OverlapSphere(origin, sphereRadius, layerMask, QueryTriggerInteraction.UseGlobal);
+            foreach (Collider col in alertColliders)
             {
-                foreach(GameObject enemy in gc.worldEnemies)
+                if (col.tag == "Protag")
                 {
-                    enemy.GetComponent<DetectPlayer>().enabled = false;
+                    /*
+                    foreach (GameObject enemy in gc.worldEnemies)
+                    {
+                        enemy.GetComponent<DetectPlayer>().enabled = false;
+                    }
+                    */
+                    gc.battleInitiator = gameObject.GetComponent<Enemy>();
+                    gc.ChangeState<InitBattleState>();
                 }
-                gc.battleInitiator = gameObject.GetComponent<Enemy>();
-                gc.ChangeState<InitBattleState>();
             }
         }
 	}

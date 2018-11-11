@@ -52,24 +52,15 @@ public class WorldExploreState : State
         battleUIController.gameObject.SetActive(false);
         gc.protag.statusIndicator.gameObject.SetActive(false);
 
-        foreach (GameObject character in gc.characters)
-        {
-            Rigidbody rb = character.GetComponent<Rigidbody>();
-
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-            }
-
-        }
-
+        gc.EnableRBs(true);
+        
+        /*
         foreach (GameObject enemy in gc.worldEnemies)
         {
 
             enemy.GetComponent<DetectPlayer>().enabled = true;
         }
-
+        */
         yield break;
     }
 }

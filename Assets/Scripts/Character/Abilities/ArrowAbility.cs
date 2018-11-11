@@ -33,7 +33,7 @@ public class ArrowAbility : BaseAbility {
         while (!Mathf.Approximately(currentTime, 1.0f))
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * arrowSpeed));
-            Vector3 framePos = MathParabola.Parabola(startingPos, endingPos, arrowHeight, currentTime);
+            Vector3 framePos = MathCurves.Parabola(startingPos, endingPos, arrowHeight, currentTime);
             arrowPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
@@ -41,5 +41,5 @@ public class ArrowAbility : BaseAbility {
         _target.Damage(AbilityPower);
         GameObject.Destroy(arrowPrefabClone);
         yield break;
-}
+    }
 }

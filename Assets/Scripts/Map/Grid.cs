@@ -1,5 +1,4 @@
-﻿using ch.sycoforge.Decal;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +12,7 @@ public class Grid : MonoBehaviour {
 	public Node[,] grid;
     public List<GameObject> tiles;
     public List<GameObject> highlightedTiles;
+    public List<GameObject> selectedTiles;
 	public List<Node> path;
     public List<Node> range;
 
@@ -63,7 +63,7 @@ public class Grid : MonoBehaviour {
         }
         List<Vector3> pathDirections = GetPathDirections(cellPath);
 
-        GameObject tileGO = Resources.Load("Prefabs/GridTile") as GameObject;
+        GameObject tileGO = Resources.Load("Prefabs/Grid/GridTile") as GameObject;
         Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius + rightDirection * nodeRadius;
         bottomRight += -Vector3.up * gc.protag.GetComponent<BoxCollider>().bounds.extents.y;
         Vector3 cellPoint = bottomRight;
@@ -79,8 +79,8 @@ public class Grid : MonoBehaviour {
             Node node = new Node(cellPoint, x, y);
             GameObject decalInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, GameObject.Find("BattleGrid").transform);
             decalInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-            decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
+            decalInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
+            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
             Tile tile = decalInstance.gameObject.GetComponent<Tile>();
 
             tiles.Add(decalInstance.gameObject);
@@ -131,10 +131,11 @@ public class Grid : MonoBehaviour {
     {
         int layerMask = (1 << LayerMask.NameToLayer("Grid"));
         layerMask |= (1 << LayerMask.NameToLayer("GridClick"));
+        layerMask |= (1 << LayerMask.NameToLayer("Character"));
         layerMask = ~layerMask;
 
         RaycastHit hit;
-        if(Physics.Raycast(point+Vector3.up*5f, -Vector3.up, out hit, 100f, layerMask))
+        if(Physics.Raycast(point+Vector3.up*20f, -Vector3.up, out hit, 100f, layerMask))
         {
             if(hit.collider.tag == "Map")
             {
@@ -191,10 +192,32 @@ public class Grid : MonoBehaviour {
         return pathDirection;
     }
 
+    public Vector3 GetDirection(Node startingNode, Node endingNode)
+    {
+        float xDist = endingNode.gridX - startingNode.gridX;
+        float yDist = endingNode.gridY - startingNode.gridY;
+
+        if(Mathf.Abs(xDist) > Mathf.Abs(yDist))
+        {
+            if (xDist > 0)
+                return leftDirection;
+            else
+                return rightDirection;
+        }
+        else
+        {
+            if (yDist > 0)
+                return forwardDirection;
+            else
+                return backwardDirection;
+        }
+
+    }
+
     public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 1f)
     {
         Node closestNode = null;
-
+        worldPosition.y = FindHeightPoint(worldPosition);
         foreach (Node node in gc.grid.grid)
         {
             float nodeDistance = Vector3.Distance(worldPosition, node.worldPosition);
@@ -223,58 +246,56 @@ public class Grid : MonoBehaviour {
     {
         foreach (Node node in nodes)
         {
-            GameObject highlightedGO = Resources.Load("Prefabs/HighlightTile") as GameObject;
+            GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
 
-            //EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, map, node.worldPosition, Quaternion.identity);
             GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
             //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
             decalInstance.layer = LayerMask.NameToLayer("Grid");
             decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            highlightedTiles.Add(decalInstance);
+            selectedTiles.Add(decalInstance);
 
         }
     }
 
     public void SelectNodes(Node node, Color color)
     {
-        GameObject highlightedGO = Resources.Load("Prefabs/HighlightDecal") as GameObject;
-        EasyDecal highlightedDecal = highlightedGO.GetComponent<EasyDecal>();
+        GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
 
-        //EasyDecal decalInstance = EasyDecal.ProjectAt(highlightedDecal.gameObject, map, node.worldPosition, Quaternion.identity);
         GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
         //decalInstance.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
         decalInstance.layer = LayerMask.NameToLayer("Grid");
         decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-        highlightedTiles.Add(decalInstance);
+        selectedTiles.Add(decalInstance);
     }
 
     public void DeSelectNodes()
     {
-        foreach(GameObject tile in highlightedTiles)
+        foreach (GameObject tile in selectedTiles)
         {
             DestroyImmediate(tile, true);
         }
     }
 
-    public void HighlightNodes(List<Node> nodes, Color color)
+    public void HighlightNodes(List<Node> nodes)
     {
         foreach (Node node in nodes)
         {
-            GameObject go = TileFromNode(node).gameObject;
-            go.AddComponent<Outline>();
-            Outline outline = go.GetComponent<Outline>();
-            outline.OutlineMode = Outline.Mode.OutlineAll;
-            outline.OutlineColor = color;
-            outline.OutlineWidth = 5f;
+            GameObject highlightedGO = Resources.Load("Prefabs/Grid/HighlightedTile") as GameObject;
+
+            GameObject hlInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+            hlInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
+            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
+            hlInstance.layer = LayerMask.NameToLayer("Grid");
+            highlightedTiles.Add(hlInstance);
+
         }
     }
 
     public void UnHighlightNodes(List<Node> nodes)
     {
-        foreach (Node node in nodes)
+        foreach (GameObject tile in highlightedTiles)
         {
-            GameObject go = TileFromNode(node).gameObject;
-            Destroy(go.GetComponent<Outline>());
+            DestroyImmediate(tile, true);
         }
     }
 

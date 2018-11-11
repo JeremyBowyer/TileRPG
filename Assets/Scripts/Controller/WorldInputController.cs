@@ -2,72 +2,79 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using ch.sycoforge.Decal;
 using System;
 
 public class WorldInputController : MonoBehaviour {
 
-    public float walkSpeed = 10f;
-    public float jumpSpeed = 0.5f;
-    public float jumpHeight = 1f;
-    public bool jump;
-    public Rigidbody rb;
-    public Transform cameraTransform;
-    public CameraController cameraController;
-    public GameController gc;
+    private Transform cameraTransform;
+    private CameraController cameraController;
+    private CharacterController _controller;
+    private GameObject protag;
+    private Transform _transform;
 
-    public GameObject map;
+    public float moveSpeed = 8f;
+    public float JumpHeight = 2f;
+    public float Gravity = -9.81f;
+    public float GroundDistance = 0.3f;
+    public float DashDistance = 5f;
+    public Vector3 Drag;
 
-    void Start () {
-        gc = GetComponent<GameController>();
+    private Vector3 _velocity;
+    public bool _isGrounded = true;
+    private Transform _groundChecker;
+
+    // Use this for initialization
+    void Start()
+    {
+        protag = GameObject.Find("Protag");
         cameraTransform = GameObject.Find("Camera").transform;
         cameraController = GameObject.Find("CameraTarget").GetComponent<CameraController>();
-        rb = GameObject.Find("Protag").GetComponent<Rigidbody>();
-        jump = false;
+        _transform = protag.transform;
+        _controller = protag.GetComponent<CharacterController>();
+        _groundChecker = protag.transform.Find("GroundChecker");
     }
 
-	void Update () {
+    void Update()
+    {
+        int layerMask = ~(1 << LayerMask.NameToLayer("Character"));
+        _isGrounded = Physics.CheckSphere(_groundChecker.position, GroundDistance, layerMask, QueryTriggerInteraction.UseGlobal);
+        if (_isGrounded && _velocity.y < 0)
+            _velocity.y = 0f;
+
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
 
-        if(x != 0 || y != 0)
+        if (x != 0 || y != 0)
         {
             Vector3 deltaMovement = AdjustMovementForCameraRotation(x, y);
-            //Vector3 deltaMovement = new Vector3(x, 0, y);
-            gc.protag.transform.position += deltaMovement * Time.deltaTime * walkSpeed;
+            Vector3 moveStep = deltaMovement * Time.deltaTime * moveSpeed;
+            _controller.Move(moveStep);
+            _transform.forward = deltaMovement;
+            /*
+            horizontalTarget = transform.position + moveStep;
+            transform.LookAt(horizontalTarget);
+            */
         }
-        
-        //if (Input.GetButtonDown("Jump") && !jump)
-        //    StartCoroutine(Jump());
-    }
 
-    public IEnumerator Jump()
-    {
-        float originalHeight = gc.protag.transform.position.y;
-        jump = true;
-        yield return null;
-
-        float maxHeight = originalHeight + jumpHeight;
-        float jumpDist = maxHeight - originalHeight;
-
-        rb.useGravity = false;
-        float currentTime = 0f;
-        while (gc.protag.transform.position.y < maxHeight)
+        if (Input.GetButtonDown("Jump") && _isGrounded)
         {
-            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * jumpSpeed));
-            float frameValue = (jumpHeight - originalHeight) * EasingEquations.Linear(0.0f, 1.0f, currentTime) + originalHeight;
-            float newY = originalHeight + jumpDist * frameValue;
-            gc.protag.transform.position = new Vector3(gc.protag.transform.position.x, newY, gc.protag.transform.position.z);
-            yield return new WaitForEndOfFrame();
+            Debug.Log("Jump");
+            _velocity.y += Mathf.Sqrt(JumpHeight * -2f * Gravity);
         }
-        rb.useGravity = true;
-
-        while(gc.protag.transform.position.y > originalHeight)
+        if (Input.GetKeyDown("f"))
         {
-            yield return null;
+            Debug.Log("Dash");
+            _velocity += Vector3.Scale(_transform.forward, DashDistance * new Vector3((Mathf.Log(1f / (Time.deltaTime * Drag.x + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * Drag.z + 1)) / -Time.deltaTime)));
         }
-        jump = false;
-        yield break;
+
+
+        _velocity.y += Gravity * Time.deltaTime;
+
+        _velocity.x /= 1 + Drag.x * Time.deltaTime;
+        _velocity.y /= 1 + Drag.y * Time.deltaTime;
+        _velocity.z /= 1 + Drag.z * Time.deltaTime;
+
+        _controller.Move(_velocity * Time.deltaTime);
     }
 
     public Vector3 AdjustMovementForCameraRotation(float x, float y)
@@ -79,7 +86,10 @@ public class WorldInputController : MonoBehaviour {
         Vector3 verticalDelta = new Vector3(direction.x * y, 0, direction.z * y);
         Vector3 horizontalDelta = new Vector3(direction.z * x, 0, direction.x * -x);
 
-        return Vector3.Normalize(verticalDelta + horizontalDelta);
+        Vector3 normDelta = Vector3.Normalize(verticalDelta + horizontalDelta);
+        normDelta.y = 0f;
+
+        return normDelta;
     }
 
 }

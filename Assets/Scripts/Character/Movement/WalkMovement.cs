@@ -12,7 +12,7 @@ public class WalkMovement : Movement
 
     public WalkMovement(Character character, GameController bc) : base(character, bc)
     {
-        speed = 2f;
+        speed = 4f;
     }
 
     public override IEnumerator Traverse(Tile tile)
@@ -30,13 +30,17 @@ public class WalkMovement : Movement
             float xDist = node.tile.worldPosition.x - character.transform.position.x;
             float zDist = node.tile.worldPosition.z - character.transform.position.z;
 
+            float _height = node.worldPosition.y + character.height / 2;
+
+            character.transform.LookAt(new Vector3(node.tile.transform.position.x, character.transform.position.y, node.tile.transform.position.z));
+
             while (!Mathf.Approximately(currentTime, 1.0f))
             {
                 currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * Speed));
                 float frameValue = (endValue - startValue) * EasingEquations.EaseInOutQuad(0.0f, 1.0f, currentTime) + startValue;
                 float newX = startingX + xDist * frameValue;
                 float newZ = startingZ + zDist * frameValue;
-                character.transform.position = new Vector3(newX, node.worldPosition.y + character.gameObject.GetComponent<BoxCollider>().bounds.extents.y, newZ);
+                character.transform.position = new Vector3(newX, _height, newZ);
                 yield return new WaitForEndOfFrame();
             }
         }

@@ -16,7 +16,7 @@ public class MoveTargetState : BattleState
         mover = gc.currentCharacter.movementAbility;
         player = gc.currentCharacter as Player;
         moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag, false);
-        grid.HighlightNodes(moveRange, Color.cyan);
+        grid.HighlightNodes(moveRange);
     }
 
     public override void Exit()
@@ -38,7 +38,6 @@ public class MoveTargetState : BattleState
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
         Tile tile = e.info.gameObject.GetComponent<Tile>();
-        Debug.Log(e.info.gameObject.name);
         if (tile == null)
         {
             Debug.Log("Select a tile.");

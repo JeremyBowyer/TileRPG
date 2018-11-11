@@ -20,9 +20,4 @@ public class Player : Character {
 
         base.Die();
     }
-
-    private void Update()
-    {
-        Debug.DrawRay(transform.position, transform.rotation * Vector3.right);
-    }
 }

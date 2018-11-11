@@ -24,6 +24,7 @@ public class GameController : StateMachine
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public Enemy battleInitiator;
+    public Vector3 protagStartPos = new Vector3(0, 0, 0);
 
     void Start()
     {
@@ -99,6 +100,21 @@ public class GameController : StateMachine
             yield return new WaitForEndOfFrame();
         }
         yield break;
+    }
+
+    public void EnableRBs(bool enabled)
+    {
+        foreach (GameObject character in characters)
+        {
+            Rigidbody rb = character.GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                rb.isKinematic = !enabled;
+                rb.useGravity = enabled;
+            }
+
+        }
     }
 
 }

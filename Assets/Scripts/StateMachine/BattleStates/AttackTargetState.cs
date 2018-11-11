@@ -12,7 +12,7 @@ public class AttackTargetState : BattleState
         base.Enter();
         attackAbility = gc.currentCharacter.attackAbility;
         attackRange = pathfinder.FindRange(gc.currentCharacter.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true);
-        grid.HighlightNodes(attackRange, Color.cyan);
+        grid.HighlightNodes(attackRange);
     }
 
     public override void Exit()

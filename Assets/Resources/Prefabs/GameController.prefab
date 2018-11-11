@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4456928732304114}
   - component: {fileID: 114968663216697834}
-  - component: {fileID: 114368043354513262}
+  - component: {fileID: 114427973592598776}
   m_Layer: 0
   m_Name: GameController
   m_TagString: BattleController
@@ -41,7 +41,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114368043354513262
+--- !u!114 &114427973592598776
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -52,15 +52,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aac1504dde63a0545addcdf15abb66bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 10
-  jumpSpeed: 0.5
-  jumpHeight: 1
-  jump: 0
-  rb: {fileID: 0}
-  cameraTransform: {fileID: 0}
-  cameraController: {fileID: 0}
-  gc: {fileID: 0}
-  terrain: {fileID: 0}
+  moveSpeed: 8
+  JumpHeight: 2
+  Gravity: -9.81
+  GroundDistance: 0.3
+  DashDistance: 5
+  Drag: {x: 0, y: 0, z: 0}
+  _isGrounded: 1
 --- !u!114 &114968663216697834
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -87,7 +85,9 @@ MonoBehaviour:
   currentTile: {fileID: 0}
   players: []
   enemies: []
+  worldEnemies: []
   characters: []
   playerName: {fileID: 0}
   statusIndicator: {fileID: 0}
   abilityMenuPanelController: {fileID: 0}
+  battleInitiator: {fileID: 0}

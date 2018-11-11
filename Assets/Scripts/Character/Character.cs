@@ -13,6 +13,8 @@ public abstract class Character : MonoBehaviour {
     public GameController gc;
     public StatusIndicator statusIndicator;
 
+    public float height;
+
     [System.Serializable]
     public class CharacterStats
     {
@@ -57,7 +59,7 @@ public abstract class Character : MonoBehaviour {
     public void Awake()
     {
         gc = GameObject.Find("GameController").GetComponent<GameController>();
-
+        height = GetComponent<BoxCollider>().bounds.extents.y * 2;
     }
 
     public void Place(Tile targetTile)

@@ -23,6 +23,7 @@ public class VictorySequence : BattleState
         {
             yield return null;
         }
+        gc.protag.transform.position = gc.protagStartPos;
         gc.ChangeState<WorldExploreState>();
         yield break;
     }
