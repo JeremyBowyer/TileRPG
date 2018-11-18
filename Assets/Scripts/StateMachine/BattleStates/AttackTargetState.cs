@@ -5,6 +5,7 @@ using UnityEngine;
 public class AttackTargetState : BattleState
 {
     List<Node> attackRange;
+    List<GameObject> outlinedEnemies = new List<GameObject>();
     public static BaseAbility attackAbility;
 
     public override void Enter()
@@ -20,6 +21,14 @@ public class AttackTargetState : BattleState
         base.Exit();
         grid.UnHighlightNodes(attackRange);
         attackRange = null;
+
+        foreach(GameObject enemy in outlinedEnemies)
+        {
+            if (enemy == null)
+                return;
+            Destroy(enemy.GetComponent<Outline>());
+        }
+        outlinedEnemies = new List<GameObject>();
     }
 
     protected override void AddListeners()
@@ -28,26 +37,54 @@ public class AttackTargetState : BattleState
         UserInputController.mouseLayer = LayerMask.NameToLayer("Character");
     }
 
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+
+        if (enemy == null || enemy.tile == null)
+            return;
+
+        if (attackRange.Contains(enemy.tile.node))
+        {
+            GameObject go = enemy.gameObject;
+            go.AddComponent<Outline>();
+            Outline outline = go.GetComponent<Outline>();
+            outline.OutlineMode = Outline.Mode.OutlineAll;
+            outline.OutlineColor = Color.cyan;
+            outline.OutlineWidth = 5f;
+
+            outlinedEnemies.Add(enemy.gameObject);
+        }
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+
+        if (enemy == null)
+            return;
+
+        Outline ol = enemy.gameObject.GetComponent<Outline>();
+
+        if (ol == null)
+            return;
+
+        Destroy(ol);
+    }
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
     {
-        if (e.info.tag == "Enemy")
+
+        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+
+        if (enemy == null || enemy.tile == null)
+            return;
+
+        if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
         {
-            if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
-            {
-                Player player = gc.currentCharacter as Player;
-                player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
-                gc.ChangeState<CommandSelectionState>();
-            }
-            else
-            {
-                Debug.Log("Select an enemy in range.");
-            }
-        }
-        else
-        {
-            Debug.Log(e.info.tag);
-            Debug.Log("Select an enemy.");
+            Player player = gc.currentCharacter as Player;
+            player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
+            gc.ChangeState<CommandSelectionState>();
         }
     }
 

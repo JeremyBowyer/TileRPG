@@ -6,7 +6,8 @@ using System.Collections.Generic;
 public class GameController : StateMachine
 {
     public CameraController cameraRig;
-    public Camera cameraGO;
+    public Camera _camera;
+    public CameraRotate _cameraController;
     public BattleUIController uiController;
     public Grid grid;
     public Pathfinding pathfinder;
@@ -32,8 +33,8 @@ public class GameController : StateMachine
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
-        cameraGO = GameObject.Find("Camera").GetComponent<Camera>();
-
+        _camera = GameObject.Find("Camera").GetComponent<Camera>();
+        _cameraController = GameObject.Find("Camera").GetComponent<CameraRotate>();
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
             worldEnemies.Add(enemy);
@@ -61,7 +62,7 @@ public class GameController : StateMachine
     public void LoadStats(Character _character)
     {
         Player _player = _character as Player;
-        playerName.text = _player.playerName;
+        playerName.text = _player.characterName;
         statusIndicator.SetHealth(_player.stats.curHealth, _player.stats.maxHealth);
         statusIndicator.SetAP(_player.stats.curAP, _player.stats.maxAP);
         statusIndicator.SetMP(_player.stats.curMP, _player.stats.maxMP);
@@ -86,17 +87,19 @@ public class GameController : StateMachine
         }
     }
 
-    public IEnumerator ZoomCamera(float targetSize)
+    public IEnumerator ZoomCamera(float targetSize, float minSize, float maxSize)
     {
-        float currentSize = cameraGO.orthographicSize;
+        float currentSize = _camera.orthographicSize;
         float speed = 2f;
+        _cameraController.minSize = minSize;
+        _cameraController.maxSize = maxSize;
 
-        float minSize = Mathf.Min(new float[] { currentSize, targetSize });
-        float maxSize = Mathf.Max(new float[] { currentSize, targetSize });
+        float min = Mathf.Min(new float[] { currentSize, targetSize });
+        float max = Mathf.Max(new float[] { currentSize, targetSize });
 
-        while (!Mathf.Approximately(cameraGO.orthographicSize, targetSize))
+        while (!Mathf.Approximately(_camera.orthographicSize, targetSize))
         {
-            cameraGO.orthographicSize = Mathf.Clamp(cameraGO.orthographicSize + (targetSize - currentSize) * Time.deltaTime * speed, minSize, maxSize);
+            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize + (targetSize - currentSize) * Time.deltaTime * speed, min, max);
             yield return new WaitForEndOfFrame();
         }
         yield break;

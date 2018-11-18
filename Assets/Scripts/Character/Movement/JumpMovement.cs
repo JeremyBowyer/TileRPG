@@ -24,7 +24,7 @@ public class JumpMovement : Movement
     {
         isMoving = true;
         Vector3 startingPos = character.transform.position;
-        Vector3 endingPos = tile.transform.position + new Vector3(0, character.height/2, 0);
+        Vector3 endingPos = tile.transform.position + new Vector3(0, character.height, 0);
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         currentTime = 0f;

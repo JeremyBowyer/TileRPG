@@ -43,7 +43,7 @@ public class Grid : MonoBehaviour {
     {
         nodeDiameter = nodeRadius * 2;
         
-        gridWorldSize = new Vector2(10f, 10f);
+        gridWorldSize = new Vector2(20f, 20f);
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
 
@@ -56,7 +56,7 @@ public class Grid : MonoBehaviour {
         {
             for (int x = 0; x <gridSizeX; x++)
             {
-                int newX = y % 2 == 0 ? x : 9 - x;
+                int newX = y % 2 == 0 ? x : gridSizeX - 1 - x;
                 cellPath.Add(new Point(newX, y));
                 
             }
@@ -298,7 +298,7 @@ public class Grid : MonoBehaviour {
             DestroyImmediate(tile, true);
         }
     }
-
+    
     public void ResetRange()
     {
         range = null;

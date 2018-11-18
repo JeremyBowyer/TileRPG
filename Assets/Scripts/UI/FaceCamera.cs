@@ -7,31 +7,19 @@ public class FaceCamera : MonoBehaviour {
     public Camera cameraToLookAt;
     public Transform cameraTarget;
     public GameObject _camera;
-
+    CameraController camcon;
 
     void Start()
     {
         _camera = GameObject.FindGameObjectWithTag("MainCamera");
+        camcon = _camera.GetComponent<CameraController>();
         cameraToLookAt = GameObject.Find("Camera").GetComponent<Camera>();
     }
 
-    void Update()
+    void LateUpdate()
     {
-        CameraController camcon = _camera.GetComponent<CameraController>();
         cameraTarget = camcon._target;
-        if(cameraTarget != null)
-        {
-            if (cameraTarget.position == transform.position)
-            {
-                Vector3 v = cameraToLookAt.transform.position - cameraTarget.position;
-                v.x = v.z = 0.0f;
-                transform.LookAt(cameraToLookAt.transform.position - v);
-                transform.Rotate(0, 180, 0);
-            }
-            else
-            {
-                transform.rotation = cameraTarget.Find("CameraAngleTarget").rotation;
-            }
-        }
+        Vector3 v = cameraToLookAt.transform.position - cameraTarget.position;
+        transform.LookAt(transform.position + v);
     }
 }

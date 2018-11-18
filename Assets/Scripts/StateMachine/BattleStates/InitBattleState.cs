@@ -12,7 +12,7 @@ public class InitBattleState : BattleState
     public override void Enter()
     {
         base.Enter();
-        StartCoroutine(gc.ZoomCamera(5f));
+        StartCoroutine(gc.ZoomCamera(5f, 3f, 15f));
         StartCoroutine(Init());
     }
 
@@ -26,7 +26,6 @@ public class InitBattleState : BattleState
         gc.currentCharacter = gc.protag;
         grid.CreateGrid();
         uiController.gameObject.SetActive(true);
-        gc.currentCharacter.statusIndicator.gameObject.SetActive(true);
 
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
@@ -37,11 +36,15 @@ public class InitBattleState : BattleState
             {
                 enemy.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.backwardDirection, Vector3.up);
                 enemy.GetComponent<Enemy>().Place(node.tile);
+                enemy.GetComponent<Enemy>().InitBattle();
+                enemy.GetComponent<Enemy>().statusIndicator.gameObject.SetActive(true);
                 gc.enemies.Add(enemy);
             }
         }
         Node protagNode = gc.grid.FindNearestNode(gc.protag.transform.position);
-        gc.currentCharacter.Place(protagNode.tile);
+
+        gc.protag.Place(protagNode.tile);
+        gc.protag.InitBattle();
         yield return null;
         gc.ChangeState<SelectUnitState>();
     }

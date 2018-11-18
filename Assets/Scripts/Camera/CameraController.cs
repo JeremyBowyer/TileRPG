@@ -16,7 +16,6 @@ public class CameraController : MonoBehaviour {
 		isFollowing = true;
 	}
 
-
     public void LateUpdate(){
 
         if(_target != null)
@@ -39,6 +38,7 @@ public class CameraController : MonoBehaviour {
 
             transform.position = new Vector3(x, y, z);
         }
+
 
 	}
 

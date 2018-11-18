@@ -25,7 +25,7 @@ public class WorldExploreState : State
     {
         base.Enter();
         gc.GetComponent<WorldInputController>().enabled = true;
-        StartCoroutine(gc.ZoomCamera(9f));
+        StartCoroutine(gc.ZoomCamera(9f, 8f, 25f));
         StartCoroutine(Init());
     }
 
@@ -53,14 +53,6 @@ public class WorldExploreState : State
         gc.protag.statusIndicator.gameObject.SetActive(false);
 
         gc.EnableRBs(true);
-        
-        /*
-        foreach (GameObject enemy in gc.worldEnemies)
-        {
-
-            enemy.GetComponent<DetectPlayer>().enabled = true;
-        }
-        */
         yield break;
     }
 }

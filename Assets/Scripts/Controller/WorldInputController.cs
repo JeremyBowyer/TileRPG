@@ -11,6 +11,7 @@ public class WorldInputController : MonoBehaviour {
     private CharacterController _controller;
     private GameObject protag;
     private Transform _transform;
+    private int layerMask;
 
     public float moveSpeed = 8f;
     public float JumpHeight = 2f;
@@ -23,20 +24,19 @@ public class WorldInputController : MonoBehaviour {
     public bool _isGrounded = true;
     private Transform _groundChecker;
 
-    // Use this for initialization
     void Start()
     {
-        protag = GameObject.Find("Protag");
+        protag = GameObject.Find("Protagonist");
         cameraTransform = GameObject.Find("Camera").transform;
         cameraController = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         _transform = protag.transform;
         _controller = protag.GetComponent<CharacterController>();
         _groundChecker = protag.transform.Find("GroundChecker");
+        layerMask = ~(1 << LayerMask.NameToLayer("Character"));
     }
 
     void Update()
     {
-        int layerMask = ~(1 << LayerMask.NameToLayer("Character"));
         _isGrounded = Physics.CheckSphere(_groundChecker.position, GroundDistance, layerMask, QueryTriggerInteraction.UseGlobal);
         if (_isGrounded && _velocity.y < 0)
             _velocity.y = 0f;
@@ -50,21 +50,11 @@ public class WorldInputController : MonoBehaviour {
             Vector3 moveStep = deltaMovement * Time.deltaTime * moveSpeed;
             _controller.Move(moveStep);
             _transform.forward = deltaMovement;
-            /*
-            horizontalTarget = transform.position + moveStep;
-            transform.LookAt(horizontalTarget);
-            */
         }
 
         if (Input.GetButtonDown("Jump") && _isGrounded)
         {
-            Debug.Log("Jump");
             _velocity.y += Mathf.Sqrt(JumpHeight * -2f * Gravity);
-        }
-        if (Input.GetKeyDown("f"))
-        {
-            Debug.Log("Dash");
-            _velocity += Vector3.Scale(_transform.forward, DashDistance * new Vector3((Mathf.Log(1f / (Time.deltaTime * Drag.x + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * Drag.z + 1)) / -Time.deltaTime)));
         }
 
 

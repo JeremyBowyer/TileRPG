@@ -30,7 +30,7 @@ public class WalkMovement : Movement
             float xDist = node.tile.worldPosition.x - character.transform.position.x;
             float zDist = node.tile.worldPosition.z - character.transform.position.z;
 
-            float _height = node.worldPosition.y + character.height / 2;
+            float _height = node.worldPosition.y + character.height;
 
             character.transform.LookAt(new Vector3(node.tile.transform.position.x, character.transform.position.y, node.tile.transform.position.z));
 

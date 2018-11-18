@@ -10,9 +10,14 @@ public class CameraRotate : MonoBehaviour {
 	public Transform _cameraTarget;
 	public Camera _camera;
 
+    public float minSize;
+    public float maxSize;
+
 	// Use this for initialization
 	void Start () {
 		_camera = GetComponent<Camera> ();
+        minSize = 8f;
+        maxSize = 20f;
 	}
 	
 	// Update is called once per frame
@@ -32,6 +37,6 @@ public class CameraRotate : MonoBehaviour {
 			_cameraSize -= 1;
 		}
 
-		_camera.orthographicSize = Mathf.Clamp (_cameraSize, 3, 20);
+		_camera.orthographicSize = Mathf.Clamp (_cameraSize, minSize, maxSize);
 	}
 }

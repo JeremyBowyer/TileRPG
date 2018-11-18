@@ -21,7 +21,7 @@ public class ArrowAbility : BaseAbility {
     public override IEnumerator Initiate(Character _target)
     {
 
-        arrowPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/ArrowPrefab") as GameObject, character.transform.position, Quaternion.identity) as GameObject;
+        arrowPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/ArrowPrefab") as GameObject, character.transform.position, Quaternion.identity) as GameObject;
         isAttacking = true;
         Vector3 startingPos = arrowPrefabClone.transform.position;
         Vector3 endingPos = _target.transform.position;

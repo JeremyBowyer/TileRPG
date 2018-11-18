@@ -17,7 +17,7 @@ public class TeleportMovement : Movement
     public override IEnumerator Traverse(Tile tile)
     {
         isMoving = true;
-        Vector3 _targetPos = tile.transform.position + new Vector3(0, character.height / 2, 0);
+        Vector3 _targetPos = tile.transform.position + new Vector3(0, character.height, 0);
         character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         character.transform.position = _targetPos;
         isMoving = false;
