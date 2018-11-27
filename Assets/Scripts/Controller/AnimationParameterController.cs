@@ -13,6 +13,7 @@ public class AnimationParameterController : MonoBehaviour {
     private void Start()
     {
         _animator = GetComponent<Animator>();
+        _animator.applyRootMotion = false; // Running animation would move character forward without this
     }
 
     void ClearBools()
@@ -23,10 +24,22 @@ public class AnimationParameterController : MonoBehaviour {
         }
     }
 
-    public void SetBool(string _bool)
+    public void SetBool(string _name)
     {
         ClearBools();
-        _animator.SetBool(_bool, true);
+        _animator.SetBool(_name, true);
+    }
+
+    public void SetBool(string _name, bool _bool)
+    {
+        if(_bool)
+            ClearBools();
+        _animator.SetBool(_name, _bool);
+    }
+
+    public void SetFloat(string _float, float _value)
+    {
+        _animator.SetFloat(_float, _value);
     }
 
     public void SetTrigger(string _trigger)

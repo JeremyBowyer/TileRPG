@@ -513,6 +513,7 @@ GameObject:
   - component: {fileID: 114590916187802574}
   - component: {fileID: 114050316874690448}
   - component: {fileID: 114621800136882240}
+  - component: {fileID: 114271180246642710}
   m_Layer: 9
   m_Name: Druid
   m_TagString: Enemy
@@ -4082,6 +4083,17 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &114271180246642710
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 136616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0139e0d30e2e07949a1ba7b4a723d361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114312948354843078
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4154,7 +4166,7 @@ MonoBehaviour:
   tile: {fileID: 0}
   stats:
     maxHealth: 100
-    maxAP: 1000
+    maxAP: 100
     maxMP: 100
   animParamController: {fileID: 0}
   characterName: 

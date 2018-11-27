@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArrowAbility : BaseAbility {
+public class ArrowAbility : AttackAbility {
 
     GameObject arrowPrefabClone;
 
@@ -12,7 +12,7 @@ public class ArrowAbility : BaseAbility {
         AbilityDescription = "Attack at range with an arrow.";
         AbilityID = 2;
         AbilityPower = 50;
-        AbilityCost = 25;
+        AbilityCost = 50;
         AbilityRange = 60;
         diag = true;
         character = _character;
@@ -20,9 +20,10 @@ public class ArrowAbility : BaseAbility {
 
     public override IEnumerator Initiate(Character _target)
     {
-
+        character.transform.LookAt(new Vector3(_target.tile.transform.position.x, character.transform.position.y, _target.tile.transform.position.z));
+        character.animParamController.SetTrigger("attack");
         arrowPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/ArrowPrefab") as GameObject, character.transform.position, Quaternion.identity) as GameObject;
-        isAttacking = true;
+        inProgress = true;
         Vector3 startingPos = arrowPrefabClone.transform.position;
         Vector3 endingPos = _target.transform.position;
         float currentTime = 0f;
@@ -37,8 +38,12 @@ public class ArrowAbility : BaseAbility {
             arrowPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
-        isAttacking = false;
         _target.Damage(AbilityPower);
+
+        // Clean up
+        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        inProgress = false;
+        character.animParamController.SetBool("idle");
         GameObject.Destroy(arrowPrefabClone);
         yield break;
     }

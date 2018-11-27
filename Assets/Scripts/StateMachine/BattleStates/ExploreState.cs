@@ -6,7 +6,9 @@ public class ExploreState : BattleState
 
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
+        inTransition = false;
     }
 
     protected override void OnClick(object sender, InfoEventArgs<GameObject> e)

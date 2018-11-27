@@ -6,13 +6,12 @@ public class AttackTargetState : BattleState
 {
     List<Node> attackRange;
     List<GameObject> outlinedEnemies = new List<GameObject>();
-    public static BaseAbility attackAbility;
+    public static AttackAbility attackAbility;
 
     public override void Enter()
     {
         base.Enter();
-        attackAbility = gc.currentCharacter.attackAbility;
-        attackRange = pathfinder.FindRange(gc.currentCharacter.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true);
+        attackRange = pathfinder.FindRange(gc.currentCharacter.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true, false);
         grid.HighlightNodes(attackRange);
     }
 
@@ -82,9 +81,8 @@ public class AttackTargetState : BattleState
 
         if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
         {
-            Player player = gc.currentCharacter as Player;
-            player.Attack(e.info.GetComponent<Enemy>(), attackAbility);
-            gc.ChangeState<CommandSelectionState>();
+            gc.currentCharacter.attackTarget = e.info.GetComponent<Enemy>();
+            gc.ChangeState<AttackSequenceState>();
         }
     }
 

@@ -6,18 +6,18 @@ public class Enemy : Character {
 
     void Start()
     {
+        base.Awake();
         stats.Init();
-        attackAbility = new AttackAbility(this);
+        attackAbility = new MeleeAbility(this);
         movementAbility = new TeleportMovement(this, gc);
     }
 
     public override void Die()
     {
         gc.worldEnemies.Remove(this.gameObject);
-        gc.enemies.Remove(this.gameObject);
+        gc.battleEnemies.Remove(this.gameObject);
         gc.characters.Remove(this.gameObject);
         Destroy(this.gameObject);
-
         base.Die();
     }
 }

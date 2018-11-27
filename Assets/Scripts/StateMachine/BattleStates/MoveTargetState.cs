@@ -12,11 +12,13 @@ public class MoveTargetState : BattleState
 
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
         mover = gc.currentCharacter.movementAbility;
         player = gc.currentCharacter as Player;
         moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag, false);
         grid.HighlightNodes(moveRange);
+        inTransition = false;
     }
 
     public override void Exit()
@@ -46,8 +48,13 @@ public class MoveTargetState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            gc.currentTile = tile;
-            gc.ChangeState<MoveSequenceState>();
+            List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, player.stats.moveRange, player.movementAbility.diag, player.movementAbility.ignoreOccupant, player.movementAbility.ignoreUnwalkable, false);
+            StateArgs moveArgs = new StateArgs
+            {
+                path = path,
+                character = gc.currentCharacter
+            };
+            gc.ChangeState<MoveSequenceState>(moveArgs);
         }
         else
         {
@@ -64,7 +71,7 @@ public class MoveTargetState : BattleState
 
         if(moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.stats.moveRange, mover.diag, false, mover.ignoreUnwalkable);
+            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false);
             if (player.movementAbility.isPath)
             {
                 grid.SelectNodes(path, Color.black);

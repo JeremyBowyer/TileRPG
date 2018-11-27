@@ -6,15 +6,16 @@ public class Goblin : Enemy {
 
     void Start()
     {
+        base.Awake();
         characterName = "Goblin";
         stats.Init();
-        attackAbility = new AttackAbility(this);
+        attackAbility = new MeleeAbility(this);
         movementAbility = new WalkMovement(this, gc);
     }
 
     public override void InitBattle()
     {
-       animParamController.SetBool("combat_idle");
+       animParamController.SetBool("idle");
     }
 
     public override void SetAnimatorParameters()
@@ -27,7 +28,7 @@ public class Goblin : Enemy {
     public override void Die()
     {
         gc.worldEnemies.Remove(this.gameObject);
-        gc.enemies.Remove(this.gameObject);
+        gc.battleEnemies.Remove(this.gameObject);
         gc.characters.Remove(this.gameObject);
         animParamController.SetTrigger("die", AfterDeath);
     }

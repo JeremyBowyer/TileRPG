@@ -9,6 +9,7 @@ public class JumpMovement : Movement
     public override bool diag { get { return true; } set { diag = value; } }
     public override bool isPath { get { return false; } set { isPath = value; } }
     public override bool ignoreUnwalkable { get { return true; } set { ignoreUnwalkable = value; } }
+    public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
     private float currentTime;
@@ -20,13 +21,13 @@ public class JumpMovement : Movement
 
     }
 
-    public override IEnumerator Traverse(Tile tile)
+    public override IEnumerator Traverse(List<Node> path, Action callback)
     {
-        isMoving = true;
+        Tile targetTile = path[path.Count - 1].tile;
         Vector3 startingPos = character.transform.position;
-        Vector3 endingPos = tile.transform.position + new Vector3(0, character.height, 0);
+        Vector3 endingPos = targetTile.transform.position + new Vector3(0, character.height, 0);
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
-        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
         currentTime = 0f;
         jumpHeight = Vector3.Distance(startingPos, endingPos) / 2;
         jumpSpeed = speed + speed / jumpHeight;
@@ -38,7 +39,7 @@ public class JumpMovement : Movement
             character.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
-        isMoving = false;
+
         yield break;
     }
 

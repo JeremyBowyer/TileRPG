@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Player : Character {
 
-    void Start () {
+    void Start ()
+    {
+        base.Awake();
         stats.Init();
         attackAbility = new ArrowAbility(this);
         movementAbility = new WalkMovement(this, gc);

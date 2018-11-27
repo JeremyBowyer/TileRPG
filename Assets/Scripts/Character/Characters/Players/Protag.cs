@@ -7,9 +7,14 @@ public class Protag : Player
 
     private void Start()
     {
+        base.Awake();
+        stats.maxHealth = 1000;
+        stats.maxAP = 10000;
         stats.Init();
         characterName = "Protagonist";
-        attackAbility = new FireballAbility(this);
+        spells.Add(new MagmaBallAbility(this));
+        spells.Add(new FireboltAbility(this));
+        attackAbility = new MeleeAbility(this);
         movementAbility = new WalkMovement(this, gc);
         gc = GameObject.Find("GameController").GetComponent<GameController>();
     }

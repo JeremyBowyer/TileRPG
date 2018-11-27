@@ -9,7 +9,6 @@ public abstract class BattleState : State
     public BattleUIController uiController { get { return gc.uiController; } }
     public Grid grid { get { return gc.grid; } }
     public Pathfinding pathfinder { get { return gc.pathfinder; } }
-    public Node node { get { return gc.node; } set { gc.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
     public List<GameObject> characters { get { return gc.characters; } }
 
@@ -20,9 +19,9 @@ public abstract class BattleState : State
 
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
-        if(gc.currentCharacter is Player)
-            gc.LoadStats(gc.currentCharacter);
+        inTransition = false;
     }
 
     protected override void AddListeners()

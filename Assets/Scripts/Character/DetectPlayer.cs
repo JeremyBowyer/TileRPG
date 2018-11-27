@@ -16,7 +16,6 @@ public class DetectPlayer : MonoBehaviour {
     }
 	
 	void Update () {
-
         //origin = transform.position;
         //Collider[] noticeColliders = Physics.OverlapSphere(origin, sphereRadius*1.5f, layerMask, QueryTriggerInteraction.UseGlobal);
         //foreach (Collider col in noticeColliders)
@@ -27,7 +26,7 @@ public class DetectPlayer : MonoBehaviour {
         //    }
         //}
 
-        if(gc.CurrentState.GetType().Name == "WorldExploreState" && !gc._inTransition)
+        if (gc.CurrentState.GetType().Name == "WorldExploreState" && !gc._inTransition)
         {
             origin = transform.position;
             Collider[] alertColliders = Physics.OverlapSphere(origin, sphereRadius, layerMask, QueryTriggerInteraction.UseGlobal);
@@ -42,6 +41,7 @@ public class DetectPlayer : MonoBehaviour {
                     }
                     */
                     gc.battleInitiator = gameObject.GetComponent<Enemy>();
+                    
                     gc.ChangeState<InitBattleState>();
                 }
             }

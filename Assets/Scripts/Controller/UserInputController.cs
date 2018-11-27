@@ -29,7 +29,7 @@ public class UserInputController : MonoBehaviour {
     void Update() {
 
         if (Input.GetKeyDown("f"))
-            Debug.Log(gc.protag.transform.rotation);
+            gc.ChangeState<SelectUnitState>();
 
         // Pause Button
         if (Input.GetButtonDown("Pause"))

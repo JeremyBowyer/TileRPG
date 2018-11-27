@@ -7,25 +7,17 @@ public class VictorySequence : BattleState
     
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
         gc.grid.ClearGrid();
-        StartCoroutine(Init());
+        gc.protag.transform.position = gc.protagStartPos;
+        inTransition = false;
+        gc.ChangeState<WorldExploreState>();
     }
 
     public override void Exit()
     {
         base.Exit();
-    }
-
-    public IEnumerator Init()
-    {
-        while (gc._inTransition)
-        {
-            yield return null;
-        }
-        gc.protag.transform.position = gc.protagStartPos;
-        gc.ChangeState<WorldExploreState>();
-        yield break;
     }
 
 }

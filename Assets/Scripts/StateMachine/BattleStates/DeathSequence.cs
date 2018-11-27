@@ -7,7 +7,9 @@ public class DeathSequence : BattleState
 
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
+        inTransition = false;
         gc.ChangeState<WorldExploreState>();
     }
 

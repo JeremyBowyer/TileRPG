@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public abstract class Movement
 {
@@ -11,12 +12,11 @@ public abstract class Movement
     protected Character character;
     protected GameController gc;
     protected Pathfinding pathfinder;
-    public bool nextTurn;
     public abstract bool diag { get; set; }
     public abstract bool ignoreUnwalkable { get; set; }
+    public abstract bool ignoreOccupant { get; set; }
     public abstract bool isPath { get; set; }
     public abstract float Speed { get; set; }
-    public bool isMoving;
 
     public Movement(Character _character, GameController _gc)
     {
@@ -26,11 +26,12 @@ public abstract class Movement
 
     public virtual List<Node> GetNodesInRange(int limit, bool diag, bool ignoreOccupant)
     {
-        List<Node> retValue = gc.pathfinder.FindRange(character.tile.node, limit, diag, ignoreOccupant, ignoreUnwalkable);
+        List<Node> retValue = gc.pathfinder.FindRange(character.tile.node, limit, diag, ignoreOccupant, ignoreUnwalkable, false);
         return retValue;
     }
 
-    public abstract IEnumerator Traverse(Tile tile);
+    //public abstract IEnumerator Traverse(Tile startingTile, Tile targetTile, Action callback);
+    public abstract IEnumerator Traverse(List<Node> path, Action callback);
 
 
 }

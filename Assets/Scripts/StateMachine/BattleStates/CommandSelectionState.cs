@@ -5,16 +5,15 @@ using System.Collections.Generic;
 
 public class CommandSelectionState : BaseAbilityMenuState
 {
+    
     protected override void LoadMenu()
     {
-        if (menuOptions == null)
-        {
-            menuTitle = "Commands";
-            menuOptions = new Dictionary<string, UnityAction>(3);
-            menuOptions.Add("Move", Move);
-            menuOptions.Add("Attack", Attack);
-            menuOptions.Add("End Turn", EndTurn);
-        }
+        menuOptions = new Dictionary<string, UnityAction>();
+        menuTitle = "Commands";
+        menuOptions.Add("Move", Move);
+        menuOptions.Add(gc.currentCharacter.attackAbility.AbilityName, Attack);
+        menuOptions.Add("Spells", Spells);
+        menuOptions.Add("End Turn", EndTurn);
         abilityMenuPanelController.Show(menuTitle, menuOptions);
     }
 
@@ -35,7 +34,13 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected void Attack()
     {
+        AttackTargetState.attackAbility = gc.currentCharacter.attackAbility;
         gc.ChangeState<AttackTargetState>();
+    }
+
+    protected void Spells()
+    {
+        gc.ChangeState<SpellSelectionState>();
     }
 
     protected void EndTurn()

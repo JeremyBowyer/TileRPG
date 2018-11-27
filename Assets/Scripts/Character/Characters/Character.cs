@@ -6,11 +6,20 @@ using UnityEngine;
 public abstract class Character : MonoBehaviour {
 
     public Tile tile;
+    public Tile targetTile;
     public CharacterStats stats = new CharacterStats();
-    public BaseAbility attackAbility;
+    public AttackAbility attackAbility;
     public Movement movementAbility;
     public AnimationParameterController animParamController;
     public string characterName;
+    public List<SpellAbility> spells;
+    public Character attackTarget;
+
+    public bool NextTurn
+    {
+        get { return stats.curAP <= 0; }
+        set { }
+    }
 
     // References
     public GameController gc;
@@ -22,7 +31,7 @@ public abstract class Character : MonoBehaviour {
     public class CharacterStats
     {
         public int maxHealth = 100;
-        public int maxAP = 1000;
+        public int maxAP = 100;
         public int maxMP = 100;
 
         private int _curHealth;
@@ -62,6 +71,7 @@ public abstract class Character : MonoBehaviour {
     public void Awake()
     {
         SetAnimatorParameters();
+        spells = new List<SpellAbility>();
         gc = GameObject.Find("GameController").GetComponent<GameController>();
         height = transform.position.y - transform.Find("GroundChecker").transform.position.y;
     }
@@ -78,44 +88,40 @@ public abstract class Character : MonoBehaviour {
         animParamController._triggers = new List<string> { "jump", "die", "attack" };
     }
 
-    public void Place(Tile targetTile)
+    public void Place(Tile _tile)
     {
 
         //float _height = targetTile.gameObject.GetComponent<BoxCollider>().bounds.extents.y + gameObject.GetComponent<BoxCollider>().bounds.extents.y;
 
-        Vector3 _targetPos = targetTile.transform.position;
-        transform.position = targetTile.transform.position + new Vector3(0, height, 0);
+        Vector3 _targetPos = _tile.transform.position;
+        transform.position = _tile.transform.position + new Vector3(0, height, 0);
 
-        tile = targetTile;
-        targetTile.occupant = gameObject;
+        // Leave current tile
+        if (tile != null)
+            tile.occupant = null;
+
+        // Assign new tile
+        tile = _tile;
+        tile.occupant = gameObject;
     }
 
-    public void Move (Tile targetTile)
+    public void Move (Tile _tile)
     {
-        gc.pathfinder.FindPath(tile.node, targetTile.node, stats.moveRange, movementAbility.diag, false, movementAbility.ignoreUnwalkable); // This assigns proper costs to tiles
-        if (stats.curAP >= targetTile.node.gCost)
-            StartCoroutine(movementAbility.Traverse(targetTile));
-            stats.curAP -= targetTile.node.gCost;
-            //statusIndicator.SetAP(stats.curAP, stats.maxAP);
+        stats.curAP -= _tile.node.gCost;
 
-            if(tile != null)
-                tile.occupant = null;
+        // Leave current tile
+        if (tile != null)
+            tile.occupant = null;
 
-            targetTile.occupant = gameObject;
-            tile = targetTile;
-
-            if (stats.curAP <= 0)
-            {
-                movementAbility.nextTurn = true;
-            }
-
+        // Assign new tile
+        tile = _tile;
+        tile.occupant = gameObject;
     }
 
-    public void Attack(Character _target, BaseAbility _ability)
+    public void Attack(Character _target, AttackAbility _ability)
     {
         if (stats.curAP >= _ability.AbilityCost)
         {
-            animParamController.SetTrigger("attack");
             stats.curAP -= _ability.AbilityCost;
             StartCoroutine(_ability.Initiate(_target));
         }
@@ -124,6 +130,11 @@ public abstract class Character : MonoBehaviour {
         {
 
         }
+    }
+
+    public void CastSpell(SpellAbility spell)
+    {
+        stats.curAP -= spell.AbilityCost;
     }
 
     public void Damage(int amt)
@@ -136,8 +147,14 @@ public abstract class Character : MonoBehaviour {
         }
     }
 
+    public void OnTurnEnd()
+    {
+        fillAP();
+    }
+
     public virtual void Die()
     {
+        gc.onUnitChange -= OnTurnEnd;
         gc.CheckEndCondition();
     }
 

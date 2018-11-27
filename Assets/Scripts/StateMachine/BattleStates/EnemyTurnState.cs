@@ -7,12 +7,10 @@ public class EnemyTurnState : BattleState
 {
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
-        StartCoroutine("EnemyAI");
+        BaseAI enemyAI = gc.currentCharacter.GetComponent<BaseAI>();
+        StartCoroutine(enemyAI.TakeTurn());
     }
-    IEnumerator EnemyAI()
-    {
-        yield return null;
-        gc.ChangeState<SelectUnitState>();
-    }
+
 }

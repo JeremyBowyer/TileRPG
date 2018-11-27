@@ -9,7 +9,6 @@ public class WorldExploreState : State
     public BattleUIController battleUIController { get { return gc.uiController; } }
     public Grid grid { get { return gc.grid; } }
     public Pathfinding pathfinder { get { return gc.pathfinder; } }
-    public Node node { get { return gc.node; } set { gc.node = value; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
     public List<GameObject> characters { get { return gc.characters; } }
 
@@ -23,10 +22,12 @@ public class WorldExploreState : State
 
     public override void Enter()
     {
+        inTransition = true;
         base.Enter();
         gc.GetComponent<WorldInputController>().enabled = true;
         StartCoroutine(gc.ZoomCamera(9f, 8f, 25f));
         StartCoroutine(Init());
+        inTransition = false;
     }
 
     public override void Exit()

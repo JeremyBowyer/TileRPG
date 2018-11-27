@@ -1,32 +1,36 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireballAbility : BaseAbility
+public class MagmaBallAbility : EnvironmentSpellAbility
 {
 
     GameObject fbPrefabClone;
+    List<Node> splashZone;
 
-    public FireballAbility(Character _character)
+    public MagmaBallAbility(Character _character)
     {
-        AbilityName = "Fireball attack";
-        AbilityDescription = "Attack at range with an arrow.";
+        AbilityName = "Magma Ball";
+        AbilityDescription = "Attack at range with an magma ball.";
         AbilityID = 2;
         AbilityPower = 50;
         AbilityCost = 25;
         AbilityRange = 100;
         diag = true;
         character = _character;
+        mouseLayer = LayerMask.NameToLayer("GridClick");
     }
 
-    public override IEnumerator Initiate(Character _target)
+    public override IEnumerator Initiate(Tile tile, Action callback)
     {
-        character.transform.LookAt(new Vector3(_target.transform.position.x, character.transform.position.y, _target.transform.position.z));
+        character.animParamController.SetTrigger("attack");
+        character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 2f, character.transform.position.z);
-        fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/FireballPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
-        isAttacking = true;
+        fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/MagmaBallPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
+        inProgress = true;
         Vector3 startingPos = fbPrefabClone.transform.position;
-        Vector3 endingPos = _target.transform.position;
+        Vector3 endingPos = tile.worldPosition;
         float currentTime = 0f;
         float speed = 0.8f;
         float fbHeight = Vector3.Distance(startingPos, endingPos);
@@ -43,10 +47,11 @@ public class FireballAbility : BaseAbility
             fbPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
-        isAttacking = false;
-        _target.Damage(AbilityPower);
+
+        character.animParamController.SetBool("idle");
+        callback();
         GameObject.Destroy(fbPrefabClone);
-        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         yield break;
     }
 }

@@ -11,8 +11,6 @@ public class ActionSelectionState : BaseAbilityMenuState
 
     protected override void LoadMenu()
     {
-        if (menuOptions == null)
-            menuOptions = new Dictionary<string, UnityAction>(3);
         if (category == 0)
         {
             menuTitle = "White Magic";

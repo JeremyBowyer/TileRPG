@@ -10,6 +10,7 @@ public class WorldInputController : MonoBehaviour {
     private CameraController cameraController;
     private CharacterController _controller;
     private GameObject protag;
+    private AnimationParameterController protagAnimator;
     private Transform _transform;
     private int layerMask;
 
@@ -27,6 +28,7 @@ public class WorldInputController : MonoBehaviour {
     void Start()
     {
         protag = GameObject.Find("Protagonist");
+        protagAnimator = protag.GetComponent<AnimationParameterController>();
         cameraTransform = GameObject.Find("Camera").transform;
         cameraController = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         _transform = protag.transform;
@@ -46,10 +48,15 @@ public class WorldInputController : MonoBehaviour {
 
         if (x != 0 || y != 0)
         {
+            protagAnimator.SetBool("running", true);
             Vector3 deltaMovement = AdjustMovementForCameraRotation(x, y);
             Vector3 moveStep = deltaMovement * Time.deltaTime * moveSpeed;
             _controller.Move(moveStep);
             _transform.forward = deltaMovement;
+        }
+        else
+        {
+            protagAnimator.SetBool("idle", true);
         }
 
         if (Input.GetButtonDown("Jump") && _isGrounded)

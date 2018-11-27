@@ -13,6 +13,8 @@ public class AbilityMenuPanelController : MonoBehaviour
     const string EntryPoolKey = "AbilityMenuPanel.Entry";
     const int MenuCount = 4;
 
+    public string currentPanel;
+
     [SerializeField] GameObject entryPrefab;
     [SerializeField] Text titleLabel;
     [SerializeField] UIPanel panel;
@@ -85,6 +87,7 @@ public class AbilityMenuPanelController : MonoBehaviour
 
     public void Show(string title, Dictionary<string, UnityAction> options)
     {
+        currentPanel = title;
         canvas.SetActive(true);
         Clear();
         titleLabel.text = title;

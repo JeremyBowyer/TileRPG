@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class WalkMovement : Movement
     public override bool diag { get { return false; } set { diag = value; } }
     public override bool isPath { get { return true; } set { isPath = value; } }
     public override bool ignoreUnwalkable { get { return false; } set { ignoreUnwalkable = value; } }
+    public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
     public WalkMovement(Character character, GameController bc) : base(character, bc)
@@ -15,11 +17,12 @@ public class WalkMovement : Movement
         speed = 4f;
     }
 
-    public override IEnumerator Traverse(Tile tile)
+    public override IEnumerator Traverse(List<Node> path, Action callback)
     {
-        isMoving = true;
-        List<Node> path = gc.pathfinder.FindPath(character.tile.node, tile.node, character.stats.moveRange, diag, false, ignoreUnwalkable);
+        // Set Animation
+        character.animParamController.SetBool("running", true);
 
+        // Movement routine
         foreach (Node node in path)
         {
             float currentTime = 0f;
@@ -33,7 +36,6 @@ public class WalkMovement : Movement
             float _height = node.worldPosition.y + character.height;
 
             character.transform.LookAt(new Vector3(node.tile.transform.position.x, character.transform.position.y, node.tile.transform.position.z));
-
             while (!Mathf.Approximately(currentTime, 1.0f))
             {
                 currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * Speed));
@@ -44,7 +46,10 @@ public class WalkMovement : Movement
                 yield return new WaitForEndOfFrame();
             }
         }
-        isMoving = false;
+
+        // Clean up
+        character.animParamController.SetBool("idle", true);
+        callback();
         yield break;
     }
 }

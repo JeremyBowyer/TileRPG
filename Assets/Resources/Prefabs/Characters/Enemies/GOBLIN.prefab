@@ -5288,6 +5288,7 @@ GameObject:
   - component: {fileID: 95564161031736902}
   - component: {fileID: 114449509420456790}
   - component: {fileID: 114117644844065906}
+  - component: {fileID: 114590918629149178}
   m_Layer: 9
   m_Name: GOBLIN
   m_TagString: Enemy
@@ -11152,7 +11153,7 @@ MonoBehaviour:
   tile: {fileID: 0}
   stats:
     maxHealth: 100
-    maxAP: 1000
+    maxAP: 100
     maxMP: 100
   animParamController: {fileID: 0}
   characterName: 
@@ -11254,6 +11255,17 @@ MonoBehaviour:
     m_Bits: 4294967295
   enemies: []
   gc: {fileID: 0}
+--- !u!114 &114590918629149178
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0139e0d30e2e07949a1ba7b4a723d361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114600709048394154
 MonoBehaviour:
   m_ObjectHideFlags: 1

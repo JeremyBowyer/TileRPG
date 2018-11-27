@@ -7,9 +7,10 @@ public class Druid : Enemy
 
     void Start()
     {
+        base.Awake();
         characterName = "Druid";
         stats.Init();
-        attackAbility = new AttackAbility(this);
+        attackAbility = new ArrowAbility(this);
         movementAbility = new WalkMovement(this, gc);
     }
 
@@ -28,7 +29,7 @@ public class Druid : Enemy
     public override void Die()
     {
         gc.worldEnemies.Remove(this.gameObject);
-        gc.enemies.Remove(this.gameObject);
+        gc.battleEnemies.Remove(this.gameObject);
         gc.characters.Remove(this.gameObject);
         animParamController.SetTrigger("die", AfterDeath);
     }

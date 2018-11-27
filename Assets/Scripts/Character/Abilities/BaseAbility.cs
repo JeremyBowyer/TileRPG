@@ -13,7 +13,9 @@ public abstract class BaseAbility {
     private int abilityRange;
     public Character character;
     public bool diag;
-    public bool isAttacking;
+    public bool inProgress;
+    public bool nextTurn;
+    public int mouseLayer;
 
     public string AbilityName
     {
@@ -50,7 +52,4 @@ public abstract class BaseAbility {
         get { return abilityRange; }
         set { abilityRange = value; }
     }
-
-    public abstract IEnumerator Initiate(Character target);
-
 }

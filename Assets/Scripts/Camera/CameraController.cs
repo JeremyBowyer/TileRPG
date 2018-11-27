@@ -14,7 +14,13 @@ public class CameraController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		isFollowing = true;
-	}
+        gc = GameObject.Find("GameController").GetComponent<GameController>();
+    }
+
+    public void NewTarget()
+    {
+        _target = gc.currentCharacter.transform;
+    }
 
     public void LateUpdate(){
 
