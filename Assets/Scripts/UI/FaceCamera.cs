@@ -20,6 +20,6 @@ public class FaceCamera : MonoBehaviour {
     {
         cameraTarget = camcon._target;
         Vector3 v = cameraToLookAt.transform.position - cameraTarget.position;
-        transform.LookAt(transform.position + v);
+        transform.LookAt(transform.position - v);
     }
 }

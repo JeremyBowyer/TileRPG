@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldExploreState : State
 {
-    protected GameController gc;
     public CameraController cameraRig { get { return gc.cameraRig; } }
     public BattleUIController battleUIController { get { return gc.uiController; } }
     public Grid grid { get { return gc.grid; } }
@@ -15,18 +15,28 @@ public class WorldExploreState : State
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
 
-    protected virtual void Awake()
+    public override List<Type> AllowedTransitions
     {
-        gc = GetComponent<GameController>();
+        get
+        {
+            return new List<Type>
+            {
+            typeof(InitBattleState)
+            };
+        }
+        set { }
     }
-
+        
     public override void Enter()
     {
         inTransition = true;
         base.Enter();
         gc.GetComponent<WorldInputController>().enabled = true;
         StartCoroutine(gc.ZoomCamera(9f, 8f, 25f));
-        StartCoroutine(Init());
+        gc.cameraRig._target = gc.protag.transform;
+        battleUIController.gameObject.SetActive(false);
+        gc.protag.statusIndicator.gameObject.SetActive(false);
+        gc.EnableRBs(true);
         inTransition = false;
     }
 
@@ -44,16 +54,5 @@ public class WorldExploreState : State
     protected override void RemoveListeners()
     {
         
-    }
-
-
-    IEnumerator Init()
-    {
-        gc.cameraRig._target = gc.protag.transform;
-        battleUIController.gameObject.SetActive(false);
-        gc.protag.statusIndicator.gameObject.SetActive(false);
-
-        gc.EnableRBs(true);
-        yield break;
     }
 }

@@ -26,7 +26,7 @@ public class Player : Character {
         animParamController.SetTrigger("die", AfterDeath);
     }
 
-    public void AfterDeath()
+    public override void AfterDeath()
     {
         Destroy(this.gameObject);
         base.Die();

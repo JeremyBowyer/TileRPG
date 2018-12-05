@@ -70,24 +70,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c56a43c02fae75a43b28155bec57aa1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugText: {fileID: 0}
-  _inTransition: 0
+  dequeueRunning: 0
+  waitingList: []
+  currentStateText: {fileID: 0}
   cameraRig: {fileID: 0}
-  cameraGO: {fileID: 0}
+  _camera: {fileID: 0}
+  _cameraController: {fileID: 0}
   uiController: {fileID: 0}
   grid: {fileID: 0}
   pathfinder: {fileID: 0}
-  playerPrefab: {fileID: 1948207434569554, guid: 1a05e1b65ed67f74cb5a62c330f95b5a,
-    type: 2}
-  enemyPrefab: {fileID: 0}
+  statusIndicator: {fileID: 0}
+  abilityMenuPanelController: {fileID: 0}
   currentCharacter: {fileID: 0}
   protag: {fileID: 0}
   currentTile: {fileID: 0}
   players: []
-  enemies: []
+  battleEnemies: []
   worldEnemies: []
   characters: []
-  playerName: {fileID: 0}
-  statusIndicator: {fileID: 0}
-  abilityMenuPanelController: {fileID: 0}
+  battleCharacters: []
   battleInitiator: {fileID: 0}
+  protagStartPos: {x: 0, y: 0, z: 0}

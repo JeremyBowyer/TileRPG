@@ -8,7 +8,7 @@ public class Grid : MonoBehaviour {
 
 	public LayerMask unwalkableMask;
 	public Vector2 gridWorldSize;
-	public float nodeRadius = 0.5f;
+	public float nodeRadius;
 	public Node[,] grid;
     public List<GameObject> tiles;
     public List<GameObject> highlightedTiles;
@@ -27,6 +27,7 @@ public class Grid : MonoBehaviour {
 
     void Awake()
     {
+        nodeRadius = 0.5f;
         gc = GameObject.Find("GameController").GetComponent<GameController>();
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Grid"));
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("GridClick"));
@@ -43,7 +44,7 @@ public class Grid : MonoBehaviour {
     {
         nodeDiameter = nodeRadius * 2;
         
-        gridWorldSize = new Vector2(20f, 20f);
+        gridWorldSize = new Vector2(10f, 10f) * nodeDiameter;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
 
@@ -71,27 +72,42 @@ public class Grid : MonoBehaviour {
 
         for (int i = 0; i < cellPath.Count; i++)
         {
+            // Grab next cell in path
             Point cell = cellPath[i];
 
+            // Create new node
             int x = Mathf.RoundToInt(cell.x);
             int y = Mathf.RoundToInt(cell.y);
-
             Node node = new Node(cellPoint, x, y);
-            GameObject decalInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-            decalInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-            decalInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
-            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
-            Tile tile = decalInstance.gameObject.GetComponent<Tile>();
 
-            tiles.Add(decalInstance.gameObject);
+            // Create game object
+            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+            tileInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
+            tileInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
+            tileInstance.transform.localScale = tileInstance.transform.localScale * nodeDiameter;
+            tiles.Add(tileInstance.gameObject);
+
+            // Assign appropriate values for tile and node
+            Tile tile = tileInstance.gameObject.GetComponent<Tile>();
             tile.grid = gc.grid;
             tile.node = node;
             node.tile = tile;
+
+            // Is tile walkable?
+            int UnWalkableLayerMask = (1 << LayerMask.NameToLayer("Unwalkable"));
+            Collider[] alertColliders = Physics.OverlapSphere(cellPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
+            if (alertColliders != null && alertColliders.Length != 0)
+            {
+                tile.isWalkable = false;
+            }
+
+            // Assign to grid
             grid[x, y] = node;
 
+            // Set up next cellPoint, if not at the end
             if (i >= pathDirections.Count)
                 break;
-            //cellPoint = MoveAlongTerrain(cellPoint, pathDirections[i], nodeDiameter);
+
             cellPoint = cellPoint + pathDirections[i] * nodeDiameter;
             cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
         }
@@ -216,14 +232,15 @@ public class Grid : MonoBehaviour {
 
     public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 1f)
     {
+        float normalizedLowestDistance = lowestDistance * nodeDiameter;
         Node closestNode = null;
         worldPosition.y = FindHeightPoint(worldPosition);
         foreach (Node node in gc.grid.grid)
         {
             float nodeDistance = Vector3.Distance(worldPosition, node.worldPosition);
-            if (nodeDistance < lowestDistance)
+            if (nodeDistance < normalizedLowestDistance)
             {
-                lowestDistance = nodeDistance;
+                normalizedLowestDistance = nodeDistance;
                 closestNode = node;
             }
         }

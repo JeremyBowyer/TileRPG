@@ -22,9 +22,14 @@ public class CameraController : MonoBehaviour {
         _target = gc.currentCharacter.transform;
     }
 
-    public void LateUpdate(){
+    public void LateUpdate()
+    {
+        if(gc.currentCharacter == null)
+            _target = gc.protag.transform;
+        else
+            _target = gc.currentCharacter.transform;
 
-        if(_target != null)
+        if (_target != null)
         {
             //_target = gc.currentCharacter.transform;
 

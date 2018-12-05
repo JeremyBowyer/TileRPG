@@ -13,11 +13,8 @@ public class GameController : StateMachine
     public BattleUIController uiController;
     public Grid grid;
     public Pathfinding pathfinder;
-    public GameObject playerPrefab;
-    public GameObject enemyPrefab;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
-    public Text playerName;
 
     // Variables
     public Character currentCharacter;
@@ -32,7 +29,7 @@ public class GameController : StateMachine
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
 
     // Delegates
-    public delegate void OnUnitChange();
+    public delegate void OnUnitChange(Character character);
     public OnUnitChange onUnitChange;
 
     void Start()
@@ -68,38 +65,40 @@ public class GameController : StateMachine
             Debug.LogError("StatusIndicator not assigned to " + gameObject.name);
 
         // Set delegate for camera
-        onUnitChange += cameraRig.NewTarget;
+        //onUnitChange += cameraRig.NewTarget;
 
         ChangeState<WorldExploreState>();
     }
 
-    public void LoadStats(Character _character)
+    public void NextPlayer()
     {
-        playerName.text = _character.characterName;
-        statusIndicator.SetHealth(_character.stats.curHealth, _character.stats.maxHealth);
-        statusIndicator.SetAP(_character.stats.curAP, _character.stats.maxAP);
-        statusIndicator.SetMP(_character.stats.curMP, _character.stats.maxMP);
+        int index = battleCharacters.IndexOf(currentCharacter.gameObject);
+        index = (index+2 > battleCharacters.Count) ? 0 : index + 1;
+        ChangePlayer(battleCharacters[index].GetComponent<Character>());
     }
 
     public void ChangePlayer(Character character)
     {
         currentCharacter = character;
         if (onUnitChange != null)
-            onUnitChange();
+            onUnitChange(character);
+    }
 
-        LoadStats(currentCharacter);
+    public void OnUnitDeath(Character character)
+    {
+        CheckEndCondition();
     }
 
     public void CheckEndCondition()
     {
-        if (battleEnemies.Count == 0)
+        if (battleEnemies.Count == 0 && !IsInQueue(typeof(VictorySequence)))
         {
             ChangeState<VictorySequence>();
         }
 
         if (players.Count == 0)
         {
-            ChangeState<DeathSequence>();
+            ChangeState<LossSequence>();
         }
     }
 

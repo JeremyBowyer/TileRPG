@@ -1053,6 +1053,8 @@ GameObject:
   - component: {fileID: 143533300360100784}
   - component: {fileID: 65395803883556588}
   - component: {fileID: 114816689730711846}
+  - component: {fileID: 114119010434591444}
+  - component: {fileID: 114031345855312048}
   m_Layer: 9
   m_Name: Protagonist
   m_TagString: Protag
@@ -1715,7 +1717,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 193682}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 34.758286, y: 4.302, z: -17.550274}
+  m_LocalPosition: {x: 24.25, y: 7.31, z: -13.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4656834500666144}
@@ -3997,6 +3999,34 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1.82, z: 1}
   m_Center: {x: 0, y: 0.91, z: 0}
+--- !u!114 &114031345855312048
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 193682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b326ed67a894148955173a85eb310f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereRadius: 5
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  enemies: []
+  gc: {fileID: 0}
+--- !u!114 &114119010434591444
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 193682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0139e0d30e2e07949a1ba7b4a723d361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114187086705595074
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4030,12 +4060,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tile: {fileID: 0}
+  targetTile: {fileID: 0}
   stats:
     maxHealth: 100
     maxAP: 1000
     maxMP: 100
   animParamController: {fileID: 114816689730711846}
   characterName: 
+  attackTarget: {fileID: 0}
   gc: {fileID: 0}
   statusIndicator: {fileID: 114514460841903400}
   height: 0.91499996

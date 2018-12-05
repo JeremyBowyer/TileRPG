@@ -17,13 +17,7 @@ public class Tile : MonoBehaviour {
     public float worldY { get { return node.worldPosition.y; } }
 
     public GameObject occupant;
-    public bool isWalkable
-    {
-        get
-        {
-            return LayerMask.LayerToName(gameObject.layer) != "Unwalkable";
-        }
-    }
+    public bool isWalkable = true;
 
 	void Start() {
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();

@@ -23,6 +23,8 @@ public class JumpMovement : Movement
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
+        character.animParamController.SetBool("falling", true);
+
         Tile targetTile = path[path.Count - 1].tile;
         Vector3 startingPos = character.transform.position;
         Vector3 endingPos = targetTile.transform.position + new Vector3(0, character.height, 0);
@@ -40,6 +42,9 @@ public class JumpMovement : Movement
             yield return new WaitForEndOfFrame();
         }
 
+        // Clean up
+        character.animParamController.SetBool("idle", true);
+        callback();
         yield break;
     }
 

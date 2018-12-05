@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,11 +19,12 @@ public class ArrowAbility : AttackAbility {
         character = _character;
     }
 
-    public override IEnumerator Initiate(Character _target)
+    public override IEnumerator Initiate(Character _target, Action callback)
     {
         character.transform.LookAt(new Vector3(_target.tile.transform.position.x, character.transform.position.y, _target.tile.transform.position.z));
         character.animParamController.SetTrigger("attack");
         arrowPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/ArrowPrefab") as GameObject, character.transform.position, Quaternion.identity) as GameObject;
+        arrowPrefabClone.gameObject.tag = "AttackAbilityGO";
         inProgress = true;
         Vector3 startingPos = arrowPrefabClone.transform.position;
         Vector3 endingPos = _target.transform.position;
@@ -38,12 +40,12 @@ public class ArrowAbility : AttackAbility {
             arrowPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
-        _target.Damage(AbilityPower);
 
         // Clean up
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         inProgress = false;
         character.animParamController.SetBool("idle");
+        callback();
         GameObject.Destroy(arrowPrefabClone);
         yield break;
     }

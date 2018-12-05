@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,4 +14,8 @@ public struct StateArgs {
 
     public List<Node> splashZone;
     public SpellAbility spell;
+    public AttackAbility attackAbility;
+
+    public List<StateMachine> waitingStateMachines;
+    public Action callback;
 }

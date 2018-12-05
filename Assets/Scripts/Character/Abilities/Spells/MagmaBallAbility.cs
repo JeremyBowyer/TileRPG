@@ -6,7 +6,7 @@ using UnityEngine;
 public class MagmaBallAbility : EnvironmentSpellAbility
 {
 
-    GameObject fbPrefabClone;
+    GameObject mbPrefabClone;
     List<Node> splashZone;
 
     public MagmaBallAbility(Character _character)
@@ -27,9 +27,10 @@ public class MagmaBallAbility : EnvironmentSpellAbility
         character.animParamController.SetTrigger("attack");
         character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 2f, character.transform.position.z);
-        fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/MagmaBallPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
+        mbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/MagmaBallPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
+        mbPrefabClone.gameObject.tag = "SpellEnvironmentGO";
         inProgress = true;
-        Vector3 startingPos = fbPrefabClone.transform.position;
+        Vector3 startingPos = mbPrefabClone.transform.position;
         Vector3 endingPos = tile.worldPosition;
         float currentTime = 0f;
         float speed = 0.8f;
@@ -44,13 +45,13 @@ public class MagmaBallAbility : EnvironmentSpellAbility
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * fbSpeed));
             float frameValue = (1f - 0f) * EasingEquations.EaseInExpo(0.0f, 1.0f, currentTime) + 0f;
             Vector3 framePos = MathCurves.Bezier(startingPos, endingPos, cp1, frameValue);
-            fbPrefabClone.transform.position = framePos;
+            mbPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
 
         character.animParamController.SetBool("idle");
         callback();
-        GameObject.Destroy(fbPrefabClone);
+        GameObject.Destroy(mbPrefabClone);
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         yield break;
     }

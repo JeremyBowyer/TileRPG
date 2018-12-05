@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using System;
 
 public class BaseAI : MonoBehaviour {
 
@@ -15,9 +16,17 @@ public class BaseAI : MonoBehaviour {
 
     private TargetSpellAbility maxSpell;
 
+    private Action callback;
+
+    private AIState nextAction;
     enum AIState { Attack, Cast, Chase, HealSelf, HealAlly, End };
 
-    private Text currentActionText;
+    public Text aiAction;
+
+    public bool EndOfTurn
+    {
+        get { return CheckForEnd(); }
+    }
 
     public void Start()
     {
@@ -27,7 +36,7 @@ public class BaseAI : MonoBehaviour {
     public void Init() {
         character = GetComponent<Character>();
         gc = character.gc;
-        currentActionText = gc.uiController.transform.Find("CurrentAction").GetComponent<Text>();
+        aiAction = gc.uiController.transform.Find("AIAction").GetComponent<Text>();
     }
 
     public void FindRanges()
@@ -57,74 +66,57 @@ public class BaseAI : MonoBehaviour {
         }
     }
 
-    public virtual IEnumerator TakeTurn()
+    public virtual void ConsiderOptions(Action _callback)
     {
-        int cnt = 3;
-        while (cnt > 0)
-        {
-            yield return new WaitForSeconds(1f);
-            currentActionText.text = "Thinking...";
-            cnt--;
-        }
-
+        aiAction.text = "Thinking...";
+        callback = _callback;
         FindRanges();
         AcquireTarget();
-        if (CheckForEnd())
-            yield break;
-        Chase();
-        character.stats.curAP = 0;
-        yield break;
-        /*
-        int cnt = 3;
-        while (cnt > 0)
-        {
-            yield return new WaitForSeconds(1f);
-            currentActionText.text = "Thinking...";
-            cnt--;
-        }
+        DecideAction(); // Add logic here to decide next action
+        TakeNextAction();
+    }
 
-        if (CheckSpell())
+    public virtual void TakeNextAction()
+    {
+        switch(nextAction)
         {
-            cnt = 2;
-            while (cnt > 0)
-            {
-                yield return new WaitForSeconds(1f);
-                currentActionText.text = "Casting...";
-                cnt--;
-            }
-            CastSpell(maxSpell);
-            yield break;
+            case AIState.Attack:
+                Attack();
+                break;
+            case AIState.Cast:
+                CastSpell(maxSpell);
+                break;
+            case AIState.Chase:
+                Chase();
+                break;
+            case AIState.End:
+                EndTurn();
+                break;
+            case AIState.HealAlly:
+                HealAlly();
+                break;
+            case AIState.HealSelf:
+                HealSelf();
+                break;
+            default:
+                EndTurn();
+                break;
         }
-        else if (attackRange.Contains(_target.tile.node) & character.attackAbility.AbilityCost <= character.stats.curAP)
-        {
-            cnt = 2;
-            while (cnt > 0)
-            {
-                yield return new WaitForSeconds(1f);
-                currentActionText.text = "Attacking...";
-                cnt--;
-            }
-            Attack();
-            yield break;
-        }
-        else if (character.stats.curAP >= 10f)
-        {
-            cnt = 2;
-            while (cnt > 0)
-            {
-                yield return new WaitForSeconds(1f);
-                currentActionText.text = "Chasing...";
-                cnt--;
-            }
-            Chase();
-            yield break;
-        }
-        else
-        {
-            gc.ChangeState<SelectUnitState>();
-        }
-        */
-        
+    }
+
+    private void EndTurn()
+    {
+        callback();
+    }
+
+    private void HealSelf()
+    {
+
+    }
+
+    private void HealAlly()
+    {
+
     }
 
     protected virtual bool CheckSpell()
@@ -138,7 +130,7 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual void CastSpell(TargetSpellAbility spell)
     {
-        character.gc.ChangeState<SpellEnvironmentSequenceState>();
+        character.CastSpell(spell);
     }
 
     protected virtual void Attack()
@@ -149,14 +141,21 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual void Chase()
     {
+        aiAction.text = "Chasing...";
         Tile tile = gc.grid.GetNeighbors(_target.tile.node, true, false)[0].tile;
         List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, character.stats.moveRange, character.movementAbility.diag, character.movementAbility.ignoreOccupant, character.movementAbility.ignoreUnwalkable, false);
         StateArgs moveArgs = new StateArgs
         {
             path = path,
-            character = gc.currentCharacter
+            callback = callback
         };
-        gc.ChangeState<MoveSequenceState>(moveArgs);
+        character.stats.curAP = 0;
+        if (path.Count == 0)
+        {
+            callback();
+            return;
+        }
+        character.ChangeState<MoveSequenceState>(moveArgs);
     }
 
     protected virtual bool CheckForEnd()
@@ -166,7 +165,6 @@ public class BaseAI : MonoBehaviour {
         float distanceFromTarget = gc.pathfinder.GetDistance(character.tile.node, _target.tile.node);
         if ((curAP < minCost & distanceFromTarget < 20) | curAP <= 10)
         {
-            gc.ChangeState<SelectUnitState>();
             return true;
         }
         return false;
@@ -188,5 +186,12 @@ public class BaseAI : MonoBehaviour {
 
         _target = closestPlayer.GetComponent<Character>();
 
+    }
+
+    protected virtual void DecideAction()
+    {
+        if (CheckForEnd())
+            nextAction = AIState.End;
+        nextAction = AIState.Chase;
     }
 }

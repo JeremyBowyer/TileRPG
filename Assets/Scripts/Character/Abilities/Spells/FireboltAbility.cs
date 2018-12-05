@@ -25,6 +25,7 @@ public class FireboltAbility : TargetSpellAbility
         character.transform.LookAt(new Vector3(_target.transform.position.x, character.transform.position.y, _target.transform.position.z));
         Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 1f, character.transform.position.z);
         GameObject fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/FireboltPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
+        fbPrefabClone.gameObject.tag = "SpellTargetGO";
         Vector3 startingPos = fbPrefabClone.transform.position;
         Vector3 endingPos = _target.transform.position + Vector3.up * 1f;
         float currentTime = 0f;
@@ -42,6 +43,7 @@ public class FireboltAbility : TargetSpellAbility
         character.animParamController.SetBool("idle");
         GameObject.Destroy(fbPrefabClone);
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        callback();
         yield break;
     }
 }

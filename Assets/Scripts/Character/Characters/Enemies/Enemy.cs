@@ -16,8 +16,6 @@ public class Enemy : Character {
     {
         gc.worldEnemies.Remove(this.gameObject);
         gc.battleEnemies.Remove(this.gameObject);
-        gc.characters.Remove(this.gameObject);
-        Destroy(this.gameObject);
         base.Die();
     }
 }

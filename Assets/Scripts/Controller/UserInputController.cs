@@ -29,18 +29,16 @@ public class UserInputController : MonoBehaviour {
     void Update() {
 
         if (Input.GetKeyDown("f"))
-            gc.ChangeState<SelectUnitState>();
-
-        // Pause Button
-        if (Input.GetButtonDown("Pause"))
         {
-            pauseMenu.paused = !pauseMenu.paused;
+            Debug.Log("yeah hi");
+            gc.ChangeState<InitBattleState>();
         }
 
         // Escape (cancel)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            cancelEvent(this, new InfoEventArgs<int>(1));
+            if(cancelEvent != null)
+                cancelEvent(this, new InfoEventArgs<int>(1));
         }
 
         /* ---------------- */

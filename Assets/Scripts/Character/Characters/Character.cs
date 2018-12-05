@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Character : MonoBehaviour {
+public abstract class Character : StateMachine {
 
     public Tile tile;
     public Tile targetTile;
@@ -120,16 +120,7 @@ public abstract class Character : MonoBehaviour {
 
     public void Attack(Character _target, AttackAbility _ability)
     {
-        if (stats.curAP >= _ability.AbilityCost)
-        {
-            stats.curAP -= _ability.AbilityCost;
-            StartCoroutine(_ability.Initiate(_target));
-        }
-
-        if (stats.curAP < attackAbility.AbilityCost)
-        {
-
-        }
+        stats.curAP -= _ability.AbilityCost;
     }
 
     public void CastSpell(SpellAbility spell)
@@ -147,15 +138,28 @@ public abstract class Character : MonoBehaviour {
         }
     }
 
-    public void OnTurnEnd()
+    public void OnTurnEnd(Character character)
     {
         fillAP();
     }
 
     public virtual void Die()
     {
+        statusIndicator.gameObject.SetActive(false);
         gc.onUnitChange -= OnTurnEnd;
-        gc.CheckEndCondition();
+        gc.battleCharacters.Remove(gameObject);
+        gc.characters.Remove(this.gameObject);
+        StateArgs deathArgs = new StateArgs()
+        {
+            waitingStateMachines = new List<StateMachine> { gc }
+        };
+        ChangeState<DeathSequence>(deathArgs);
+    }
+
+    public virtual void AfterDeath()
+    {
+        gc.OnUnitDeath(this);
+        Destroy(this.gameObject);
     }
 
     public void fillAP(int amt)

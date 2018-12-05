@@ -1,0 +1,67 @@
+﻿using UnityEngine;
+using System.Collections;
+using System;
+using System.Collections.Generic;
+
+public class SpellTargetSequenceState : BattleState
+{
+    public static Character targetCharacter;
+    public static TargetSpellAbility spell;
+    private Character character;
+    private State stateToNotify;
+    private IEnumerator spellCoroutine;
+
+    public override List<Type> AllowedTransitions
+    {
+        get
+        {
+            return new List<Type>
+            {
+            typeof(SelectUnitState),
+            typeof(CommandSelectionState),
+            typeof(EnemyTurnState),
+            typeof(VictorySequence),
+            typeof(DeathSequence),
+            typeof(CheckForTurnEndState)
+            };
+        }
+        set { }
+    }
+
+    public override void Enter()
+    {
+        inTransition = true;
+        spell = args.spell as TargetSpellAbility;
+        targetCharacter = args.targetCharacter;
+        base.Enter();
+
+        character = GetComponent<Character>();
+        character.CastSpell(spell);
+        spellCoroutine = spell.Initiate(targetCharacter, OnCoroutineFinish);
+        StartCoroutine(spellCoroutine);
+    }
+
+    public void OnCoroutineFinish()
+    {
+        targetCharacter.Damage(spell.AbilityPower);
+        inTransition = false;
+        character.ChangeState<IdleState>();
+    }
+
+    public override void InterruptTransition()
+    {
+        isInterrupting = true;
+        StopCoroutine(spellCoroutine);
+        targetCharacter.Damage(spell.AbilityPower);
+        foreach(GameObject go in GameObject.FindGameObjectsWithTag("SpellTargetGO"))
+        {
+            GameObject.Destroy(go);
+        }
+        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, targetCharacter.tile.node), Vector3.up);
+        character.animParamController.SetBool("idle", true);
+        isInterrupting = false;
+        inTransition = false;
+        character.ChangeState<IdleState>();
+    }
+
+}

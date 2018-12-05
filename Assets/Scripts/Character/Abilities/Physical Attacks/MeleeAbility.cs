@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class MeleeAbility : AttackAbility
         character = _character;
     }
 
-    public override IEnumerator Initiate(Character _target)
+    public override IEnumerator Initiate(Character _target, Action callback)
     {
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         inProgress = true;
@@ -25,6 +26,7 @@ public class MeleeAbility : AttackAbility
         _target.Damage(AbilityPower);
         character.animParamController.SetBool("idle");
         inProgress = false;
+        callback();
         yield break;
     }
 }

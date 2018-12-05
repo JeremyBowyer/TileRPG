@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public abstract class BattleState : State
 {
-    protected GameController gc;
     public CameraController cameraRig { get { return gc.cameraRig; } }
     public BattleUIController uiController { get { return gc.uiController; } }
     public Grid grid { get { return gc.grid; } }
@@ -12,16 +11,9 @@ public abstract class BattleState : State
     public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
     public List<GameObject> characters { get { return gc.characters; } }
 
-    protected virtual void Awake()
-    {
-        gc = GetComponent<GameController>();
-    }
-
     public override void Enter()
     {
-        inTransition = true;
         base.Enter();
-        inTransition = false;
     }
 
     protected override void AddListeners()

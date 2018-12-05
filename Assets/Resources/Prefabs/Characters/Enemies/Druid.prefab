@@ -510,7 +510,6 @@ GameObject:
   - component: {fileID: 9520156}
   - component: {fileID: 54265097993194382}
   - component: {fileID: 65864192211584194}
-  - component: {fileID: 114590916187802574}
   - component: {fileID: 114050316874690448}
   - component: {fileID: 114621800136882240}
   - component: {fileID: 114271180246642710}
@@ -1973,7 +1972,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136616}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 37.027912, y: 3.86, z: -7.231312}
+  m_LocalPosition: {x: 36.56, y: 3.72, z: -8.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4903708201935650}
@@ -4094,6 +4093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0139e0d30e2e07949a1ba7b4a723d361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiAction: {fileID: 0}
 --- !u!114 &114312948354843078
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4135,23 +4135,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114590916187802574
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 136616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a16ad0a9fdf6fc4eb53da21517be9f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sphereRadius: 5
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  enemies: []
-  gc: {fileID: 0}
 --- !u!114 &114621800136882240
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4163,13 +4146,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9c1ae6710466374f98cfd5359416682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dequeueRunning: 0
+  waitingList: []
+  currentStateText: {fileID: 0}
   tile: {fileID: 0}
+  targetTile: {fileID: 0}
   stats:
     maxHealth: 100
     maxAP: 100
     maxMP: 100
   animParamController: {fileID: 0}
-  characterName: 
+  characterName: Druid
+  attackTarget: {fileID: 0}
   gc: {fileID: 0}
   statusIndicator: {fileID: 114177034252726962}
   height: 0

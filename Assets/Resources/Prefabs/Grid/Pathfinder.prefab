@@ -57,7 +57,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   gridWorldSize: {x: 10, y: 10}
-  nodeRadius: 0.5
+  nodeRadius: 0
   tiles: []
   highlightedTiles: []
   selectedTiles: []

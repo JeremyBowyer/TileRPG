@@ -28,15 +28,8 @@ public class Druid : Enemy
 
     public override void Die()
     {
+        base.Die();
         gc.worldEnemies.Remove(this.gameObject);
         gc.battleEnemies.Remove(this.gameObject);
-        gc.characters.Remove(this.gameObject);
-        animParamController.SetTrigger("die", AfterDeath);
-    }
-
-    public void AfterDeath()
-    {
-        Destroy(this.gameObject);
-        base.Die();
     }
 }
