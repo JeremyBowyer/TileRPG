@@ -14,7 +14,7 @@ public class Protag : Player
         characterName = "Protagonist";
         spells.Add(new MagmaBallAbility(this));
         spells.Add(new FireboltAbility(this));
-        attackAbility = new MeleeAbility(this);
+        attackAbility = new ArrowAbility(this);
         movementAbility = new WalkMovement(this, gc);
         gc = GameObject.Find("GameController").GetComponent<GameController>();
     }

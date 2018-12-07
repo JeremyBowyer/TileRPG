@@ -25,11 +25,11 @@ public class ArrowAbility : AttackAbility {
         character.animParamController.SetTrigger("attack");
         arrowPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/ArrowPrefab") as GameObject, character.transform.position, Quaternion.identity) as GameObject;
         arrowPrefabClone.gameObject.tag = "AttackAbilityGO";
-        inProgress = true;
+
         Vector3 startingPos = arrowPrefabClone.transform.position;
         Vector3 endingPos = _target.transform.position;
         float currentTime = 0f;
-        float speed = 2f;
+        float speed = 1.5f;
         float arrowHeight = Vector3.Distance(startingPos, endingPos) / 4;
         float arrowSpeed = speed + speed / arrowHeight;
 
@@ -43,7 +43,6 @@ public class ArrowAbility : AttackAbility {
 
         // Clean up
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        inProgress = false;
         character.animParamController.SetBool("idle");
         callback();
         GameObject.Destroy(arrowPrefabClone);

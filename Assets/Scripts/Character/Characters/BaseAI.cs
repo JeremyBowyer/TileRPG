@@ -130,13 +130,27 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual void CastSpell(TargetSpellAbility spell)
     {
-        character.CastSpell(spell);
+        aiAction.text = "Casting spell...";
+        StateArgs spellArgs = new StateArgs
+        {
+            targetCharacter = _target,
+            spell = spell,
+            waitingStateMachines = new List<StateMachine> { gc },
+            callback = callback
+        };
+        character.ChangeState<SpellTargetSequenceState>(spellArgs);
     }
 
     protected virtual void Attack()
     {
-        character.attackTarget = _target;
-        gc.ChangeState<AttackSequenceState>();
+        aiAction.text = "Attacking...";
+        StateArgs attackArgs = new StateArgs
+        {
+            targetCharacter = _target,
+            waitingStateMachines = new List<StateMachine> { gc },
+            callback = callback
+        };
+        character.ChangeState<AttackSequenceState>(attackArgs);
     }
 
     protected virtual void Chase()
@@ -149,12 +163,6 @@ public class BaseAI : MonoBehaviour {
             path = path,
             callback = callback
         };
-        character.stats.curAP = 0;
-        if (path.Count == 0)
-        {
-            callback();
-            return;
-        }
         character.ChangeState<MoveSequenceState>(moveArgs);
     }
 
@@ -191,7 +199,22 @@ public class BaseAI : MonoBehaviour {
     protected virtual void DecideAction()
     {
         if (CheckForEnd())
+        {
             nextAction = AIState.End;
+            return;
+        }
+
+        if (attackRange.Contains(_target.tile.node))
+        {
+            nextAction = AIState.Attack;
+            return;
+        }
+
+        if (spellRange.Contains(_target.tile.node))
+        {
+            nextAction = AIState.Cast;
+            return;
+        }
         nextAction = AIState.Chase;
     }
 }

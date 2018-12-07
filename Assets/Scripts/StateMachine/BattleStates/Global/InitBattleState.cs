@@ -29,15 +29,19 @@ public class InitBattleState : BattleState
     public override void Enter()
     {
         inTransition = true;
-        StartCoroutine(gc.ZoomCamera(5f, 3f, 15f));
         base.Enter();
-
+        gc.protag.animParamController.SetBool("idle");
+        StartCoroutine(grid.CreateGrid(OnCreateGrid));
+        StartCoroutine(gc.ZoomCamera(5f, 3f, 15f));
+    }
+      
+    public void OnCreateGrid()
+    {
         gc.EnableRBs(false);
         gc.protag.transform.position = new Vector3(gc.protag.transform.position.x, grid.FindHeightPoint(gc.protag.transform.position), gc.protag.transform.position.z);
         gc.protagStartPos = gc.protag.transform.position;
 
         gc.protag.transform.LookAt(new Vector3(gc.battleInitiator.transform.position.x, gc.protag.transform.position.y, gc.battleInitiator.transform.position.z));
-        grid.CreateGrid();
         uiController.gameObject.SetActive(true);
 
         Node protagNode = gc.grid.FindNearestNode(gc.protag.transform.position);

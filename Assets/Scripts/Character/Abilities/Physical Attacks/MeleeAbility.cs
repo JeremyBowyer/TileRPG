@@ -21,11 +21,10 @@ public class MeleeAbility : AttackAbility
     public override IEnumerator Initiate(Character _target, Action callback)
     {
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        inProgress = true;
         character.animParamController.SetTrigger("attack");
         _target.Damage(AbilityPower);
         character.animParamController.SetBool("idle");
-        inProgress = false;
+        yield return new WaitForSeconds(1.5f);
         callback();
         yield break;
     }

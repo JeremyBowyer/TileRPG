@@ -10,6 +10,7 @@ public class SpellTargetSequenceState : BattleState
     private Character character;
     private State stateToNotify;
     private IEnumerator spellCoroutine;
+    private Action callback;
 
     public override List<Type> AllowedTransitions
     {
@@ -33,6 +34,7 @@ public class SpellTargetSequenceState : BattleState
         inTransition = true;
         spell = args.spell as TargetSpellAbility;
         targetCharacter = args.targetCharacter;
+        callback = args.callback;
         base.Enter();
 
         character = GetComponent<Character>();
@@ -59,6 +61,8 @@ public class SpellTargetSequenceState : BattleState
         }
         character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, targetCharacter.tile.node), Vector3.up);
         character.animParamController.SetBool("idle", true);
+        if (callback != null)
+            callback();
         isInterrupting = false;
         inTransition = false;
         character.ChangeState<IdleState>();

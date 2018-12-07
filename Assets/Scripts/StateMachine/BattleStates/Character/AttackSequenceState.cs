@@ -7,6 +7,7 @@ public class AttackSequenceState : BattleState
 {
     Character character;
     Character targetCharacter;
+    Action callback;
 
     public override List<Type> AllowedTransitions
     {
@@ -31,6 +32,7 @@ public class AttackSequenceState : BattleState
         base.Enter();
         character = GetComponent<Character>();
         targetCharacter = args.targetCharacter;
+        callback = args.callback;
         character.Attack(targetCharacter, character.attackAbility);
         StartCoroutine(character.attackAbility.Initiate(targetCharacter, OnAttackEnd));
     }
@@ -38,6 +40,8 @@ public class AttackSequenceState : BattleState
     public void OnAttackEnd()
     {
         targetCharacter.Damage(character.attackAbility.AbilityPower);
+        if (callback != null)
+            callback();
         inTransition = false;
         character.ChangeState<IdleState>();
     }

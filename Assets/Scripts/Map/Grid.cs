@@ -1,12 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid : MonoBehaviour {
 
     public GameController gc;
+    [SerializeField]
+    private GameObject BattleGrid;
 
-	public LayerMask unwalkableMask;
+	public int UnWalkableLayerMask;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
 	public Node[,] grid;
@@ -40,8 +43,9 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-    public void CreateGrid()
+    public IEnumerator CreateGrid(Action callback)
     {
+        UnWalkableLayerMask = (1 << LayerMask.NameToLayer("Unwalkable"));
         nodeDiameter = nodeRadius * 2;
         
         gridWorldSize = new Vector2(10f, 10f) * nodeDiameter;
@@ -81,7 +85,7 @@ public class Grid : MonoBehaviour {
             Node node = new Node(cellPoint, x, y);
 
             // Create game object
-            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, BattleGrid.transform);
             tileInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
             tileInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
             tileInstance.transform.localScale = tileInstance.transform.localScale * nodeDiameter;
@@ -94,7 +98,6 @@ public class Grid : MonoBehaviour {
             node.tile = tile;
 
             // Is tile walkable?
-            int UnWalkableLayerMask = (1 << LayerMask.NameToLayer("Unwalkable"));
             Collider[] alertColliders = Physics.OverlapSphere(cellPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
             if (alertColliders != null && alertColliders.Length != 0)
             {
@@ -110,8 +113,12 @@ public class Grid : MonoBehaviour {
 
             cellPoint = cellPoint + pathDirections[i] * nodeDiameter;
             cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
+            if (i % 3 == 0)
+                yield return null;
         }
-
+        BattleGrid.gameObject.SetActive(true);
+        callback();
+        yield break;
     }
 
     public Vector3 MoveAlongTerrain(Vector3 startPoint, Vector3 direction, float distance = 1f, int steps = 4)
@@ -250,7 +257,7 @@ public class Grid : MonoBehaviour {
 
     public void ClearGrid()
     {
-
+        BattleGrid.gameObject.SetActive(false);
         grid = null;
 
         foreach(GameObject tileGO in tiles)

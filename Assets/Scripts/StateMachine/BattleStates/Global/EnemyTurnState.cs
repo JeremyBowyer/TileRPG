@@ -31,30 +31,14 @@ public class EnemyTurnState : BattleState
         inTransition = true;
         base.Enter();
         enemyAI = gc.currentCharacter.GetComponent<BaseAI>();
-        StartCoroutine(Countdown());
         enemyTurnCoroutine = ConsiderOptions();
         StartCoroutine(enemyTurnCoroutine);
     }
 
-    public IEnumerator Countdown()
-    {
-        isThinking = true;
-        int cnt = 2;
-        enemyAI.aiAction.text = "Thinking...";
-        while (cnt > 0)
-        {
-            yield return new WaitForSeconds(1f);
-            cnt--;
-        }
-        isThinking = false;
-    }
-
     public IEnumerator ConsiderOptions()
     {
-        while (isThinking)
-        {
-            yield return null;
-        }
+        enemyAI.aiAction.text = "Thinking...";
+        yield return new WaitForSeconds(2f);
         enemyAI.ConsiderOptions(OnDecide);
         yield break;
     }
@@ -69,6 +53,8 @@ public class EnemyTurnState : BattleState
         }
         else
         {
+            StopCoroutine(enemyTurnCoroutine);
+            enemyTurnCoroutine = ConsiderOptions();
             StartCoroutine(enemyTurnCoroutine);
         }
     }

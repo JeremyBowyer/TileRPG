@@ -102,7 +102,8 @@ public class AttackTargetState : BattleState
             gc.currentCharacter.attackTarget = e.info.GetComponent<Enemy>();
             StateArgs attackArgs = new StateArgs
             {
-                targetCharacter = e.info.GetComponent<Enemy>()
+                targetCharacter = e.info.GetComponent<Enemy>(),
+                waitingStateMachines = new List<StateMachine> { gc }
             };
             character.ChangeState<AttackSequenceState>(attackArgs);
             gc.ChangeState<CheckForTurnEndState>();
