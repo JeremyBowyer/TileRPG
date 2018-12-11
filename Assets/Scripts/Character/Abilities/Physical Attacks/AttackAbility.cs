@@ -5,5 +5,5 @@ using UnityEngine;
 
 public abstract class AttackAbility : BaseAbility
 {
-    public abstract IEnumerator Initiate(Character target, Action callback);
+    public abstract IEnumerator Initiate(CharacterController target, Action callback);
 }

@@ -5,7 +5,7 @@ using System;
 
 public class UserInputController : MonoBehaviour {
 
-    public static event EventHandler<InfoEventArgs<GameObject>> clickEvent;
+    public static event EventHandler<InfoEventArgs<RaycastHit>> clickEvent;
     public static event EventHandler<InfoEventArgs<GameObject>> hoverEnterEvent;
     public static event EventHandler<InfoEventArgs<GameObject>> hoverExitEvent;
     public static event EventHandler<InfoEventArgs<Point>> moveEvent;
@@ -47,7 +47,7 @@ public class UserInputController : MonoBehaviour {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         bool wasHit = Physics.Raycast(ray, out hit, 40f, 1 << mouseLayer);
 
-        if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null))
+        if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null || clickEvent != null))
         {
             currentHit = hit.collider.gameObject;
             if (currentHit != lastHit)
@@ -61,7 +61,7 @@ public class UserInputController : MonoBehaviour {
 
             if (Input.GetMouseButtonDown(0))
             {
-                clickEvent(this, new InfoEventArgs<GameObject>(currentHit));
+                clickEvent(this, new InfoEventArgs<RaycastHit>(hit));
             }
         }
         else

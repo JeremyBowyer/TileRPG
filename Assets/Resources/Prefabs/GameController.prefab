@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4456928732304114}
   - component: {fileID: 114968663216697834}
-  - component: {fileID: 114427973592598776}
   - component: {fileID: 114035475095731668}
   m_Layer: 0
   m_Name: GameController
@@ -59,24 +58,6 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
---- !u!114 &114427973592598776
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1397848231606960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aac1504dde63a0545addcdf15abb66bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 8
-  JumpHeight: 2
-  Gravity: -9.81
-  GroundDistance: 0.3
-  DashDistance: 5
-  Drag: {x: 0, y: 0, z: 0}
-  _isGrounded: 1
 --- !u!114 &114968663216697834
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -94,11 +75,14 @@ MonoBehaviour:
   cameraRig: {fileID: 0}
   _camera: {fileID: 0}
   _cameraController: {fileID: 0}
-  uiController: {fileID: 0}
+  battleUiController: {fileID: 0}
+  worldUiController: {fileID: 0}
   grid: {fileID: 0}
   pathfinder: {fileID: 0}
   statusIndicator: {fileID: 0}
   abilityMenuPanelController: {fileID: 0}
+  worldMenuPanelController: {fileID: 0}
+  movementCursor: {fileID: 0}
   currentCharacter: {fileID: 0}
   protag: {fileID: 0}
   currentTile: {fileID: 0}

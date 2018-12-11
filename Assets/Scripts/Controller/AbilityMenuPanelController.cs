@@ -10,7 +10,6 @@ public class AbilityMenuPanelController : MonoBehaviour
 {
     const string ShowKey = "Show";
     const string HideKey = "Hide";
-    const string EntryPoolKey = "AbilityMenuPanel.Entry";
     const int MenuCount = 4;
 
     public string currentPanel;

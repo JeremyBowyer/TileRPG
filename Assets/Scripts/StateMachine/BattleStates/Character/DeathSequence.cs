@@ -7,7 +7,7 @@ public class DeathSequence : BattleState
 {
     private Tile targetTile;
     private List<Node> path;
-    private Character character;
+    private CharacterController character;
     private State stateToNotify;
 
     private IEnumerator traverseCoroutine;
@@ -31,7 +31,7 @@ public class DeathSequence : BattleState
         inTransition = true;
         base.Enter();
         //character = args.character;
-        character = GetComponent<Character>();
+        character = GetComponent<CharacterController>();
         character.animParamController.SetTrigger("die", OnAnimationFinish);
     }
 

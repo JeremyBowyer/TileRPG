@@ -10,14 +10,17 @@ public class GameController : StateMachine
     public CameraController cameraRig;
     public Camera _camera;
     public CameraRotate _cameraController;
-    public BattleUIController uiController;
+    public BattleUIController battleUiController;
+    public WorldUIController worldUiController;
     public Grid grid;
     public Pathfinding pathfinder;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
+    public WorldMenuPanelController worldMenuPanelController;
+    public GameObject movementCursor;
 
     // Variables
-    public Character currentCharacter;
+    public CharacterController currentCharacter;
     public Player protag;
     public Tile currentTile;
     public List<GameObject> players; // All players on map
@@ -29,7 +32,7 @@ public class GameController : StateMachine
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
 
     // Delegates
-    public delegate void OnUnitChange(Character character);
+    public delegate void OnUnitChange(CharacterController character);
     public OnUnitChange onUnitChange;
 
     void Start()
@@ -58,7 +61,7 @@ public class GameController : StateMachine
         characters.Add(protag.gameObject);
 
         // Check for conditions
-        if (uiController == null)
+        if (battleUiController == null)
             Debug.LogError("UIController not assigned to " + gameObject.name);
 
         if (statusIndicator == null)
@@ -74,17 +77,17 @@ public class GameController : StateMachine
     {
         int index = battleCharacters.IndexOf(currentCharacter.gameObject);
         index = (index+2 > battleCharacters.Count) ? 0 : index + 1;
-        ChangePlayer(battleCharacters[index].GetComponent<Character>());
+        ChangePlayer(battleCharacters[index].GetComponent<CharacterController>());
     }
 
-    public void ChangePlayer(Character character)
+    public void ChangePlayer(CharacterController character)
     {
         currentCharacter = character;
         if (onUnitChange != null)
             onUnitChange(character);
     }
 
-    public void OnUnitDeath(Character character)
+    public void OnUnitDeath(CharacterController character)
     {
         CheckEndCondition();
     }

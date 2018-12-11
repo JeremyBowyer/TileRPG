@@ -7,7 +7,7 @@ public class MoveSequenceState : BattleState
 {
     private Tile targetTile;
     private List<Node> path;
-    private Character character;
+    private CharacterController character;
 
     private Action callback;
 
@@ -36,7 +36,7 @@ public class MoveSequenceState : BattleState
     {
         inTransition = true;
         base.Enter();
-        character = GetComponent<Character>();
+        character = GetComponent<CharacterController>();
         path = args.path;
         callback = args.callback;
         if(path.Count == 0)

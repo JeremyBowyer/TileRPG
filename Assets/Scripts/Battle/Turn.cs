@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public class Turn
 {
-    public Character actor;
+    public CharacterController actor;
     public bool lockMove;
     public Tile startTile;
 
-    public void Change(Character current)
+    public void Change(CharacterController current)
     {
         actor = current;
         lockMove = false;

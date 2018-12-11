@@ -87,6 +87,7 @@ public class UIPanel : MonoBehaviour
         if (animated)
         {
             Transition = anchor.MoveToAnchorPosition(p.myAnchor, p.parentAnchor, p.offset);
+            Transition.easingControl.duration = GetComponent<EasingControl>().duration;
             return Transition;
         }
         else

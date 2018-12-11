@@ -253,13 +253,6 @@ public class StateMachine : MonoBehaviour
             return true;
         }
 
-        // All states should be able to transition into WaitForPermissionState
-        // except master states
-        if (!CurrentState.isMaster && targetType == typeof(WaitForPermissionState))
-        {
-            return true;
-        }
-
         return true;
     }
 

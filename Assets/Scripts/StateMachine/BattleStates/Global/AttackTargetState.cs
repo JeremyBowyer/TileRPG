@@ -6,7 +6,7 @@ using UnityEngine;
 public class AttackTargetState : BattleState
 {
     List<Node> attackRange;
-    Character character;
+    CharacterController character;
     List<GameObject> outlinedEnemies = new List<GameObject>();
     public AttackAbility attackAbility;
 
@@ -89,20 +89,20 @@ public class AttackTargetState : BattleState
         Destroy(ol);
     }
 
-    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
+    protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
 
-        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+        Enemy enemy = e.info.collider.gameObject.GetComponent<Enemy>();
 
         if (enemy == null || enemy.tile == null)
             return;
 
-        if (attackRange.Contains(e.info.GetComponent<Enemy>().tile.node))
+        if (attackRange.Contains(e.info.collider.GetComponent<Enemy>().tile.node))
         {
-            gc.currentCharacter.attackTarget = e.info.GetComponent<Enemy>();
+            gc.currentCharacter.attackTarget = e.info.collider.GetComponent<Enemy>();
             StateArgs attackArgs = new StateArgs
             {
-                targetCharacter = e.info.GetComponent<Enemy>(),
+                targetCharacter = e.info.collider.GetComponent<Enemy>(),
                 waitingStateMachines = new List<StateMachine> { gc }
             };
             character.ChangeState<AttackSequenceState>(attackArgs);

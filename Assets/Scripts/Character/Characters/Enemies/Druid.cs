@@ -10,6 +10,7 @@ public class Druid : Enemy
         base.Awake();
         characterName = "Druid";
         stats.Init();
+        spells.Add(new FireboltAbility(this));
         attackAbility = new ArrowAbility(this);
         movementAbility = new WalkMovement(this, gc);
     }

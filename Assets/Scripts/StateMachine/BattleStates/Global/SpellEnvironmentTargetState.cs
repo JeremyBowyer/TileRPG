@@ -8,7 +8,7 @@ public class SpellEnvironmentTargetState : BattleState
     public List<Node> spellRange;
     public List<Node> splashZone;
     public SpellAbility spellAbility;
-    public Character character;
+    public CharacterController character;
 
     public override List<Type> AllowedTransitions
     {
@@ -72,9 +72,9 @@ public class SpellEnvironmentTargetState : BattleState
         grid.DeSelectNodes();
     }
 
-    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
+    protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        Tile tile = e.info.gameObject.GetComponent<Tile>();
+        Tile tile = e.info.collider.gameObject.GetComponent<Tile>();
 
         if (tile == null)
             return;

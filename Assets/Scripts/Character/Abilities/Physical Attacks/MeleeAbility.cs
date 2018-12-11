@@ -6,7 +6,7 @@ using UnityEngine;
 public class MeleeAbility : AttackAbility
 {
 
-    public MeleeAbility(Character _character)
+    public MeleeAbility(CharacterController _character)
     {
         AbilityName = "Melee attack";
         AbilityDescription = "Attack at melee range.";
@@ -18,7 +18,7 @@ public class MeleeAbility : AttackAbility
         character = _character;
     }
 
-    public override IEnumerator Initiate(Character _target, Action callback)
+    public override IEnumerator Initiate(CharacterController _target, Action callback)
     {
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         character.animParamController.SetTrigger("attack");

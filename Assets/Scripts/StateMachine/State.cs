@@ -37,6 +37,7 @@ public abstract class State : MonoBehaviour
 
     // References
     protected GameController gc;
+    public WorldUIController worldUiController { get { return gc.worldUiController; } }
 
     // Properties
     public virtual bool isInterruptable
@@ -77,11 +78,6 @@ public abstract class State : MonoBehaviour
     {
     }
 
-    public virtual void Permit(bool _permitted)
-    {
-
-    }
-
     protected virtual void OnDestroy()
     {
         RemoveListeners();
@@ -89,8 +85,45 @@ public abstract class State : MonoBehaviour
 
     protected virtual void AddListeners()
     {
+        UserInputController.clickEvent += OnClick;
+        UserInputController.cancelEvent += OnCancel;
+        UserInputController.hoverEnterEvent += OnHoverEnter;
+        UserInputController.hoverExitEvent += OnHoverExit;
+        UserInputController.moveEvent += OnMove;
     }
+
     protected virtual void RemoveListeners()
+    {
+        UserInputController.clickEvent -= OnClick;
+        UserInputController.cancelEvent -= OnCancel;
+        UserInputController.hoverEnterEvent -= OnHoverEnter;
+        UserInputController.hoverExitEvent -= OnHoverExit;
+        UserInputController.moveEvent -= OnMove;
+    }
+
+    protected virtual void OnClick(object sender, InfoEventArgs<RaycastHit> e)
+    {
+    }
+
+    protected virtual void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+
+    }
+
+    protected virtual void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+
+    }
+
+    protected virtual void OnMove(object sender, InfoEventArgs<Point> e)
+    {
+    }
+
+    protected virtual void OnFire(object sender, InfoEventArgs<int> e)
+    {
+    }
+
+    protected virtual void OnCancel(object sender, InfoEventArgs<int> e)
     {
     }
 

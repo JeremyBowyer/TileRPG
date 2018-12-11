@@ -41,7 +41,7 @@ public class MoveTargetState : BattleState
         //grid.SelectNodes(moveRange, Color.grey);
         grid.DeSelectNodes();
         moveRange = null;
-        uiController.SetApCost();
+        battleUiController.SetApCost();
     }
 
     protected override void AddListeners()
@@ -50,9 +50,9 @@ public class MoveTargetState : BattleState
         UserInputController.mouseLayer = LayerMask.NameToLayer("GridClick");
     }
 
-    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
+    protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        Tile tile = e.info.gameObject.GetComponent<Tile>();
+        Tile tile = e.info.collider.gameObject.GetComponent<Tile>();
         if (tile == null)
         {
             Debug.Log("Select a tile.");
@@ -95,7 +95,7 @@ public class MoveTargetState : BattleState
                 grid.SelectNodes(path[path.Count - 1], Color.black);
             }
             
-            uiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
+            battleUiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
         }
     }
 
@@ -109,7 +109,7 @@ public class MoveTargetState : BattleState
         if (moveRange.Contains(tile.node))
         {
             grid.DeSelectNodes();
-            uiController.SetApCost();
+            battleUiController.SetApCost();
         }
     }
 

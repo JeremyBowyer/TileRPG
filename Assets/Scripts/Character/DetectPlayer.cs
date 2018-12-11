@@ -12,7 +12,7 @@ public class DetectPlayer : MonoBehaviour {
 
 	void Start () {
         layerMask = LayerMask.NameToLayer("Protag");
-        gc = GetComponent<Character>().gc;
+        gc = GetComponent<CharacterController>().gc;
     }
 	
 	void Update () {

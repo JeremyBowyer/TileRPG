@@ -12,7 +12,7 @@ public class WalkMovement : Movement
     public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
-    public WalkMovement(Character character, GameController bc) : base(character, bc)
+    public WalkMovement(CharacterController character, GameController bc) : base(character, bc)
     {
         speed = 4f;
     }

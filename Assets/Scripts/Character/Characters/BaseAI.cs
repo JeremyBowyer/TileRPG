@@ -6,15 +6,17 @@ using System;
 
 public class BaseAI : MonoBehaviour {
 
-    private Character character;
+    private CharacterController character;
     private GameController gc;
-    private Character _target;
+    private CharacterController _target;
 
-    private List<Node> moveRange;
+    //private List<Node> moveRange;
     private List<Node> attackRange;
     private List<Node> spellRange;
 
     private TargetSpellAbility maxSpell;
+
+    static System.Random rnd = new System.Random();
 
     private Action callback;
 
@@ -34,15 +36,15 @@ public class BaseAI : MonoBehaviour {
     }
 
     public void Init() {
-        character = GetComponent<Character>();
+        character = GetComponent<CharacterController>();
         gc = character.gc;
-        aiAction = gc.uiController.transform.Find("AIAction").GetComponent<Text>();
+        aiAction = gc.battleUiController.transform.Find("AIAction").GetComponent<Text>();
     }
 
     public void FindRanges()
     {
         // Establish Ranges
-        moveRange = character.movementAbility.GetNodesInRange(character.stats.moveRange, character.movementAbility.diag, false);
+        //moveRange = character.movementAbility.GetNodesInRange(character.stats.moveRange, character.movementAbility.diag, false);
         attackRange = gc.pathfinder.FindRange(character.tile.node, character.attackAbility.AbilityRange, character.attackAbility.diag, true, true, false);
         // Further spell range
         // TODO: flesh this out so you're not simply using the spell with farthest range
@@ -192,7 +194,7 @@ public class BaseAI : MonoBehaviour {
             }
         }
 
-        _target = closestPlayer.GetComponent<Character>();
+        _target = closestPlayer.GetComponent<CharacterController>();
 
     }
 
@@ -201,6 +203,14 @@ public class BaseAI : MonoBehaviour {
         if (CheckForEnd())
         {
             nextAction = AIState.End;
+            return;
+        }
+
+        if(attackRange.Contains(_target.tile.node) && spellRange.Contains(_target.tile.node))
+        {
+            List<AIState> stateList = new List<AIState> { AIState.Attack, AIState.Cast }; 
+            int r = rnd.Next(stateList.Count);
+            nextAction = stateList[r];
             return;
         }
 

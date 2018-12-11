@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 public class SpellTargetSequenceState : BattleState
 {
-    public static Character targetCharacter;
+    public static CharacterController targetCharacter;
     public static TargetSpellAbility spell;
-    private Character character;
+    private CharacterController character;
     private State stateToNotify;
     private IEnumerator spellCoroutine;
     private Action callback;
@@ -37,7 +37,7 @@ public class SpellTargetSequenceState : BattleState
         callback = args.callback;
         base.Enter();
 
-        character = GetComponent<Character>();
+        character = GetComponent<CharacterController>();
         character.CastSpell(spell);
         spellCoroutine = spell.Initiate(targetCharacter, OnCoroutineFinish);
         StartCoroutine(spellCoroutine);
@@ -46,6 +46,8 @@ public class SpellTargetSequenceState : BattleState
     public void OnCoroutineFinish()
     {
         targetCharacter.Damage(spell.AbilityPower);
+        if (callback != null)
+            callback();
         inTransition = false;
         character.ChangeState<IdleState>();
     }

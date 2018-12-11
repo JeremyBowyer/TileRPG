@@ -12,7 +12,7 @@ public class TeleportMovement : Movement
     public override bool ignoreOccupant{ get { return true; } set { ignoreOccupant = value; } }
     public override float Speed { get { return 1 / speed; } set { speed = value; } }
 
-    public TeleportMovement(Character _character, GameController _bc) : base(_character, _bc)
+    public TeleportMovement(CharacterController _character, GameController _bc) : base(_character, _bc)
     {
 
     }

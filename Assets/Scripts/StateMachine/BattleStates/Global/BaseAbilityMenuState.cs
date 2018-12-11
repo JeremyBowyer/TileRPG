@@ -21,7 +21,7 @@ public abstract class BaseAbilityMenuState : BattleState
         abilityMenuPanelController.Hide();
     }
 
-    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
+    protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
 
     }

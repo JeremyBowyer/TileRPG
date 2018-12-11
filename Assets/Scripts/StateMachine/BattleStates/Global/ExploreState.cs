@@ -25,7 +25,7 @@ public class ExploreState : BattleState
         inTransition = false;
     }
 
-    protected override void OnClick(object sender, InfoEventArgs<GameObject> e)
+    protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
         Debug.Log("Explore State Click");
     }

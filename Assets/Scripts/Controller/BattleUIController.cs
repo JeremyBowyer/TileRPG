@@ -48,25 +48,24 @@ public class BattleUIController : MonoBehaviour {
     public void SetApCost()
     {
         apCost.text = "";
-
     }
 
-    public void ToggleAIAction(Character currentCharacter)
+    public void ToggleAIAction(CharacterController currentCharacter)
     {
         aiAction.gameObject.SetActive(currentCharacter is Enemy);
     }
 
-    public void ShowHealthBars(Character currentCharacter)
+    public void ShowHealthBars(CharacterController currentCharacter)
     {
         foreach(GameObject charGO in gc.battleCharacters)
         {
-            Character character = charGO.GetComponent<Character>();
+            CharacterController character = charGO.GetComponent<CharacterController>();
             character.statusIndicator.gameObject.SetActive(true);
         }
         currentCharacter.statusIndicator.gameObject.SetActive(false);
     }
 
-    public void LoadStats(Character currentCharacter)
+    public void LoadStats(CharacterController currentCharacter)
     {
         playerName.text = currentCharacter.characterName;
         statusIndicator.SetHealth(currentCharacter.stats.curHealth, currentCharacter.stats.maxHealth);

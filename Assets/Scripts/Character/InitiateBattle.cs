@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class InitiateBattle : MonoBehaviour
 {
@@ -10,25 +11,16 @@ public class InitiateBattle : MonoBehaviour
     public GameObject[] enemies;
     public GameController gc;
     private Vector3 origin;
+    public NavMeshAgent protagAgent;
 
     void Start()
     {
-        //layerMask = LayerMask.NameToLayer("Character");
-        gc = GetComponent<Character>().gc;
+        gc = GetComponent<CharacterController>().gc;
+        protagAgent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        //origin = transform.position;
-        //Collider[] noticeColliders = Physics.OverlapSphere(origin, sphereRadius*1.5f, layerMask, QueryTriggerInteraction.UseGlobal);
-        //foreach (Collider col in noticeColliders)
-        //{
-        //    if (col.tag == "Protag")
-        //    {
-        //        gc.protag.transform.LookAt(transform);
-        //    }
-        //}
-
         if (gc.CurrentState == null)
             return;
 
@@ -40,13 +32,9 @@ public class InitiateBattle : MonoBehaviour
             {
                 if (col.tag == "Enemy")
                 {
-                    /*
-                    foreach (GameObject enemy in gc.worldEnemies)
-                    {
-                        enemy.GetComponent<DetectPlayer>().enabled = false;
-                    }
-                    */
                     gc.battleInitiator = col.gameObject.GetComponent<Enemy>();
+                    protagAgent.SetDestination(protagAgent.transform.position);
+                    protagAgent.isStopped = true;
                     gc.ChangeState<InitBattleState>();
                 }
             }

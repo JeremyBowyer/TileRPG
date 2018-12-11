@@ -5,8 +5,8 @@ using System;
 
 public class AttackSequenceState : BattleState
 {
-    Character character;
-    Character targetCharacter;
+    CharacterController character;
+    CharacterController targetCharacter;
     Action callback;
 
     public override List<Type> AllowedTransitions
@@ -30,7 +30,7 @@ public class AttackSequenceState : BattleState
     {
         inTransition = true;
         base.Enter();
-        character = GetComponent<Character>();
+        character = GetComponent<CharacterController>();
         targetCharacter = args.targetCharacter;
         callback = args.callback;
         character.Attack(targetCharacter, character.attackAbility);

@@ -42,7 +42,9 @@ public class InitBattleState : BattleState
         gc.protagStartPos = gc.protag.transform.position;
 
         gc.protag.transform.LookAt(new Vector3(gc.battleInitiator.transform.position.x, gc.protag.transform.position.y, gc.battleInitiator.transform.position.z));
-        uiController.gameObject.SetActive(true);
+
+        battleUiController.gameObject.SetActive(true);
+        worldUiController.gameObject.SetActive(false);
 
         Node protagNode = gc.grid.FindNearestNode(gc.protag.transform.position);
         gc.protag.Place(protagNode.tile);
@@ -73,7 +75,7 @@ public class InitBattleState : BattleState
 
         foreach (GameObject character in gc.battleCharacters)
         {
-            gc.onUnitChange += character.GetComponent<Character>().OnTurnEnd;
+            gc.onUnitChange += character.GetComponent<CharacterController>().OnTurnEnd;
         }
 
         gc.currentCharacter = gc.battleEnemies[0].GetComponent<Enemy>();

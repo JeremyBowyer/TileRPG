@@ -16,7 +16,7 @@ public class JumpMovement : Movement
     private float jumpHeight;
     private float jumpSpeed;
 
-    public JumpMovement(Character _character, GameController _gc) : base(_character, _gc)
+    public JumpMovement(CharacterController _character, GameController _gc) : base(_character, _gc)
     {
 
     }
