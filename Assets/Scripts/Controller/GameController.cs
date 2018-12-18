@@ -9,7 +9,6 @@ public class GameController : StateMachine
     // References
     public CameraController cameraRig;
     public Camera _camera;
-    public CameraRotate _cameraController;
     public BattleUIController battleUiController;
     public WorldUIController worldUiController;
     public Grid grid;
@@ -20,74 +19,50 @@ public class GameController : StateMachine
     public GameObject movementCursor;
 
     // Variables
-    public CharacterController currentCharacter;
-    public Player protag;
+    public CharController currentCharacter;
+    public ProtagonistController protag;
     public Tile currentTile;
     public List<GameObject> players; // All players on map
     public List<GameObject> battleEnemies; // Enemies in battle
     public List<GameObject> worldEnemies; // All enemies on map
     public List<GameObject> characters; // All enemies and players on map
     public List<GameObject> battleCharacters; // Character in battle
-    public Enemy battleInitiator;
+    public Queue<GameObject> unitsToPlace; // Queue of party members to be placed on the grid
+    public EnemyController battleInitiator;
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
 
     // Delegates
-    public delegate void OnUnitChange(CharacterController character);
+    public delegate void OnUnitChange(CharController character);
     public OnUnitChange onUnitChange;
 
     void Start()
     {
         // Assign references
-        protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<Player>();
+        protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
-        _cameraController = GameObject.Find("Camera").GetComponent<CameraRotate>();
+        unitsToPlace = new Queue<GameObject>();
 
-        // Find Enemies and Players, add them to lists
-        foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            worldEnemies.Add(enemy);
-            characters.Add(enemy);
-        }
-
-        foreach(GameObject player in GameObject.FindGameObjectsWithTag("Player"))
-        {
-            players.Add(player);
-            characters.Add(player);
-        }
-        players.Add(protag.gameObject);
-        characters.Add(protag.gameObject);
-
-        // Check for conditions
-        if (battleUiController == null)
-            Debug.LogError("UIController not assigned to " + gameObject.name);
-
-        if (statusIndicator == null)
-            Debug.LogError("StatusIndicator not assigned to " + gameObject.name);
-
-        // Set delegate for camera
-        //onUnitChange += cameraRig.NewTarget;
-
-        ChangeState<WorldExploreState>();
+        ChangeState<InitLevelState>();
     }
 
     public void NextPlayer()
     {
         int index = battleCharacters.IndexOf(currentCharacter.gameObject);
         index = (index+2 > battleCharacters.Count) ? 0 : index + 1;
-        ChangePlayer(battleCharacters[index].GetComponent<CharacterController>());
+        ChangePlayer(battleCharacters[index].GetComponent<CharController>());
     }
 
-    public void ChangePlayer(CharacterController character)
+    public void ChangePlayer(CharController character)
     {
         currentCharacter = character;
         if (onUnitChange != null)
             onUnitChange(character);
     }
 
-    public void OnUnitDeath(CharacterController character)
+    public void OnUnitDeath(CharController character)
     {
         CheckEndCondition();
     }
@@ -103,24 +78,6 @@ public class GameController : StateMachine
         {
             ChangeState<LossSequence>();
         }
-    }
-
-    public IEnumerator ZoomCamera(float targetSize, float minSize, float maxSize)
-    {
-        float currentSize = _camera.orthographicSize;
-        float speed = 2f;
-        _cameraController.minSize = minSize;
-        _cameraController.maxSize = maxSize;
-
-        float min = Mathf.Min(new float[] { currentSize, targetSize });
-        float max = Mathf.Max(new float[] { currentSize, targetSize });
-
-        while (!Mathf.Approximately(_camera.orthographicSize, targetSize))
-        {
-            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize + (targetSize - currentSize) * Time.deltaTime * speed, min, max);
-            yield return new WaitForEndOfFrame();
-        }
-        yield break;
     }
 
     public void EnableRBs(bool enabled)

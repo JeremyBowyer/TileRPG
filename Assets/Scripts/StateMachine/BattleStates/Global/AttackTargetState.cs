@@ -6,7 +6,7 @@ using UnityEngine;
 public class AttackTargetState : BattleState
 {
     List<Node> attackRange;
-    CharacterController character;
+    CharController character;
     List<GameObject> outlinedEnemies = new List<GameObject>();
     public AttackAbility attackAbility;
 
@@ -56,7 +56,7 @@ public class AttackTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+        EnemyController enemy = e.info.gameObject.GetComponent<EnemyController>();
 
         if (enemy == null || enemy.tile == null)
             return;
@@ -76,7 +76,7 @@ public class AttackTargetState : BattleState
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-        Enemy enemy = e.info.gameObject.GetComponent<Enemy>();
+        EnemyController enemy = e.info.gameObject.GetComponent<EnemyController>();
 
         if (enemy == null)
             return;
@@ -92,17 +92,16 @@ public class AttackTargetState : BattleState
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
 
-        Enemy enemy = e.info.collider.gameObject.GetComponent<Enemy>();
+        EnemyController enemy = e.info.collider.gameObject.GetComponent<EnemyController>();
 
         if (enemy == null || enemy.tile == null)
             return;
 
-        if (attackRange.Contains(e.info.collider.GetComponent<Enemy>().tile.node))
+        if (attackRange.Contains(e.info.collider.GetComponent<EnemyController>().tile.node))
         {
-            gc.currentCharacter.attackTarget = e.info.collider.GetComponent<Enemy>();
             StateArgs attackArgs = new StateArgs
             {
-                targetCharacter = e.info.collider.GetComponent<Enemy>(),
+                targetCharacter = e.info.collider.GetComponent<EnemyController>(),
                 waitingStateMachines = new List<StateMachine> { gc }
             };
             character.ChangeState<AttackSequenceState>(attackArgs);

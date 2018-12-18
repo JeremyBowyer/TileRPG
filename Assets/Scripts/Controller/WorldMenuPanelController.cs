@@ -11,7 +11,6 @@ public class WorldMenuPanelController : MonoBehaviour
 {
     const string ShowKey = "Show";
     const string HideKey = "Hide";
-    const int MenuCount = 4;
 
     public string currentPanel;
 
@@ -19,16 +18,24 @@ public class WorldMenuPanelController : MonoBehaviour
     [SerializeField] UIPanel navPanel;
     [SerializeField] UIPanel partyPanel;
     [SerializeField] UIPanel inventoryPanel;
+    [SerializeField] UIPanel useItemPanel;
     [SerializeField] GameObject canvas;
+
+    GameController gc;
+    Protagonist protag;
+    Type currentItemType;
 
     UIPanel currentContentPanel;
     Dictionary<string, UIPanel> contentPanels;
-    List<WorldMenuEntry> navEntries = new List<WorldMenuEntry>(MenuCount);
+    List<WorldMenuEntry> navEntries = new List<WorldMenuEntry>();
+    List<GameObject> partyMemberEntries = new List<GameObject>();
+    List<GameObject> useItemEntries = new List<GameObject>();
+    List<GameObject> inventoryTypeEntries = new List<GameObject>();
     public int selection { get; private set; }
 
     void Awake()
     {
-
+        gc = GameObject.Find("GameController").GetComponent<GameController>();
     }
 
     void Start()
@@ -37,6 +44,7 @@ public class WorldMenuPanelController : MonoBehaviour
         contentPanels = new Dictionary<string, UIPanel>();
         contentPanels.Add("Party", partyPanel);
         contentPanels.Add("Inventory", inventoryPanel);
+        contentPanels.Add("UseItem", useItemPanel);
         canvas.SetActive(false);
     }
 
@@ -46,6 +54,21 @@ public class WorldMenuPanelController : MonoBehaviour
         t.easingControl.duration = 0.5f;
         t.easingControl.equation = EasingEquations.EaseOutQuad;
         return t;
+    }
+
+    public void Init()
+    {
+        protag = gc.protag.character as Protagonist;
+        ShowMenu();
+        LoadPartyMembers();
+        LoadInventoryTypes();
+    }
+
+    public void RemoveAll()
+    {
+        RemoveInventoryTypes();
+        RemovePartyMembers();
+        RemoveUseItemEntries();
     }
 
     bool SetSelection(int value)
@@ -100,6 +123,7 @@ public class WorldMenuPanelController : MonoBehaviour
     public void HideMenu()
     {
         currentContentPanel.SetPosition(HideKey, false);
+        useItemPanel.SetPosition(HideKey, false);
         canvas.SetActive(false);
     }
 
@@ -108,7 +132,7 @@ public class WorldMenuPanelController : MonoBehaviour
         Clear();
         foreach (KeyValuePair<string, UnityAction> option in options)
         {
-            GameObject goEntry = Instantiate(Resources.Load("Prefabs/World Menu Entry")) as GameObject;
+            GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/World Menu Entry")) as GameObject;
             goEntry.transform.SetParent(navPanel.transform, false);
             goEntry.transform.localScale = Vector3.one;
             goEntry.SetActive(true);
@@ -138,19 +162,208 @@ public class WorldMenuPanelController : MonoBehaviour
         //};
     }
 
+    public void LoadPartyMembers()
+    {
+        foreach (PartyMember member in protag.partyMembers)
+        {
+            AddPartyMember(member);
+            AddUseItemPartyMember(member);
+        }
+    }
+
     public void AddPartyMember(PartyMember member)
     {
-        GameObject goEntry = Instantiate(Resources.Load("Prefabs/Party Member Entry")) as GameObject;
+        // Instantiate prefab
+        GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Party Member Entry")) as GameObject;
         goEntry.transform.SetParent(partyPanel.transform, false);
         goEntry.transform.localScale = Vector3.one;
         goEntry.SetActive(true);
+
+        // Set Entry Fields
         PartyMenuEntry entry = goEntry.GetComponent<PartyMenuEntry>();
         entry.Reset();
         entry.mName.text = member.cName;
         entry.mClass.text = member.cClass;
-        entry.mHp.text = member.stats.maxHealth.ToString();
-        entry.mMana.text = member.stats.maxMP.ToString();
-        entry.mStamina.text = member.stats.maxAP.ToString();
+        entry.mHp.text = member.stats.curHealth.ToString();
+        entry.mMana.text = member.stats.curMP.ToString();
+        entry.mStamina.text = member.stats.curAP.ToString();
+        entry.mLevel.text = member.level.ToString();
+        entry.member = member;
+
+        // Add to list, for later removal
+        partyMemberEntries.Add(goEntry);
+    }
+
+    public void RefreshPartyMemberEntries()
+    {
+        foreach (GameObject goEntry in partyMemberEntries)
+        {
+            // Set Entry Fields
+            PartyMenuEntry entry = goEntry.GetComponent<PartyMenuEntry>();
+            PartyMember member = entry.member;
+            entry.Reset();
+            entry.mName.text = member.cName;
+            entry.mClass.text = member.cClass;
+            entry.mHp.text = member.stats.curHealth.ToString();
+            entry.mMana.text = member.stats.curMP.ToString();
+            entry.mStamina.text = member.stats.curAP.ToString();
+            entry.mLevel.text = member.level.ToString();
+            entry.member = member;
+        }
+    }
+
+    public void RemovePartyMembers()
+    {
+        foreach (GameObject entry in partyMemberEntries)
+        {
+            Destroy(entry);
+        }
+        partyMemberEntries.Clear();
+    }
+
+    public void AddUseItemPartyMember(PartyMember member)
+    {
+        // Instantiate prefab
+        GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Use Item Party Member Entry")) as GameObject;
+        goEntry.transform.SetParent(useItemPanel.transform, false);
+        goEntry.transform.localScale = Vector3.one;
+        goEntry.SetActive(true);
+
+        // Set Entry Fields
+        PartyMenuEntry entry = goEntry.GetComponent<PartyMenuEntry>();
+        entry.Reset();
+        entry.mName.text = member.cName;
+        entry.mClass.text = member.cClass;
+        entry.mHp.text = member.stats.curHealth.ToString();
+        entry.mMana.text = member.stats.curMP.ToString();
+        entry.mStamina.text = member.stats.curAP.ToString();
+        entry.mLevel.text = member.level.ToString();
+        entry.member = member;
+
+        // Set On Click
+        entry.setOnClick(delegate ()
+        {
+            Consumable item = protag.inventory.GetItemOfType(currentItemType) as Consumable;
+            item.Use(member.controller);
+            HideUseItemPanel();
+            RefreshUseItemMemberEntries();
+            RefreshPartyMemberEntries();
+            RefreshInventoryEntries();
+        });
+
+        // Add to list, for later removal
+        useItemEntries.Add(goEntry);
+    }
+
+    public void RefreshUseItemMemberEntries()
+    {
+        foreach (GameObject goEntry in useItemEntries)
+        {
+            // Set Entry Fields
+            PartyMenuEntry entry = goEntry.GetComponent<PartyMenuEntry>();
+            PartyMember member = entry.member;
+            entry.Reset();
+            entry.mName.text = member.cName;
+            entry.mClass.text = member.cClass;
+            entry.mHp.text = member.stats.curHealth.ToString();
+            entry.mMana.text = member.stats.curMP.ToString();
+            entry.mStamina.text = member.stats.curAP.ToString();
+            entry.mLevel.text = member.level.ToString();
+            entry.member = member;
+        }
+    }
+
+    public void RemoveUseItemEntries()
+    {
+        foreach(GameObject entry in useItemEntries)
+        {
+            Destroy(entry);
+        }
+        useItemEntries.Clear();
+    }
+
+    protected void LoadInventoryTypes()
+    {
+        RemoveInventoryTypes();
+        foreach (KeyValuePair<Type, int> entry in protag.inventory.typeCount)
+        {
+            if(entry.Value > 0)
+                AddInventoryType(entry);
+        }
+    }
+
+    public void AddInventoryType(KeyValuePair<Type, int> _entry)
+    {
+        // Instantiate prefab
+        GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Inventory Type Entry")) as GameObject;
+        goEntry.transform.SetParent(inventoryPanel.transform, false);
+        goEntry.transform.localScale = Vector3.one;
+        goEntry.SetActive(true);
+
+        // Set Entry Fields
+        InventoryTypeMenuEntry entry = goEntry.GetComponent<InventoryTypeMenuEntry>();
+        entry.Reset();
+        entry.Type = _entry.Key.ToString();
+        entry.Count = "x"+_entry.Value.ToString();
+
+        // Set On Click
+        entry.setOnClick(delegate ()
+        {
+            ShowUseItemPanel(_entry.Key);
+        });
+
+        // Add to list, for later removal
+        inventoryTypeEntries.Add(goEntry);
+    }
+
+    public void RefreshInventoryEntries()
+    {
+        List<GameObject> objectsToRemove = new List<GameObject>();
+        foreach (GameObject goEntry in inventoryTypeEntries)
+        {
+            // Set Entry Fields
+            InventoryTypeMenuEntry entry = goEntry.GetComponent<InventoryTypeMenuEntry>();
+            Type type = Type.GetType(entry.Type);
+            int count = protag.inventory.typeCount[type];
+            if(count <= 0)
+            {
+
+                objectsToRemove.Add(goEntry);
+                continue;
+            }
+            entry.Type = type.ToString();
+            entry.Count = "x" + count.ToString();
+        }
+
+        if(objectsToRemove.Count > 0)
+        {
+            foreach(GameObject goEntry in objectsToRemove)
+            {
+                inventoryTypeEntries.Remove(goEntry);
+                Destroy(goEntry);
+            }
+        }
+
+    }
+
+    public void ShowUseItemPanel(Type type)
+    {
+        currentItemType = type;
+        useItemPanel.SetPosition(ShowKey, true);
+    }
+
+    public void HideUseItemPanel()
+    {
+        useItemPanel.SetPosition(HideKey, true);
+    }
+
+    public void RemoveInventoryTypes()
+    {
+        foreach (GameObject entry in inventoryTypeEntries)
+        {
+            Destroy(entry);
+        }
+        inventoryTypeEntries.Clear();
     }
 
     public void SetLocked(int index, bool value)

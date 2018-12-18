@@ -1,11 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartyMember : Character
+public class PartyMember : Player
 {
-    void Start()
-    {
-        stats.Init();
-    }
+    public string model;
 }

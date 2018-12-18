@@ -101,6 +101,8 @@ public class StateMachine : MonoBehaviour
     {
         get
         {
+            if (waitingList == null)
+                return false;
             return waitingList.Count > 0;
         }
     }

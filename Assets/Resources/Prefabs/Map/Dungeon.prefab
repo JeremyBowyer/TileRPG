@@ -2416,6 +2416,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1731963110047482
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4568934374797162}
+  m_Layer: 11
+  m_Name: StartingPlace
+  m_TagString: StartingTilePlayer
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1737744510047200
 GameObject:
   m_ObjectHideFlags: 1
@@ -4389,6 +4404,7 @@ Transform:
   m_LocalPosition: {x: 12.74, y: -1.09, z: -5.4077306}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4568934374797162}
   - {fileID: 4598750052142076}
   - {fileID: 4816640144771010}
   - {fileID: 4952306347051706}
@@ -4576,6 +4592,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4598750052142076}
   m_RootOrder: 37
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4568934374797162
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731963110047482}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.7, y: 4.99, z: -9.14}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4504677687156618}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4571841041929220
 Transform:
@@ -4772,7 +4801,7 @@ Transform:
   - {fileID: 4243495532405226}
   - {fileID: 4396771325684540}
   m_Father: {fileID: 4504677687156618}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4608122302844692
 Transform:
@@ -5340,7 +5369,7 @@ Transform:
   - {fileID: 4571841041929220}
   - {fileID: 4074520439630410}
   m_Father: {fileID: 4504677687156618}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4818685173617450
 Transform:
@@ -5661,7 +5690,7 @@ Transform:
   - {fileID: 4426223540783484}
   - {fileID: 4575639187949952}
   m_Father: {fileID: 4504677687156618}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4953258899903606
 Transform:

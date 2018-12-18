@@ -13,6 +13,8 @@ public class PartyMenuEntry : MonoBehaviour
     [SerializeField] public Text mStamina;
     [SerializeField] Button button;
 
+    public PartyMember member;
+
     public string Name
     {
         get { return mName.text; }

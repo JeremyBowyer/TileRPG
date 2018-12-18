@@ -54,11 +54,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gc: {fileID: 0}
   BattleGrid: {fileID: 0}
-  unwalkableMask:
-    serializedVersion: 2
-    m_Bits: 256
-  gridWorldSize: {x: 10, y: 10}
-  nodeRadius: 1
+  gridCells: {x: 15, y: 15}
+  nodeRadius: 0.5
   tiles: []
   highlightedTiles: []
   selectedTiles: []

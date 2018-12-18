@@ -16,20 +16,20 @@ public class JumpMovement : Movement
     private float jumpHeight;
     private float jumpSpeed;
 
-    public JumpMovement(CharacterController _character, GameController _gc) : base(_character, _gc)
+    public JumpMovement(CharController controller) : base(controller)
     {
 
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
-        character.animParamController.SetBool("falling", true);
+        controller.animParamController.SetBool("falling", true);
 
         Tile targetTile = path[path.Count - 1].tile;
-        Vector3 startingPos = character.transform.position;
-        Vector3 endingPos = targetTile.transform.position + new Vector3(0, character.height, 0);
+        Vector3 startingPos = controller.transform.position;
+        Vector3 endingPos = targetTile.transform.position + new Vector3(0, controller.height, 0);
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
-        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
+        controller.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
         currentTime = 0f;
         jumpHeight = Vector3.Distance(startingPos, endingPos) / 2;
         jumpSpeed = speed + speed / jumpHeight;
@@ -38,12 +38,12 @@ public class JumpMovement : Movement
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * jumpSpeed));
             Vector3 framePos = MathCurves.Parabola(startingPos, endingPos, jumpHeight, currentTime);
-            character.transform.position = framePos;
+            controller.transform.position = framePos;
             yield return new WaitForEndOfFrame();
         }
 
         // Clean up
-        character.animParamController.SetBool("idle", true);
+        controller.animParamController.SetBool("idle", true);
         callback();
         yield break;
     }

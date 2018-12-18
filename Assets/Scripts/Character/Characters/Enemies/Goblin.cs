@@ -2,33 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Goblin : Enemy {
-
-    void Start()
+public class Goblin : Enemy
+{
+    public override void Init()
     {
-        base.Awake();
-        //characterName = "Goblin";
+        stats.maxHealth = 100;
+        stats.maxAP = 100;
         stats.Init();
-        attackAbility = new MeleeAbility(this);
-        movementAbility = new JumpMovement(this, gc);
-    }
 
-    public override void InitBattle()
-    {
-       animParamController.SetBool("idle");
-    }
+        experience = 0;
+        level = 1;
 
-    public override void SetAnimatorParameters()
-    {
-        animParamController = GetComponent<AnimationParameterController>();
-        animParamController._bools = new List<string> { "idle", "falling", "running" };
-        animParamController._triggers = new List<string> { "jump", "die", "attack" };
-    }
+        cName = "Rob";
+        cClass = "Goblin";
 
-    public override void Die()
-    {
-        base.Die();
-        gc.worldEnemies.Remove(this.gameObject);
-        gc.battleEnemies.Remove(this.gameObject);
+        spells = new List<SpellAbility>();
+
+        attackAbility = new MeleeAbility(controller);
+        movementAbility = new JumpMovement(controller);
     }
 }

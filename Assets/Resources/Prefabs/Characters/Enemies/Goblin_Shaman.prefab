@@ -3035,17 +3035,10 @@ MonoBehaviour:
   waitingList: []
   currentStateText: {fileID: 0}
   tile: {fileID: 0}
-  targetTile: {fileID: 0}
-  stats:
-    maxHealth: 100
-    maxAP: 100
-    maxMP: 100
-  animParamController: {fileID: 114504051119614582}
-  characterName: Goblin Shaman
-  attackTarget: {fileID: 0}
+  height: 0
   gc: {fileID: 0}
   statusIndicator: {fileID: 114298224252580764}
-  height: 0
+  animParamController: {fileID: 114504051119614582}
 --- !u!114 &114504051119614582
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4754,8 +4747,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 2.4999924, y: 6}
-  m_SizeDelta: {x: -5, y: 10}
+  m_AnchoredPosition: {x: 2.4999924, y: 2}
+  m_SizeDelta: {x: -5, y: 3}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!224 &224934932786790746
 RectTransform:
@@ -4774,5 +4767,5 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 12}
+  m_SizeDelta: {x: 200, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}

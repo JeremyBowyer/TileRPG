@@ -7,7 +7,7 @@ public class MoveSequenceState : BattleState
 {
     private Tile targetTile;
     private List<Node> path;
-    private CharacterController character;
+    private CharController character;
 
     private Action callback;
 
@@ -36,7 +36,7 @@ public class MoveSequenceState : BattleState
     {
         inTransition = true;
         base.Enter();
-        character = GetComponent<CharacterController>();
+        character = GetComponent<CharController>();
         path = args.path;
         callback = args.callback;
         if(path.Count == 0)
@@ -45,7 +45,7 @@ public class MoveSequenceState : BattleState
             return;
         }
         targetTile = path[path.Count - 1].tile;
-        traverseCoroutine = character.movementAbility.Traverse(path, OnCoroutineFinish);
+        traverseCoroutine = character.MovementAbility.Traverse(path, OnCoroutineFinish);
         character.Move(targetTile);
         StartCoroutine(traverseCoroutine);
     }

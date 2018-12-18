@@ -12,7 +12,7 @@ public class TeleportMovement : Movement
     public override bool ignoreOccupant{ get { return true; } set { ignoreOccupant = value; } }
     public override float Speed { get { return 1 / speed; } set { speed = value; } }
 
-    public TeleportMovement(CharacterController _character, GameController _bc) : base(_character, _bc)
+    public TeleportMovement(CharController controller) : base(controller)
     {
 
     }
@@ -20,10 +20,10 @@ public class TeleportMovement : Movement
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
         Tile targetTile = path[path.Count - 1].tile;
-        Vector3 _targetPos = targetTile.transform.position + new Vector3(0, character.height, 0);
-        character.transform.LookAt(new Vector3(targetTile.transform.position.x, character.transform.position.y, targetTile.transform.position.z));
-        character.transform.position = _targetPos;
-
-        yield break; ;
+        Vector3 _targetPos = targetTile.transform.position + new Vector3(0, controller.height, 0);
+        controller.transform.LookAt(new Vector3(targetTile.transform.position.x, controller.transform.position.y, targetTile.transform.position.z));
+        controller.transform.position = _targetPos;
+        callback();
+        yield break;
     }
 }

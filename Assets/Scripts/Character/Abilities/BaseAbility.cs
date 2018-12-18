@@ -11,7 +11,7 @@ public abstract class BaseAbility {
     private int abilityPower;
     private int abilityCost;
     private int abilityRange;
-    public CharacterController character;
+    public CharController character;
     public bool diag;
     public bool inProgress;
     public bool nextTurn;

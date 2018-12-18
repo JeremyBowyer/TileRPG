@@ -6,7 +6,7 @@ using UnityEngine;
 public class FireboltAbility : TargetSpellAbility
 {
 
-    public FireboltAbility(CharacterController _character)
+    public FireboltAbility(CharController _character)
     {
         AbilityName = "Firebolt";
         AbilityDescription = "Attack at range with a firebolt.";
@@ -19,7 +19,7 @@ public class FireboltAbility : TargetSpellAbility
         mouseLayer = LayerMask.NameToLayer("Character");
     }
 
-    public override IEnumerator Initiate(CharacterController _target, Action callback)
+    public override IEnumerator Initiate(CharController _target, Action callback)
     {
         character.animParamController.SetTrigger("attack");
         character.transform.LookAt(new Vector3(_target.transform.position.x, character.transform.position.y, _target.transform.position.z));

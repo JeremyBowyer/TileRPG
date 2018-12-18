@@ -9,9 +9,10 @@ public class Grid : MonoBehaviour {
     [SerializeField]
     private GameObject BattleGrid;
 
-	public int UnWalkableLayerMask;
-	public Vector2 gridWorldSize;
-	public float nodeRadius;
+	private int UnWalkableLayerMask;
+    public Vector2 gridCells;
+    private Vector2 gridWorldSize;
+    public float nodeRadius;
 	public Node[,] grid;
     public List<GameObject> tiles;
     public List<GameObject> highlightedTiles;
@@ -30,7 +31,6 @@ public class Grid : MonoBehaviour {
 
     void Awake()
     {
-        nodeRadius = 0.5f;
         gc = GameObject.Find("GameController").GetComponent<GameController>();
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Grid"));
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("GridClick"));
@@ -48,7 +48,7 @@ public class Grid : MonoBehaviour {
         UnWalkableLayerMask = (1 << LayerMask.NameToLayer("Unwalkable"));
         nodeDiameter = nodeRadius * 2;
         
-        gridWorldSize = new Vector2(10f, 10f) * nodeDiameter;
+        gridWorldSize = gridCells * nodeDiameter;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
 

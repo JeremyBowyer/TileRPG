@@ -12,7 +12,7 @@ public class DetectPlayer : MonoBehaviour {
 
 	void Start () {
         layerMask = LayerMask.NameToLayer("Protag");
-        gc = GetComponent<CharacterController>().gc;
+        gc = GetComponent<CharController>().gc;
     }
 	
 	void Update () {
@@ -40,7 +40,7 @@ public class DetectPlayer : MonoBehaviour {
                         enemy.GetComponent<DetectPlayer>().enabled = false;
                     }
                     */
-                    gc.battleInitiator = gameObject.GetComponent<Enemy>();
+                    gc.battleInitiator = gameObject.GetComponent<EnemyController>();
                     
                     gc.ChangeState<InitBattleState>();
                 }

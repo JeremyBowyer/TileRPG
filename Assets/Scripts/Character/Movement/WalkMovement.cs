@@ -12,7 +12,7 @@ public class WalkMovement : Movement
     public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
-    public WalkMovement(CharacterController character, GameController bc) : base(character, bc)
+    public WalkMovement(CharController controller) : base(controller)
     {
         speed = 4f;
     }
@@ -20,35 +20,35 @@ public class WalkMovement : Movement
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
         // Set Animation
-        character.animParamController.SetBool("running", true);
+        controller.animParamController.SetBool("running", true);
 
         // Movement routine
         foreach (Node node in path)
         {
             float currentTime = 0f;
 
-            float startingX = character.transform.position.x;
-            float startingZ = character.transform.position.z;
+            float startingX = controller.transform.position.x;
+            float startingZ = controller.transform.position.z;
 
-            float xDist = node.tile.worldPosition.x - character.transform.position.x;
-            float zDist = node.tile.worldPosition.z - character.transform.position.z;
+            float xDist = node.tile.worldPosition.x - controller.transform.position.x;
+            float zDist = node.tile.worldPosition.z - controller.transform.position.z;
 
-            float _height = node.worldPosition.y + character.height;
+            float _height = node.worldPosition.y + controller.height;
 
-            character.transform.LookAt(new Vector3(node.tile.transform.position.x, character.transform.position.y, node.tile.transform.position.z));
+            controller.transform.LookAt(new Vector3(node.tile.transform.position.x, controller.transform.position.y, node.tile.transform.position.z));
             while (!Mathf.Approximately(currentTime, 1.0f))
             {
                 currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * Speed));
                 float frameValue = (endValue - startValue) * EasingEquations.EaseInOutQuad(0.0f, 1.0f, currentTime) + startValue;
                 float newX = startingX + xDist * frameValue;
                 float newZ = startingZ + zDist * frameValue;
-                character.transform.position = new Vector3(newX, _height, newZ);
+                controller.transform.position = new Vector3(newX, _height, newZ);
                 yield return new WaitForEndOfFrame();
             }
         }
 
         // Clean up
-        character.animParamController.SetBool("idle", true);
+        controller.animParamController.SetBool("idle", true);
         callback();
         yield break;
     }

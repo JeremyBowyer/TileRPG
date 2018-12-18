@@ -24,13 +24,13 @@ public class SelectUnitState : BattleState
         inTransition = true;
         base.Enter();
         gc.NextPlayer();
-        if (gc.currentCharacter is Player)
+        if (gc.currentCharacter is PlayerController)
         {
             inTransition = false;
             gc.ChangeState<CommandSelectionState>();
             return;
         }
-        else if (gc.currentCharacter is Enemy)
+        else if (gc.currentCharacter is EnemyController)
         {
             inTransition = false;
             gc.ChangeState<EnemyTurnState>();

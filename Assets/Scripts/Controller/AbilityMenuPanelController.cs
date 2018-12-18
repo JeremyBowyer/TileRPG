@@ -92,7 +92,7 @@ public class AbilityMenuPanelController : MonoBehaviour
         titleLabel.text = title;
         foreach(KeyValuePair<string, UnityAction> option in options)
         {
-            GameObject goEntry = Instantiate(Resources.Load("Prefabs/Ability Menu Entry")) as GameObject;
+            GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Ability Menu Entry")) as GameObject;
             goEntry.transform.SetParent(panel.transform, false);
             goEntry.transform.localScale = Vector3.one;
             goEntry.SetActive(true);

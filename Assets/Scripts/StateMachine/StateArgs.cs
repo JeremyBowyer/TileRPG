@@ -5,11 +5,11 @@ using UnityEngine;
 
 public struct StateArgs {
 
-    public CharacterController character;
+    public CharController character;
 
     public Tile startingTile;
     public Tile targetTile;
-    public CharacterController targetCharacter;
+    public CharController targetCharacter;
     public List<Node> path;
 
     public List<Node> splashZone;

@@ -11,6 +11,7 @@ public class WorldMenuState : WorldBaseMenuState
 
     protected string menuTitle;
     protected Dictionary<string, UnityAction> menuOptions;
+    protected Protagonist protag;
 
     public override List<Type> AllowedTransitions
     {
@@ -18,9 +19,7 @@ public class WorldMenuState : WorldBaseMenuState
         {
             return new List<Type>
             {
-            typeof(WorldExploreState),
-            typeof(WorldInventoryState),
-            typeof(WorldPartyState)
+            typeof(WorldExploreState)
             };
         }
         set { }
@@ -30,15 +29,16 @@ public class WorldMenuState : WorldBaseMenuState
     {
         inTransition = true;
         base.Enter();
-        worldMenuPanelController.ShowMenu();
+        protag = gc.protag.character as Protagonist;
+        worldMenuPanelController.Init();
         LoadMenu();
-        LoadPartyMembers();
         worldMenuPanelController.ShowContentPanel("Party");
         inTransition = false;
     }
     public override void Exit()
     {
         base.Exit();
+        worldMenuPanelController.RemoveAll();
         worldMenuPanelController.HideMenu();
     }
 
@@ -50,14 +50,6 @@ public class WorldMenuState : WorldBaseMenuState
         menuOptions.Add("Inventory", Inventory);
         menuOptions.Add("Exit Game", Quit);
         worldMenuPanelController.ShowNavEntries(menuTitle, menuOptions);
-    }
-
-    protected void LoadPartyMembers()
-    {
-        foreach(PartyMember member in gc.protag.GetComponent<Protag>().partyMembers)
-        {
-            worldMenuPanelController.AddPartyMember(member);
-        }
     }
 
     protected void Confirm()

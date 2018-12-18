@@ -28,12 +28,6 @@ public class UserInputController : MonoBehaviour {
     }
     void Update() {
 
-        if (Input.GetKeyDown("f"))
-        {
-            Debug.Log("yeah hi");
-            gc.ChangeState<InitBattleState>();
-        }
-
         // Escape (cancel)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -41,9 +35,31 @@ public class UserInputController : MonoBehaviour {
                 cancelEvent(this, new InfoEventArgs<int>(1));
         }
 
+        // Move Event
+        float x = Input.GetAxis("Horizontal");
+        float y = Input.GetAxis("Vertical");
+
+        if (x != 0 || y != 0)
+        {
+            if (moveEvent != null)
+                moveEvent(this, new InfoEventArgs<Point>(new Point(x, y)));
+        }
+
+        // Fire Event
+        for (int i = 0; i < 3; ++i)
+        {
+            if (Input.GetButtonUp(_buttons[i]))
+            {
+                if (fireEvent != null)
+                    fireEvent(this, new InfoEventArgs<int>(i));
+            }
+        }
+
         /* ---------------- */
         /* - Mouse Events - */
         /* ---------------- */
+        if (!Cursor.visible)
+            return;
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         bool wasHit = Physics.Raycast(ray, out hit, 40f, 1 << mouseLayer);
 
@@ -69,28 +85,6 @@ public class UserInputController : MonoBehaviour {
             if (lastHit != null && hoverExitEvent != null)
                 hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
             lastHit = null;
-        }
-
-
-        // Move Event
-        float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
-
-        if (x != 0 || y != 0)
-        {
-            if (moveEvent != null)
-                moveEvent(this, new InfoEventArgs<Point>(new Point(x, y)));
-        }
-
-
-        // Fire Event
-        for (int i = 0; i < 3; ++i)
-        {
-            if (Input.GetButtonUp(_buttons[i]))
-            {
-                if (fireEvent != null)
-                    fireEvent(this, new InfoEventArgs<int>(i));
-            }
         }
 
     }

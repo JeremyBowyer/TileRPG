@@ -9,7 +9,7 @@ public class MagmaBallAbility : EnvironmentSpellAbility
     GameObject mbPrefabClone;
     List<Node> splashZone;
 
-    public MagmaBallAbility(CharacterController _character)
+    public MagmaBallAbility(CharController _character)
     {
         AbilityName = "Magma Ball";
         AbilityDescription = "Attack at range with an magma ball.";

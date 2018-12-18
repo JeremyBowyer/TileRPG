@@ -4,33 +4,22 @@ using UnityEngine;
 
 public class Druid : Enemy
 {
-
-    void Start()
+    public override void Init()
     {
-        base.Awake();
-        characterName = "Druid";
+        stats.maxHealth = 100;
+        stats.maxAP = 100;
         stats.Init();
-        spells.Add(new FireboltAbility(this));
-        attackAbility = new ArrowAbility(this);
-        movementAbility = new WalkMovement(this, gc);
-    }
 
-    public override void InitBattle()
-    {
-        animParamController.SetBool("idle");
-    }
+        experience = 0;
+        level = 1;
 
-    public override void SetAnimatorParameters()
-    {
-        animParamController = GetComponent<AnimationParameterController>();
-        animParamController._bools = new List<string> { "idle", "falling", "running" };
-        animParamController._triggers = new List<string> { "jump", "die", "attack" };
-    }
+        cName = "Drew";
+        cClass = "Druid";
 
-    public override void Die()
-    {
-        base.Die();
-        gc.worldEnemies.Remove(this.gameObject);
-        gc.battleEnemies.Remove(this.gameObject);
+        spells = new List<SpellAbility>();
+        spells.Add(new FireboltAbility(controller));
+
+        attackAbility = new ArrowAbility(controller);
+        movementAbility = new WalkMovement(controller);
     }
 }

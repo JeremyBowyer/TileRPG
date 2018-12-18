@@ -41,7 +41,7 @@ public class CategorySelectionState : BaseAbilityMenuState
             case 0:
                 StateArgs attackTargetArgs = new StateArgs
                 {
-                    attackAbility = gc.currentCharacter.attackAbility
+                    attackAbility = gc.currentCharacter.AttackAbility
                 };
                 gc.ChangeState<AttackTargetState>(attackTargetArgs);
                 break;

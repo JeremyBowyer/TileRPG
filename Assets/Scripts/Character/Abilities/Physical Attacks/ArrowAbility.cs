@@ -7,7 +7,7 @@ public class ArrowAbility : AttackAbility {
 
     GameObject arrowPrefabClone;
 
-    public ArrowAbility(CharacterController _character)
+    public ArrowAbility(CharController _character)
     {
         AbilityName = "Arrow attack";
         AbilityDescription = "Attack at range with an arrow.";
@@ -19,7 +19,7 @@ public class ArrowAbility : AttackAbility {
         character = _character;
     }
 
-    public override IEnumerator Initiate(CharacterController _target, Action callback)
+    public override IEnumerator Initiate(CharController _target, Action callback)
     {
         character.transform.LookAt(new Vector3(_target.tile.transform.position.x, character.transform.position.y, _target.tile.transform.position.z));
         character.animParamController.SetTrigger("attack");

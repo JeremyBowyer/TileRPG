@@ -8,7 +8,7 @@ public class SpellEnvironmentTargetState : BattleState
     public List<Node> spellRange;
     public List<Node> splashZone;
     public SpellAbility spellAbility;
-    public CharacterController character;
+    public CharController character;
 
     public override List<Type> AllowedTransitions
     {

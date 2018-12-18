@@ -1728,7 +1728,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1666983237943974}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.11267, y: 3.2054977, z: -11.9}
+  m_LocalPosition: {x: 67.912674, y: 9.6, z: -3.71}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4562513747574424}
@@ -3077,17 +3077,10 @@ MonoBehaviour:
   waitingList: []
   currentStateText: {fileID: 0}
   tile: {fileID: 0}
-  targetTile: {fileID: 0}
-  stats:
-    maxHealth: 100
-    maxAP: 100
-    maxMP: 100
-  animParamController: {fileID: 114574359889543828}
-  characterName: Goblin Warchief
-  attackTarget: {fileID: 0}
+  height: 0
   gc: {fileID: 0}
   statusIndicator: {fileID: 114117796978557260}
-  height: 0
+  animParamController: {fileID: 114574359889543828}
 --- !u!114 &114361770634641718
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4737,7 +4730,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 1}
-  m_SizeDelta: {x: 4, y: 1}
+  m_SizeDelta: {x: 2, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224587715494888730
 RectTransform:
@@ -4754,8 +4747,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 2.4999924, y: 6}
-  m_SizeDelta: {x: -5, y: 10}
+  m_AnchoredPosition: {x: 2.4999924, y: 2}
+  m_SizeDelta: {x: -5, y: 3}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!224 &224995225478037480
 RectTransform:
@@ -4774,5 +4767,5 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 12}
+  m_SizeDelta: {x: 100, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}

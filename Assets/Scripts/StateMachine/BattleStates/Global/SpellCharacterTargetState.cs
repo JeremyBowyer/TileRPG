@@ -8,7 +8,7 @@ public class SpellCharacterTargetState : BattleState
     public List<Node> spellRange;
     public List<GameObject> outlinedEnemies = new List<GameObject>();
     public SpellAbility spellAbility;
-    public CharacterController character;
+    public CharController character;
 
     public override List<Type> AllowedTransitions
     {
@@ -64,7 +64,7 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        Enemy target = e.info.gameObject.GetComponent<Enemy>();
+        EnemyController target = e.info.gameObject.GetComponent<EnemyController>();
 
         if (target == null || target.tile == null)
             return;
@@ -89,12 +89,12 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        Enemy target = e.info.collider.gameObject.GetComponent<Enemy>();
+        EnemyController target = e.info.collider.gameObject.GetComponent<EnemyController>();
 
         if (target == null || target.tile == null)
             return;
 
-        if (spellRange.Contains(e.info.collider.GetComponent<Enemy>().tile.node))
+        if (spellRange.Contains(e.info.collider.GetComponent<EnemyController>().tile.node))
         {
             StateArgs spellArgs = new StateArgs
             {

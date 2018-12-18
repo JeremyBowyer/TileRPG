@@ -5,8 +5,8 @@ using System;
 
 public class SpellEnvironmentSequenceState : BattleState
 {
-    public static CharacterController targetCharacter;
-    public static CharacterController character;
+    public static CharController targetCharacter;
+    public static CharController character;
     public static Tile targetTile;
     private List<Node> splashZone;
     public static EnvironmentSpellAbility spell;
@@ -33,7 +33,7 @@ public class SpellEnvironmentSequenceState : BattleState
     public override void Enter()
     {
         inTransition = true;
-        character = GetComponent<CharacterController>();
+        character = GetComponent<CharController>();
         spell = args.spell as EnvironmentSpellAbility;
         targetTile = args.targetTile;
         splashZone = args.splashZone;
@@ -50,7 +50,7 @@ public class SpellEnvironmentSequenceState : BattleState
         {
             if (node.tile.occupant != null)
             {
-                node.tile.occupant.GetComponent<CharacterController>().Damage(spell.AbilityPower);
+                node.tile.occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
             }
         }
         inTransition = false;
@@ -65,7 +65,7 @@ public class SpellEnvironmentSequenceState : BattleState
         {
             if (node.tile.occupant != null)
             {
-                node.tile.occupant.GetComponent<CharacterController>().Damage(spell.AbilityPower);
+                node.tile.occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
             }
         }
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("SpellEnvironmentGO"))

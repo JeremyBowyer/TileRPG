@@ -12,19 +12,20 @@ public class InitiateBattle : MonoBehaviour
     public GameController gc;
     private Vector3 origin;
     public NavMeshAgent protagAgent;
+    public CharController character;
 
     void Start()
     {
-        gc = GetComponent<CharacterController>().gc;
+        character = GetComponent<CharController>();
         protagAgent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        if (gc.CurrentState == null)
+        if (character.gc.CurrentState == null)
             return;
 
-        if (gc.CurrentState.GetType().Name == "WorldExploreState")
+        if (character.gc.CurrentState.GetType().Name == "WorldExploreState")
         {
             origin = transform.position;
             Collider[] alertColliders = Physics.OverlapSphere(origin, sphereRadius, layerMask, QueryTriggerInteraction.UseGlobal);
@@ -32,10 +33,10 @@ public class InitiateBattle : MonoBehaviour
             {
                 if (col.tag == "Enemy")
                 {
-                    gc.battleInitiator = col.gameObject.GetComponent<Enemy>();
+                    character.gc.battleInitiator = col.gameObject.GetComponent<EnemyController>();
                     protagAgent.SetDestination(protagAgent.transform.position);
                     protagAgent.isStopped = true;
-                    gc.ChangeState<InitBattleState>();
+                    character.gc.ChangeState<InitBattleState>();
                 }
             }
         }

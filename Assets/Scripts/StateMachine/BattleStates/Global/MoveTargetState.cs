@@ -6,7 +6,7 @@ using System;
 public class MoveTargetState : BattleState
 {
     List<Node> moveRange;
-    Player player;
+    PlayerController player;
     Movement mover;
 
     public override List<Type> AllowedTransitions
@@ -27,9 +27,9 @@ public class MoveTargetState : BattleState
     {
         inTransition = true;
         base.Enter();
-        mover = gc.currentCharacter.movementAbility;
-        player = gc.currentCharacter as Player;
-        moveRange = mover.GetNodesInRange(player.stats.moveRange, mover.diag, false);
+        mover = gc.currentCharacter.MovementAbility;
+        player = gc.currentCharacter as PlayerController;
+        moveRange = mover.GetNodesInRange(player.Stats.moveRange, mover.diag, false);
         grid.HighlightNodes(moveRange);
         inTransition = false;
     }
@@ -61,7 +61,15 @@ public class MoveTargetState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, player.stats.moveRange, player.movementAbility.diag, player.movementAbility.ignoreOccupant, player.movementAbility.ignoreUnwalkable, false);
+            List<Node> path = gc.pathfinder.FindPath(
+                gc.currentCharacter.tile.node,
+                tile.node,
+                player.Stats.moveRange,
+                player.MovementAbility.diag,
+                player.MovementAbility.ignoreOccupant,
+                player.MovementAbility.ignoreUnwalkable,
+                false);
+
             StateArgs moveArgs = new StateArgs
             {
                 path = path,
@@ -85,8 +93,8 @@ public class MoveTargetState : BattleState
 
         if(moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false);
-            if (player.movementAbility.isPath)
+            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false);
+            if (player.MovementAbility.isPath)
             {
                 grid.SelectNodes(path, Color.black);
             }
@@ -95,7 +103,7 @@ public class MoveTargetState : BattleState
                 grid.SelectNodes(path[path.Count - 1], Color.black);
             }
             
-            battleUiController.SetApCost(path[path.Count - 1].gCost, player.stats.moveRange);
+            battleUiController.SetApCost(path[path.Count - 1].gCost, player.Stats.moveRange);
         }
     }
 

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldUIController : MonoBehaviour {
+public class WorldUIController : MonoBehaviour
+{
 
-    private GameController gc;
+    //private GameController gc;
 
     // Use this for initialization
     void Awake()
     {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        //gc = GameObject.Find("GameController").GetComponent<GameController>();
     }
 }

@@ -6,9 +6,9 @@ using System;
 
 public class BaseAI : MonoBehaviour {
 
-    private CharacterController character;
+    private CharController character;
     private GameController gc;
-    private CharacterController _target;
+    private CharController _target;
 
     //private List<Node> moveRange;
     private List<Node> attackRange;
@@ -36,7 +36,7 @@ public class BaseAI : MonoBehaviour {
     }
 
     public void Init() {
-        character = GetComponent<CharacterController>();
+        character = GetComponent<CharController>();
         gc = character.gc;
         aiAction = gc.battleUiController.transform.Find("AIAction").GetComponent<Text>();
     }
@@ -45,12 +45,12 @@ public class BaseAI : MonoBehaviour {
     {
         // Establish Ranges
         //moveRange = character.movementAbility.GetNodesInRange(character.stats.moveRange, character.movementAbility.diag, false);
-        attackRange = gc.pathfinder.FindRange(character.tile.node, character.attackAbility.AbilityRange, character.attackAbility.diag, true, true, false);
+        attackRange = gc.pathfinder.FindRange(character.tile.node, character.AttackAbility.AbilityRange, character.AttackAbility.diag, true, true, false);
         // Further spell range
         // TODO: flesh this out so you're not simply using the spell with farthest range
         float maxSpellRange = 0;
         maxSpell = null;
-        foreach (SpellAbility spell in character.spells)
+        foreach (SpellAbility spell in character.Spells)
         {
             if (spell.AbilityRange >= maxSpellRange & spell is TargetSpellAbility)
             {
@@ -125,7 +125,7 @@ public class BaseAI : MonoBehaviour {
     {
         if (maxSpell == null | spellRange.Count == 0)
             return false;
-        if (!spellRange.Contains(_target.tile.node) & maxSpell.AbilityCost <= character.stats.curAP)
+        if (!spellRange.Contains(_target.tile.node) & maxSpell.AbilityCost <= character.Stats.curAP)
             return false;
         return true;
     }
@@ -159,7 +159,7 @@ public class BaseAI : MonoBehaviour {
     {
         aiAction.text = "Chasing...";
         Tile tile = gc.grid.GetNeighbors(_target.tile.node, true, false)[0].tile;
-        List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, character.stats.moveRange, character.movementAbility.diag, character.movementAbility.ignoreOccupant, character.movementAbility.ignoreUnwalkable, false);
+        List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, character.Stats.moveRange, character.MovementAbility.diag, character.MovementAbility.ignoreOccupant, character.MovementAbility.ignoreUnwalkable, false);
         StateArgs moveArgs = new StateArgs
         {
             path = path,
@@ -170,8 +170,8 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual bool CheckForEnd()
     {
-        float curAP = character.stats.curAP;
-        float minCost = Mathf.Min(new float[] { character.attackAbility.AbilityCost, maxSpell == null ? curAP+1 : maxSpell.AbilityCost });
+        float curAP = character.Stats.curAP;
+        float minCost = Mathf.Min(new float[] { character.AttackAbility.AbilityCost, maxSpell == null ? curAP+1 : maxSpell.AbilityCost });
         float distanceFromTarget = gc.pathfinder.GetDistance(character.tile.node, _target.tile.node);
         if ((curAP < minCost & distanceFromTarget < 20) | curAP <= 10)
         {
@@ -194,7 +194,7 @@ public class BaseAI : MonoBehaviour {
             }
         }
 
-        _target = closestPlayer.GetComponent<CharacterController>();
+        _target = closestPlayer.GetComponent<CharController>();
 
     }
 

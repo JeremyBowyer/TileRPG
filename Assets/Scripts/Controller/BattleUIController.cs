@@ -50,27 +50,27 @@ public class BattleUIController : MonoBehaviour {
         apCost.text = "";
     }
 
-    public void ToggleAIAction(CharacterController currentCharacter)
+    public void ToggleAIAction(CharController currentCharacter)
     {
-        aiAction.gameObject.SetActive(currentCharacter is Enemy);
+        aiAction.gameObject.SetActive(currentCharacter is EnemyController);
     }
 
-    public void ShowHealthBars(CharacterController currentCharacter)
+    public void ShowHealthBars(CharController currentCharacter)
     {
         foreach(GameObject charGO in gc.battleCharacters)
         {
-            CharacterController character = charGO.GetComponent<CharacterController>();
+            CharController character = charGO.GetComponent<CharController>();
             character.statusIndicator.gameObject.SetActive(true);
         }
         currentCharacter.statusIndicator.gameObject.SetActive(false);
     }
 
-    public void LoadStats(CharacterController currentCharacter)
+    public void LoadStats(CharController currentCharacter)
     {
-        playerName.text = currentCharacter.characterName;
-        statusIndicator.SetHealth(currentCharacter.stats.curHealth, currentCharacter.stats.maxHealth);
-        statusIndicator.SetAP(currentCharacter.stats.curAP, currentCharacter.stats.maxAP);
-        statusIndicator.SetMP(currentCharacter.stats.curMP, currentCharacter.stats.maxMP);
+        playerName.text = currentCharacter.Name;
+        statusIndicator.SetHealth(currentCharacter.Stats.curHealth, currentCharacter.Stats.maxHealth);
+        statusIndicator.SetAP(currentCharacter.Stats.curAP, currentCharacter.Stats.maxAP);
+        statusIndicator.SetMP(currentCharacter.Stats.curMP, currentCharacter.Stats.maxMP);
     }
 
 }

@@ -25,7 +25,7 @@ public class SpellSelectionState : BaseAbilityMenuState
     {
         menuTitle = "Spells";
         menuOptions = new Dictionary<string, UnityAction>();
-        foreach (SpellAbility spell in gc.currentCharacter.spells)
+        foreach (SpellAbility spell in gc.currentCharacter.Spells)
         {
             if (spell is EnvironmentSpellAbility)
             {

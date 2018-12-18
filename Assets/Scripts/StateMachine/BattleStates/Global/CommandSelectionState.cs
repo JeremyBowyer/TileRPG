@@ -13,7 +13,7 @@ public class CommandSelectionState : BaseAbilityMenuState
         {
             return new List<Type>
             {
-            typeof(ExploreState),
+            typeof(ExploreBattleState),
             typeof(MoveTargetState),
             typeof(AttackTargetState),
             typeof(SpellSelectionState),
@@ -28,8 +28,9 @@ public class CommandSelectionState : BaseAbilityMenuState
         menuOptions = new Dictionary<string, UnityAction>();
         menuTitle = "Commands";
         menuOptions.Add("Move", Move);
-        menuOptions.Add(gc.currentCharacter.attackAbility.AbilityName, Attack);
-        menuOptions.Add("Spells", Spells);
+        menuOptions.Add(gc.currentCharacter.AttackAbility.AbilityName, Attack);
+        if(gc.currentCharacter.Spells != null && gc.currentCharacter.Spells.Count > 0)
+            menuOptions.Add("Spells", Spells);
         menuOptions.Add("End Turn", EndTurn);
         abilityMenuPanelController.Show(menuTitle, menuOptions);
     }
@@ -41,7 +42,7 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<ExploreState>();
+        gc.ChangeState<ExploreBattleState>();
     }
 
     protected void Move()
@@ -53,7 +54,7 @@ public class CommandSelectionState : BaseAbilityMenuState
     {
         StateArgs attackTargetArgs = new StateArgs
         {
-            attackAbility = gc.currentCharacter.attackAbility
+            attackAbility = gc.currentCharacter.AttackAbility
         };
         gc.ChangeState<AttackTargetState>(attackTargetArgs);
     }
