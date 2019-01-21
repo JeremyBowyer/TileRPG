@@ -13,13 +13,16 @@ public class Wizard : PartyMember
         experience = 0;
         level = 1;
 
+        cName = "Wizard";
         cClass = "Wizard";
 
         spells = new List<SpellAbility>();
         spells.Add(new MagmaBallAbility(controller));
         spells.Add(new FireboltAbility(controller));
+        spells.Add(new HealRayAbility(controller));
 
         attackAbility = new MeleeAbility(controller);
         movementAbility = new TeleportMovement(controller);
+        movementAbility.costModifier = 3f;
     }
 }

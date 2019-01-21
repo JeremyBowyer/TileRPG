@@ -29,7 +29,7 @@ public class MoveTargetState : BattleState
         base.Enter();
         mover = gc.currentCharacter.MovementAbility;
         player = gc.currentCharacter as PlayerController;
-        moveRange = mover.GetNodesInRange(player.Stats.moveRange, mover.diag, false);
+        moveRange = mover.GetNodesInRange(player.Stats.moveRange, mover.diag, false, mover.costModifier);
         grid.HighlightNodes(moveRange);
         inTransition = false;
     }
@@ -38,7 +38,7 @@ public class MoveTargetState : BattleState
     {
         base.Exit();
         grid.UnHighlightNodes(moveRange);
-        //grid.SelectNodes(moveRange, Color.grey);
+        gc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes();
         moveRange = null;
         battleUiController.SetApCost();
@@ -68,7 +68,8 @@ public class MoveTargetState : BattleState
                 player.MovementAbility.diag,
                 player.MovementAbility.ignoreOccupant,
                 player.MovementAbility.ignoreUnwalkable,
-                false);
+                false,
+                player.MovementAbility.costModifier);
 
             StateArgs moveArgs = new StateArgs
             {
@@ -88,19 +89,21 @@ public class MoveTargetState : BattleState
     {
         Tile tile = e.info.gameObject.GetComponent<Tile>();
 
-        if (tile == null)
+        if (tile == null || !tile.isWalkable)
             return;
 
         if(moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false);
+            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false, mover.costModifier);
             if (player.MovementAbility.isPath)
             {
-                grid.SelectNodes(path, Color.black);
+                //grid.HighlightPath(player.tile.node, path, Color.black);
+                grid.SelectNodes(path, Color.cyan);
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], Color.black);
+                //grid.HighlightPath(player.tile.node, path[path.Count - 1], Color.black);
+                grid.SelectNodes(path[path.Count - 1], Color.cyan);
             }
             
             battleUiController.SetApCost(path[path.Count - 1].gCost, player.Stats.moveRange);
@@ -117,6 +120,7 @@ public class MoveTargetState : BattleState
         if (moveRange.Contains(tile.node))
         {
             grid.DeSelectNodes();
+            gc.lineRenderer.positionCount = 0;
             battleUiController.SetApCost();
         }
     }

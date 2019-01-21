@@ -7,6 +7,7 @@ public class CharacterStats
     public int maxHealth = 100;
     public int maxAP = 100;
     public int maxMP = 100;
+    public float movementModifier = 0.5f;
 
     private int _curHealth;
     public int curHealth

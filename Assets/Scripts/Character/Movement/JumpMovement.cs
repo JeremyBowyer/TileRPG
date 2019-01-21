@@ -18,16 +18,16 @@ public class JumpMovement : Movement
 
     public JumpMovement(CharController controller) : base(controller)
     {
-
+        mName = "Jump";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
-        controller.animParamController.SetBool("falling", true);
+        controller.animParamController.SetTrigger("jump");
 
         Tile targetTile = path[path.Count - 1].tile;
         Vector3 startingPos = controller.transform.position;
-        Vector3 endingPos = targetTile.transform.position + new Vector3(0, controller.height, 0);
+        Vector3 endingPos = targetTile.transform.position;
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         controller.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
         currentTime = 0f;

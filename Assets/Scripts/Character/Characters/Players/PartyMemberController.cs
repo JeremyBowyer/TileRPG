@@ -8,7 +8,7 @@ public class PartyMemberController : PlayerController
 
     public override void Die()
     {
-        Protagonist protag = gc.protag.character as Protagonist;
+        ProtagonistController protag = gc.protag;
         PartyMember pm = character as PartyMember;
         protag.partyMembers.Remove(pm);
         base.Die();

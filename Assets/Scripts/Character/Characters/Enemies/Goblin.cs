@@ -6,8 +6,8 @@ public class Goblin : Enemy
 {
     public override void Init()
     {
-        stats.maxHealth = 100;
-        stats.maxAP = 100;
+        stats.maxHealth = 200;
+        stats.maxAP = 125;
         stats.Init();
 
         experience = 0;

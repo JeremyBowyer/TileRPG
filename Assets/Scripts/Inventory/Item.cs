@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Item
 {
-    public string name;
+    public string iName;
 }

@@ -11,6 +11,7 @@ public class BattleUIController : MonoBehaviour {
     public Text aiAction;
     private GameController gc;
 
+
     // Use this for initialization
     void Awake () {
         if (apCost == null)
@@ -65,12 +66,20 @@ public class BattleUIController : MonoBehaviour {
         currentCharacter.statusIndicator.gameObject.SetActive(false);
     }
 
+    public void UpdateStats()
+    {
+        LoadStats(gc.currentCharacter);
+    }
+
     public void LoadStats(CharController currentCharacter)
     {
-        playerName.text = currentCharacter.Name;
-        statusIndicator.SetHealth(currentCharacter.Stats.curHealth, currentCharacter.Stats.maxHealth);
-        statusIndicator.SetAP(currentCharacter.Stats.curAP, currentCharacter.Stats.maxAP);
-        statusIndicator.SetMP(currentCharacter.Stats.curMP, currentCharacter.Stats.maxMP);
+        if(currentCharacter != null)
+        {
+            playerName.text = currentCharacter.Name;
+            statusIndicator.SetHealth(currentCharacter.Stats.curHealth, currentCharacter.Stats.maxHealth);
+            statusIndicator.SetAP(currentCharacter.Stats.curAP, currentCharacter.Stats.maxAP);
+            statusIndicator.SetMP(currentCharacter.Stats.curMP, currentCharacter.Stats.maxMP);
+        }
     }
 
 }

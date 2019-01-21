@@ -12,13 +12,33 @@ public class StatusIndicator : MonoBehaviour {
     [SerializeField]
     private RectTransform mpBarRect;
 
+    private GameObject popupText;
+
     void Start()
 	{
 		if (healthBarRect == null) {
 			Debug.LogError ("STATUS INDICATOR: No health bar object assigned to " + gameObject.name);
 		}
 
+        popupText = Resources.Load("Prefabs/UI/PopupText") as GameObject;
+
     }
+
+
+    public void FloatText(string text, Color color, float duration = 1.5f)
+    {
+        GameObject popUpGO = Instantiate(popupText, gameObject.transform);
+        PopupText popUp = popUpGO.GetComponent<PopupText>();
+        popUp.duration = duration;
+        popUp.speed = 1f;
+
+        Text popUpText = popUpGO.GetComponent<Text>();
+        popUpText.text = text;
+        popUpText.color = color;
+
+        popUpGO.SetActive(true);
+    }
+
 
     public void SetHealth(int _cur, int _max)
     {

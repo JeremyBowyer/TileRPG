@@ -16,11 +16,22 @@ public class AnimationParameterController : MonoBehaviour {
         _animator.applyRootMotion = false; // Running animation would move character forward without this
     }
 
+    public void Pause()
+    {
+        _animator.enabled = false;
+    }
+
+    public void Resume()
+    {
+        _animator.enabled = true;
+    }
+
     void ClearBools()
     {
-        foreach (string _bool in _bools)
+        foreach (AnimatorControllerParameter param in _animator.parameters)
         {
-            _animator.SetBool(_bool, false);
+            if(param.type == AnimatorControllerParameterType.Bool)
+                _animator.SetBool(param.name, false);
         }
     }
 

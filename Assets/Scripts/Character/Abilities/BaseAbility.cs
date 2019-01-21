@@ -9,13 +9,15 @@ public abstract class BaseAbility {
     private string abilityDescription;
     private int abilityID;
     private int abilityPower;
-    private int abilityCost;
+    private int apCost;
+    private int mpCost;
     private int abilityRange;
     public CharController character;
     public bool diag;
     public bool inProgress;
     public bool nextTurn;
     public int mouseLayer;
+    public AbilityTypes.Intent abilityIntent;
 
     public string AbilityName
     {
@@ -41,15 +43,36 @@ public abstract class BaseAbility {
         set { abilityPower = value; }
     }
 
-    public int AbilityCost
+    public int ApCost
     {
-        get { return abilityCost; }
-        set { abilityCost = value; }
+        get { return apCost; }
+        set { apCost = value; }
+    }
+
+    public int MpCost
+    {
+        get { return mpCost; }
+        set { mpCost = value; }
     }
 
     public int AbilityRange
     {
         get { return abilityRange; }
         set { abilityRange = value; }
+    }
+
+    public virtual void ApplyCost(CharController _owner)
+    {
+        _owner.Stats.curAP = Mathf.Clamp(_owner.Stats.curAP - ApCost, 0, _owner.Stats.maxAP);
+        _owner.Stats.curMP = Mathf.Clamp(_owner.Stats.curMP - MpCost, 0, _owner.Stats.maxMP);
+    }
+
+    public abstract void ApplyEffect(CharController _target);
+
+    public abstract bool ValidateCost(CharController _owner);
+
+    public virtual bool ValidateTarget(CharController _target)
+    {
+        return true;
     }
 }

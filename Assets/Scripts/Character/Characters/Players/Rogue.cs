@@ -9,13 +9,18 @@ public class Rogue : PartyMember
         stats.maxHealth = 100;
         stats.maxAP = 100;
         stats.Init();
-        stats.curHealth = 25;
+
         experience = 0;
         level = 1;
 
+        cName = "Rogue";
         cClass = "Rogue";
 
         attackAbility = new MeleeAbility(controller);
         movementAbility = new TeleportMovement(controller);
+        movementAbility.costModifier = 2f;
+
+        spells = new List<SpellAbility>();
+        spells.Add(new BackstabAbility(controller));
     }
 }

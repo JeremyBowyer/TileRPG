@@ -5,20 +5,8 @@ using UnityEngine;
 public class Node : IHeapItem<Node> {
 
     public Tile tile = null;
-	public bool walkable
-    {
-        get
-        {
-            return tile.isWalkable;
-        }
-    }
-    public GameObject occupant
-    {
-        get
-        {
-            return tile.occupant;
-        }
-    }
+	public bool IsWalkable { get { return tile.isWalkable; } }
+    public CharController occupant { get { return tile.Occupant; } }
 	public Vector3 worldPosition;
 	public int gridX;
 	public int gridY;

@@ -29,6 +29,7 @@ public class WorldMenuState : WorldBaseMenuState
     {
         inTransition = true;
         base.Enter();
+        gc.PauseGame();
         protag = gc.protag.character as Protagonist;
         worldMenuPanelController.Init();
         LoadMenu();
@@ -38,6 +39,7 @@ public class WorldMenuState : WorldBaseMenuState
     public override void Exit()
     {
         base.Exit();
+        gc.ResumeGame();
         worldMenuPanelController.RemoveAll();
         worldMenuPanelController.HideMenu();
     }

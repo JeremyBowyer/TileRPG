@@ -15,12 +15,13 @@ public class WalkMovement : Movement
     public WalkMovement(CharController controller) : base(controller)
     {
         speed = 4f;
+        mName = "Walk";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
         // Set Animation
-        controller.animParamController.SetBool("running", true);
+        controller.animParamController.SetBool("walking", true);
 
         // Movement routine
         foreach (Node node in path)
@@ -30,21 +31,23 @@ public class WalkMovement : Movement
             float startingX = controller.transform.position.x;
             float startingZ = controller.transform.position.z;
 
-            float xDist = node.tile.worldPosition.x - controller.transform.position.x;
-            float zDist = node.tile.worldPosition.z - controller.transform.position.z;
+            float xDist = node.tile.WorldPosition.x - controller.transform.position.x;
+            float zDist = node.tile.WorldPosition.z - controller.transform.position.z;
 
-            float _height = node.worldPosition.y + controller.height;
+            float _height = node.worldPosition.y;
 
             controller.transform.LookAt(new Vector3(node.tile.transform.position.x, controller.transform.position.y, node.tile.transform.position.z));
             while (!Mathf.Approximately(currentTime, 1.0f))
             {
                 currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * Speed));
-                float frameValue = (endValue - startValue) * EasingEquations.EaseInOutQuad(0.0f, 1.0f, currentTime) + startValue;
+                float frameValue = (endValue - startValue) * EasingEquations.Linear(0.0f, 1.0f, currentTime) + startValue;
                 float newX = startingX + xDist * frameValue;
                 float newZ = startingZ + zDist * frameValue;
                 controller.transform.position = new Vector3(newX, _height, newZ);
                 yield return new WaitForEndOfFrame();
             }
+
+            controller.OccupyTile(node.tile);
         }
 
         // Clean up

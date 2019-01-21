@@ -17,9 +17,8 @@ public class WorldExploreState : State
     private List<GameObject> startingTilesEnemy;
 
     // Movement fields and references
-    private Transform cameraTransform;
     public Camera cam;
-    private UnityEngine.CharacterController _controller;
+    private CharacterController _controller;
     private GameObject protag;
     private AnimationParameterController protagAnimator;
     private Transform _transform;
@@ -61,9 +60,8 @@ public class WorldExploreState : State
         protag = gc.protag.gameObject;
         protagAnimator = protag.GetComponent<AnimationParameterController>();
         protagAgent = protag.GetComponent<NavMeshAgent>();
-        cameraTransform = gc._camera.transform;
         _transform = protag.transform;
-        _controller = protag.GetComponent<UnityEngine.CharacterController>();
+        _controller = protag.GetComponent<CharacterController>();
         UserInputController.mouseLayer = LayerMask.NameToLayer("Terrain");
 
         StartCoroutine(gc.cameraRig.ZoomCamera(9f, 8f, 25f));
@@ -72,7 +70,7 @@ public class WorldExploreState : State
 
         gc.protag.statusIndicator.gameObject.SetActive(false);
         gc.EnableRBs(true);
-        protagAgent.SetDestination(protagAgent.transform.position);
+        //protagAgent.SetDestination(protagAgent.transform.position);
         protagAgent.isStopped = false;
 
         inTransition = false;

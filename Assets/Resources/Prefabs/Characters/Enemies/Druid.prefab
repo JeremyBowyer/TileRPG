@@ -149,7 +149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 429864}
   - component: {fileID: 13748240}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Character_Female_Druid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1972,7 +1972,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136616}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 44.795242, y: 3.86, z: -23.34}
+  m_LocalPosition: {x: 26.415241, y: 3.9745018, z: -8.609999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4903708201935650}
@@ -2702,7 +2702,7 @@ Animator:
   m_GameObject: {fileID: 136616}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: e2958561779b1a748a4246b9d0c0b309, type: 3}
-  m_Controller: {fileID: 9100000, guid: 954cbde13d1c53146a4cfa10772d81f2, type: 2}
+  m_Controller: {fileID: 9100000, guid: c429861467d94b946af64b15b466321e, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -4151,6 +4151,7 @@ MonoBehaviour:
   currentStateText: {fileID: 0}
   tile: {fileID: 0}
   height: 0
+  direction: {x: 0, y: 0, z: 0}
   gc: {fileID: 0}
   statusIndicator: {fileID: 114177034252726962}
   animParamController: {fileID: 0}

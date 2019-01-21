@@ -45,7 +45,7 @@ public class SpellTargetSequenceState : BattleState
 
     public void OnCoroutineFinish()
     {
-        targetCharacter.Damage(spell.AbilityPower);
+        spell.ApplyEffect(targetCharacter);
         if (callback != null)
             callback();
         inTransition = false;
@@ -56,7 +56,7 @@ public class SpellTargetSequenceState : BattleState
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);
-        targetCharacter.Damage(spell.AbilityPower);
+        spell.ApplyEffect(targetCharacter);
         foreach(GameObject go in GameObject.FindGameObjectsWithTag("SpellTargetGO"))
         {
             GameObject.Destroy(go);

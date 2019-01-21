@@ -8,7 +8,7 @@ public class InitBattleState : BattleState
 {
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
-    private Protagonist protag;
+    private ProtagonistController protag;
 
     public override bool isInterruptable
     {
@@ -38,6 +38,9 @@ public class InitBattleState : BattleState
         gc.protag.transform.LookAt(new Vector3(gc.battleInitiator.transform.position.x, gc.protag.transform.position.y, gc.battleInitiator.transform.position.z));
         gc.protagStartPos = gc.protag.transform.position;
 
+        // Show Message
+        superUiController.ShowMessage("Battle Start", 2f);
+
         // Start Coroutines
         StartCoroutine(grid.CreateGrid(OnCreateGrid));
         StartCoroutine(gc.cameraRig.ZoomCamera(5f, 3f, 15f));
@@ -56,13 +59,14 @@ public class InitBattleState : BattleState
         gc.protag.InitBattle();
 
         // Place party members on protag tile, to be moved in next phase
-        protag = gc.protag.character as Protagonist;
+        protag = gc.protag;
         foreach (PartyMember member in protag.partyMembers)
         {
             member.controller.Place(protagNode.tile);
             gc.battleCharacters.Add(member.controller.gameObject);
             gc.unitsToPlace.Enqueue(member.controller.gameObject);
         }
+        gc.unitsToPlace.Enqueue(protag.gameObject);
 
         // Setup Nearby Enemies
         foreach (GameObject enemyGO in GameObject.FindGameObjectsWithTag("Enemy"))
@@ -88,11 +92,10 @@ public class InitBattleState : BattleState
             gc.onUnitChange += character.GetComponent<CharController>().OnTurnEnd;
         }
 
-        // Set first character
-        gc.currentCharacter = gc.battleEnemies[0].GetComponent<EnemyController>();
+        gc.protag.gameObject.transform.localScale = Vector3.zero;
 
         inTransition = false;
-        gc.protag.gameObject.transform.localScale = Vector3.zero;
         gc.ChangeState<PlaceUnitsState>();
     }
+
 }

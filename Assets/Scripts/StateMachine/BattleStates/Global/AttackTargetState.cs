@@ -61,15 +61,15 @@ public class AttackTargetState : BattleState
         if (enemy == null || enemy.tile == null)
             return;
 
-        if (attackRange.Contains(enemy.tile.node))
+        if (attackRange.Contains(enemy.tile.node) && attackAbility.ValidateTarget(enemy))
         {
             GameObject go = enemy.gameObject;
             go.AddComponent<Outline>();
             Outline outline = go.GetComponent<Outline>();
             outline.OutlineMode = Outline.Mode.OutlineAll;
-            outline.OutlineColor = Color.cyan;
+            outline.OutlineColor = Color.red;
             outline.OutlineWidth = 5f;
-
+            
             outlinedEnemies.Add(enemy.gameObject);
         }
     }
@@ -97,12 +97,13 @@ public class AttackTargetState : BattleState
         if (enemy == null || enemy.tile == null)
             return;
 
-        if (attackRange.Contains(e.info.collider.GetComponent<EnemyController>().tile.node))
+        if (attackRange.Contains(e.info.collider.GetComponent<EnemyController>().tile.node) && attackAbility.ValidateTarget(enemy))
         {
             StateArgs attackArgs = new StateArgs
             {
                 targetCharacter = e.info.collider.GetComponent<EnemyController>(),
-                waitingStateMachines = new List<StateMachine> { gc }
+                waitingStateMachines = new List<StateMachine> { gc },
+                attackAbility = attackAbility
             };
             character.ChangeState<AttackSequenceState>(attackArgs);
             gc.ChangeState<CheckForTurnEndState>();

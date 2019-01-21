@@ -12,11 +12,23 @@ public class ArrowAbility : AttackAbility {
         AbilityName = "Arrow attack";
         AbilityDescription = "Attack at range with an arrow.";
         AbilityID = 2;
-        AbilityPower = 50;
-        AbilityCost = 50;
+        AbilityPower = 10;
+        ApCost = 50;
         AbilityRange = 60;
         diag = true;
         character = _character;
+        mouseLayer = LayerMask.NameToLayer("Character");
+        abilityIntent = AbilityTypes.Intent.Hostile;
+    }
+
+    public override bool ValidateCost(CharController _owner)
+    {
+        return _owner.Stats.curAP >= ApCost;
+    }
+
+    public override void ApplyEffect(CharController character)
+    {
+        character.Damage(AbilityPower);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
@@ -44,7 +56,6 @@ public class ArrowAbility : AttackAbility {
         // Clean up
         character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         character.animParamController.SetBool("idle");
-        yield return new WaitForSeconds(1f);
         callback();
         GameObject.Destroy(arrowPrefabClone);
         yield break;

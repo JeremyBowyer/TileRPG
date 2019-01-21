@@ -61,7 +61,7 @@ public class UserInputController : MonoBehaviour {
         if (!Cursor.visible)
             return;
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        bool wasHit = Physics.Raycast(ray, out hit, 40f, 1 << mouseLayer);
+        bool wasHit = Physics.Raycast(ray, out hit, 100f, 1 << mouseLayer);
 
         if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null || clickEvent != null))
         {

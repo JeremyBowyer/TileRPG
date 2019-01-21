@@ -7,11 +7,13 @@ public class Grid : MonoBehaviour {
 
     public GameController gc;
     [SerializeField]
-    private GameObject BattleGrid;
+    private GameObject battleGrid;
+    [SerializeField]
+    private Projector battleGridProjector;
 
 	private int UnWalkableLayerMask;
-    public Vector2 gridCells;
-    private Vector2 gridWorldSize;
+    public int gridCells;
+    private float gridWorldSize;
     public float nodeRadius;
 	public Node[,] grid;
     public List<GameObject> tiles;
@@ -19,12 +21,15 @@ public class Grid : MonoBehaviour {
     public List<GameObject> selectedTiles;
 	public List<Node> path;
     public List<Node> range;
+    public Vector3 centerPoint;
 
     // Directions
     public Vector3 rightDirection;
     public Vector3 leftDirection { get { return -rightDirection; } }
     public Vector3 forwardDirection;
     public Vector3 backwardDirection { get { return -forwardDirection; } }
+
+    public enum Position { Front, Back, Left, Right, Diagonal};
 
     float nodeDiameter;
 	int gridSizeX, gridSizeY;
@@ -49,8 +54,8 @@ public class Grid : MonoBehaviour {
         nodeDiameter = nodeRadius * 2;
         
         gridWorldSize = gridCells * nodeDiameter;
-        gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+        gridSizeX = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
+        gridSizeY = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
 
         rightDirection = gc.protag.transform.rotation * Vector3.right;
         forwardDirection = gc.protag.transform.rotation * Vector3.forward;
@@ -70,7 +75,9 @@ public class Grid : MonoBehaviour {
 
         GameObject tileGO = Resources.Load("Prefabs/Grid/GridTile") as GameObject;
         Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius + rightDirection * nodeRadius;
-        bottomRight += -Vector3.up * gc.protag.GetComponent<BoxCollider>().bounds.extents.y;
+
+        centerPoint = bottomRight + rightDirection * nodeDiameter * 0.5f + backwardDirection * nodeDiameter * 0.5f + leftDirection * gridWorldSize / 2 + forwardDirection * gridWorldSize / 2;
+
         Vector3 cellPoint = bottomRight;
         cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
 
@@ -85,7 +92,7 @@ public class Grid : MonoBehaviour {
             Node node = new Node(cellPoint, x, y);
 
             // Create game object
-            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, BattleGrid.transform);
+            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, battleGrid.transform);
             tileInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
             tileInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
             tileInstance.transform.localScale = tileInstance.transform.localScale * nodeDiameter;
@@ -116,9 +123,18 @@ public class Grid : MonoBehaviour {
             if (i % 3 == 0)
                 yield return null;
         }
-        BattleGrid.gameObject.SetActive(true);
+        battleGrid.gameObject.SetActive(true);
+        ProjectorSetup();
         callback();
         yield break;
+    }
+
+    private void ProjectorSetup()
+    {
+        battleGridProjector.orthographicSize = gridCells + 1.5f;
+        battleGridProjector.transform.position = centerPoint + Vector3.up * 5f;
+        battleGridProjector.transform.rotation = Quaternion.LookRotation(Vector3.down, forwardDirection);
+        battleGridProjector.gameObject.SetActive(true);
     }
 
     public Vector3 MoveAlongTerrain(Vector3 startPoint, Vector3 direction, float distance = 1f, int steps = 4)
@@ -237,6 +253,48 @@ public class Grid : MonoBehaviour {
 
     }
 
+    public Position CompareDirection(Node nodeA, Node nodeB, Vector3 targetDirection)
+    {
+        // Check for back position
+        if ((targetDirection == forwardDirection && nodeA.gridY < nodeB.gridY) ||
+            (targetDirection == backwardDirection && nodeA.gridY > nodeB.gridY) ||
+            (targetDirection == leftDirection && nodeA.gridX < nodeB.gridX) ||
+            (targetDirection == rightDirection && nodeA.gridX > nodeB.gridX))
+        {
+            return Position.Back;
+        }
+
+        // Check for front position
+        if ((targetDirection == backwardDirection && nodeA.gridY < nodeB.gridY) ||
+            (targetDirection == forwardDirection && nodeA.gridY > nodeB.gridY) ||
+            (targetDirection == leftDirection && nodeA.gridX > nodeB.gridX) ||
+            (targetDirection == rightDirection && nodeA.gridX < nodeB.gridX))
+        {
+            return Position.Front;
+        }
+
+        // Check for left position
+        if ((targetDirection == backwardDirection && nodeA.gridX < nodeB.gridX) ||
+            (targetDirection == forwardDirection && nodeA.gridX > nodeB.gridX) ||
+            (targetDirection == leftDirection && nodeA.gridY < nodeB.gridY) ||
+            (targetDirection == rightDirection && nodeA.gridY > nodeB.gridY))
+        {
+            return Position.Left;
+        }
+
+        // Check for right position
+        if ((targetDirection == backwardDirection && nodeA.gridX > nodeB.gridX) ||
+            (targetDirection == forwardDirection && nodeA.gridX < nodeB.gridX) ||
+            (targetDirection == leftDirection && nodeA.gridY > nodeB.gridY) ||
+            (targetDirection == rightDirection && nodeA.gridY < nodeB.gridY))
+        {
+            return Position.Right;
+        }
+
+        return Position.Diagonal;
+
+    }
+
     public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 1f)
     {
         float normalizedLowestDistance = lowestDistance * nodeDiameter;
@@ -257,7 +315,8 @@ public class Grid : MonoBehaviour {
 
     public void ClearGrid()
     {
-        BattleGrid.gameObject.SetActive(false);
+        battleGrid.gameObject.SetActive(false);
+        battleGridProjector.gameObject.SetActive(false);
         grid = null;
 
         foreach(GameObject tileGO in tiles)
@@ -270,25 +329,21 @@ public class Grid : MonoBehaviour {
     {
         foreach (Node node in nodes)
         {
-            GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-
-            GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
-            decalInstance.layer = LayerMask.NameToLayer("Grid");
-            decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            selectedTiles.Add(decalInstance);
-
+            SelectNodes(node, color);
         }
     }
 
     public void SelectNodes(Node node, Color color)
     {
         GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-
         GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-        //decalInstance.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+        decalInstance.transform.localScale = decalInstance.transform.localScale * nodeDiameter;
         decalInstance.layer = LayerMask.NameToLayer("Grid");
         decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+
+        MeshRenderer mesh = decalInstance.GetComponent<MeshRenderer>();
+        mesh.material = new Material(mesh.material);
+        mesh.material.SetColor("_Color", color);
         selectedTiles.Add(decalInstance);
     }
 
@@ -300,14 +355,37 @@ public class Grid : MonoBehaviour {
         }
     }
 
+    public void HighlightPath(Node startingNode, List<Node> nodes, Color color)
+    {
+        gc.lineRenderer.positionCount = nodes.Count + 1;
+        Vector3[] points = new Vector3[nodes.Count + 1];
+        points[0] = startingNode.tile.WorldPosition + Vector3.up * gc.currentCharacter.height;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            points[i + 1] = nodes[i].worldPosition + Vector3.up * gc.currentCharacter.height;
+        }
+        gc.lineRenderer.SetPositions(points);
+    }
+
+    public void HighlightPath(Node startingNode, Node node, Color color)
+    {
+        gc.lineRenderer.positionCount = 2;
+        Vector3[] points = new Vector3[2];
+        points[0] = startingNode.tile.WorldPosition + Vector3.up * gc.currentCharacter.height;
+        points[1] = node.worldPosition + Vector3.up * gc.currentCharacter.height;
+        gc.lineRenderer.SetPositions(points);
+    }
+
     public void HighlightNodes(List<Node> nodes)
     {
         foreach (Node node in nodes)
         {
-            GameObject highlightedGO = Resources.Load("Prefabs/Grid/HighlightedTile") as GameObject;
+            //GameObject highlightedGO = Resources.Load("Prefabs/Grid/HighlightedTile") as GameObject;
+            GameObject highlightedGO = Resources.Load("Prefabs/Grid/GridTileVisible") as GameObject;
 
             GameObject hlInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
             hlInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
+            hlInstance.transform.localScale = hlInstance.transform.localScale * nodeDiameter;
             //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
             hlInstance.layer = LayerMask.NameToLayer("Grid");
             highlightedTiles.Add(hlInstance);

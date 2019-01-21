@@ -5,18 +5,29 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Tile : MonoBehaviour {
-
-	// References
-	//private BattleController bc;
-	//private Pathfinding pathfinder;
+    
     public Grid grid;
-    //private GameObject apCost;
     public Node node;
-    public Vector3 worldPosition { get { return node.worldPosition;  } }
-    public float worldX { get { return node.worldPosition.x; } }
-    public float worldY { get { return node.worldPosition.y; } }
+    public Vector3 WorldPosition { get { return node.worldPosition;  } }
+    public float WorldX { get { return node.worldPosition.x; } }
+    public float WorldY { get { return node.worldPosition.y; } }
+    public TileEffect effect;
+    public CharController occupant;
 
-    public GameObject occupant;
+    public CharController Occupant
+    {
+        get { return occupant; }
+        set
+        {
+            if(effect != null)
+            {
+                CharController character = value.GetComponent<CharController>();
+                if (character != null)
+                    effect.ApplyEffect(character);
+            }
+            occupant = value;
+        }
+    }
     public bool isWalkable = true;
 
 	void Start() {

@@ -16,7 +16,9 @@ public class GameController : StateMachine
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public WorldMenuPanelController worldMenuPanelController;
+    public SuperUIController superUiController;
     public GameObject movementCursor;
+    public LineRenderer lineRenderer;
 
     // Variables
     public CharController currentCharacter;
@@ -38,6 +40,7 @@ public class GameController : StateMachine
     void Start()
     {
         // Assign references
+        lineRenderer = GameObject.Find("LineRenderer").GetComponent<LineRenderer>();
         protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
@@ -48,8 +51,31 @@ public class GameController : StateMachine
         ChangeState<InitLevelState>();
     }
 
+    public void PauseGame()
+    {
+        foreach (GameObject character in characters)
+        {
+            CharController controller = character.GetComponent<CharController>();
+            controller.Pause();
+        }
+    }
+
+    public void ResumeGame()
+    {
+        foreach (GameObject character in characters)
+        {
+            CharController controller = character.GetComponent<CharController>();
+            controller.Resume();
+        }
+    }
+
     public void NextPlayer()
     {
+        if(currentCharacter == null)
+        {
+            ChangePlayer(battleCharacters[0].GetComponent<CharController>());
+            return;
+        }
         int index = battleCharacters.IndexOf(currentCharacter.gameObject);
         index = (index+2 > battleCharacters.Count) ? 0 : index + 1;
         ChangePlayer(battleCharacters[index].GetComponent<CharController>());
@@ -78,6 +104,11 @@ public class GameController : StateMachine
         {
             ChangeState<LossSequence>();
         }
+    }
+
+    public void TerminateBattle()
+    {
+        currentCharacter = null;
     }
 
     public void EnableRBs(bool enabled)

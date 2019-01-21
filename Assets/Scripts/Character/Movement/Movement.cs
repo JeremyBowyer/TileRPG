@@ -9,6 +9,8 @@ public abstract class Movement
     public float speed = 1f;
     public float startValue = 0f;
     public float endValue = 1f;
+    public float costModifier = 1f;
+    public string mName;
     protected CharController controller;
     protected GameController gc
     {
@@ -26,14 +28,12 @@ public abstract class Movement
         controller = _character;
     }
 
-    public virtual List<Node> GetNodesInRange(int limit, bool diag, bool ignoreOccupant)
+    public virtual List<Node> GetNodesInRange(int limit, bool diag, bool ignoreOccupant, float costModifier = 1f)
     {
-        List<Node> retValue = gc.pathfinder.FindRange(controller.tile.node, limit, diag, ignoreOccupant, ignoreUnwalkable, false);
+        List<Node> retValue = gc.pathfinder.FindRange(controller.tile.node, limit, diag, ignoreOccupant, ignoreUnwalkable, false, costModifier);
         return retValue;
     }
 
-    //public abstract IEnumerator Traverse(Tile startingTile, Tile targetTile, Action callback);
     public abstract IEnumerator Traverse(List<Node> path, Action callback);
-
 
 }

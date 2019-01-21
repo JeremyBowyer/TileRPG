@@ -13,7 +13,7 @@ public class Druid : Enemy
         experience = 0;
         level = 1;
 
-        cName = "Drew";
+        cName = "Druid";
         cClass = "Druid";
 
         spells = new List<SpellAbility>();

@@ -125,7 +125,7 @@ public class BaseAI : MonoBehaviour {
     {
         if (maxSpell == null | spellRange.Count == 0)
             return false;
-        if (!spellRange.Contains(_target.tile.node) & maxSpell.AbilityCost <= character.Stats.curAP)
+        if (!spellRange.Contains(_target.tile.node) & maxSpell.ApCost <= character.Stats.curAP)
             return false;
         return true;
     }
@@ -150,7 +150,8 @@ public class BaseAI : MonoBehaviour {
         {
             targetCharacter = _target,
             waitingStateMachines = new List<StateMachine> { gc },
-            callback = callback
+            callback = callback,
+            attackAbility = character.AttackAbility
         };
         character.ChangeState<AttackSequenceState>(attackArgs);
     }
@@ -171,7 +172,7 @@ public class BaseAI : MonoBehaviour {
     protected virtual bool CheckForEnd()
     {
         float curAP = character.Stats.curAP;
-        float minCost = Mathf.Min(new float[] { character.AttackAbility.AbilityCost, maxSpell == null ? curAP+1 : maxSpell.AbilityCost });
+        float minCost = Mathf.Min(new float[] { character.AttackAbility.ApCost, maxSpell == null ? curAP+1 : maxSpell.ApCost });
         float distanceFromTarget = gc.pathfinder.GetDistance(character.tile.node, _target.tile.node);
         if ((curAP < minCost & distanceFromTarget < 20) | curAP <= 10)
         {

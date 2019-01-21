@@ -33,10 +33,12 @@ public class VictorySequence : BattleState
         base.Enter();
 
         // Hide party members
-        Protagonist protag = gc.protag.character as Protagonist;
+        ProtagonistController protag = gc.protag;
+        protag.TerminateBattle();
         foreach (PartyMember member in protag.partyMembers)
         {
             member.controller.gameObject.transform.localScale = Vector3.zero;
+            member.controller.TerminateBattle();
         }
 
         // Deconstruct battle grid
@@ -47,6 +49,8 @@ public class VictorySequence : BattleState
 
         // Clear list of battle character
         gc.battleCharacters.Clear();
+
+        gc.TerminateBattle();
 
         inTransition = false;
         gc.ChangeState<WorldExploreState>();

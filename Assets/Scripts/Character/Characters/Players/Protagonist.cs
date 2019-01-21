@@ -26,6 +26,7 @@ public class Protagonist : PartyMember
         attackAbility = new MeleeAbility(controller);
         movementAbility = new WalkMovement(controller);
 
+        /*
         Rogue member1 = new Rogue()
         {
             cName = "Wingus",
@@ -49,6 +50,7 @@ public class Protagonist : PartyMember
             model = "Character_Male_Wizard"
         };
         partyMembers.Add(member3);
+        */
 
         inventory = new Inventory();
         inventory.Add(new Potion());

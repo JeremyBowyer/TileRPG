@@ -9,7 +9,7 @@ public class Potion : Consumable
     public Potion()
     {
         power = 25;
-        name = "Potion";
+        iName = "Potion";
     }
 
     public override void Use(CharController _target)

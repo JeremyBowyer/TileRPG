@@ -14,13 +14,13 @@ public class TeleportMovement : Movement
 
     public TeleportMovement(CharController controller) : base(controller)
     {
-
+        mName = "Teleport";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
     {
         Tile targetTile = path[path.Count - 1].tile;
-        Vector3 _targetPos = targetTile.transform.position + new Vector3(0, controller.height, 0);
+        Vector3 _targetPos = targetTile.transform.position;
         controller.transform.LookAt(new Vector3(targetTile.transform.position.x, controller.transform.position.y, targetTile.transform.position.z));
         controller.transform.position = _targetPos;
         callback();

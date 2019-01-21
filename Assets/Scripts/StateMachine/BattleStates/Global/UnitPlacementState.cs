@@ -26,8 +26,8 @@ public class UnitPlacementState : BattleState
         inTransition = true;
         base.Enter();
         character = args.character;
-        mover = new TeleportMovement(character);
-        moveRange = mover.GetNodesInRange(character.Stats.moveRange, true, false);
+        mover = character.MovementAbility;
+        moveRange = mover.GetNodesInRange(character.Stats.moveRange, true, false, mover.costModifier);
         grid.HighlightNodes(moveRange);
         inTransition = false;
     }
@@ -59,8 +59,27 @@ public class UnitPlacementState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
+            /*
             character.Place(tile);
             character.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+            */
+
+            List<Node> path = gc.pathfinder.FindPath(
+                character.tile.node,
+                tile.node,
+                character.Stats.moveRange,
+                character.MovementAbility.diag,
+                character.MovementAbility.ignoreOccupant,
+                character.MovementAbility.ignoreUnwalkable,
+                false,
+                character.MovementAbility.costModifier);
+
+            StateArgs moveArgs = new StateArgs
+            {
+                path = path,
+                waitingStateMachines = new List<StateMachine> { gc }
+            };
+            character.ChangeState<MoveSequenceState>(moveArgs);
             gc.ChangeState<PlaceUnitsState>();
             return;
         }
@@ -79,14 +98,14 @@ public class UnitPlacementState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(character.tile.node, tile.node, character.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false);
+            List<Node> path = pathfinder.FindPath(character.tile.node, tile.node, character.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false, mover.costModifier);
             if (mover.isPath)
             {
-                grid.SelectNodes(path, Color.black);
+                grid.SelectNodes(path, Color.cyan);
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], Color.black);
+                grid.SelectNodes(path[path.Count - 1], Color.cyan);
             }
 
             battleUiController.SetApCost(path[path.Count - 1].gCost, character.Stats.moveRange);

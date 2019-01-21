@@ -25,7 +25,7 @@ public class Pathfinding : MonoBehaviour {
         return _path.Count > 0;
     }
 
-    public List<Node> FindRange(Node startNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable, bool includeOrigin)
+    public List<Node> FindRange(Node startNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable, bool includeOrigin, float costModifier = 1f)
     {
         List<Node> nodesInRange = new List<Node>();
         //Node startNode = grid.NodeFromWorldPoint(startPos);
@@ -45,7 +45,7 @@ public class Pathfinding : MonoBehaviour {
         for (int i = 0; i < nodesInRange.Count; i++)
         {
             Node node = nodesInRange[i];
-            List<Node> _path = FindPath(startNode, node, _limit, diag, ignoreOccupant, ignoreUnwalkable, includeOrigin);
+            List<Node> _path = FindPath(startNode, node, _limit, diag, ignoreOccupant, ignoreUnwalkable, includeOrigin, costModifier);
             if (_path.Contains(node))
             {
                 validNodesInRange.Add(node);
@@ -56,7 +56,7 @@ public class Pathfinding : MonoBehaviour {
 
     }
 
-	public List<Node> FindPath(Node startNode, Node targetNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable, bool includeOrigin) {
+	public List<Node> FindPath(Node startNode, Node targetNode, int _limit, bool diag, bool ignoreOccupant, bool ignoreUnwalkable, bool includeOrigin, float costModifier = 1f) {
 
         ResetCosts();
 
@@ -77,14 +77,14 @@ public class Pathfinding : MonoBehaviour {
             }
 
 			foreach (Node neighbor in grid.GetNeighbors(currentNode, diag, ignoreOccupant)) {
-				if ((!neighbor.walkable && !ignoreUnwalkable) || closedSet.Contains(neighbor)) {
+				if ((!neighbor.IsWalkable && !ignoreUnwalkable) || closedSet.Contains(neighbor)) {
 					continue;
                 }
 
-				int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
+				int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor, costModifier);
 				if( newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor)) {
 					neighbor.gCost = newMovementCostToNeighbor;
-					neighbor.hCost = GetDistance(neighbor, targetNode);
+					neighbor.hCost = GetDistance(neighbor, targetNode, costModifier);
 					neighbor.parent = currentNode;
 
 					if (!openSet.Contains (neighbor)) {
@@ -128,14 +128,14 @@ public class Pathfinding : MonoBehaviour {
 
 	}
 
-	public int GetDistance (Node nodeA, Node nodeB) {
+	public int GetDistance (Node nodeA, Node nodeB, float costModifier = 1f) {
 		int distX = Mathf.Abs (nodeA.gridX - nodeB.gridX);
 		int distY = Mathf.Abs (nodeA.gridY - nodeB.gridY);
 
 		if (distX > distY)
-			return 14 * distY + 10 * (distX - distY);
+			return (int)(14 * distY * costModifier) + (int)(10 * (distX - distY) * costModifier);
 
-		return 14 * distX + 10 * (distY - distX);
+		return (int)(14 * distX * costModifier) + (int)(10 * (distY - distX) * costModifier);
 	}
 
     public void ResetCosts()

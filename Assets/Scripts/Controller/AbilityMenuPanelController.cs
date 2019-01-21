@@ -92,17 +92,32 @@ public class AbilityMenuPanelController : MonoBehaviour
         titleLabel.text = title;
         foreach(KeyValuePair<string, UnityAction> option in options)
         {
-            GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Ability Menu Entry")) as GameObject;
-            goEntry.transform.SetParent(panel.transform, false);
-            goEntry.transform.localScale = Vector3.one;
-            goEntry.SetActive(true);
-            AbilityMenuEntry entry = goEntry.GetComponent<AbilityMenuEntry>();
-            entry.Reset();
-            entry.Title = option.Key;
-            entry.setOnClick(option.Value);
-            menuEntries.Add(entry);
+            AddEntry(option, true);
         }
         TogglePos(ShowKey);
+    }
+
+    public void Show(string title)
+    {
+        currentPanel = title;
+        canvas.SetActive(true);
+        Clear();
+        titleLabel.text = title;
+        TogglePos(ShowKey);
+    }
+
+    public void AddEntry(KeyValuePair<string, UnityAction> option, bool enabled)
+    {
+        GameObject goEntry = Instantiate(Resources.Load("Prefabs/UI/Ability Menu Entry")) as GameObject;
+        goEntry.transform.SetParent(panel.transform, false);
+        goEntry.transform.localScale = Vector3.one;
+        goEntry.SetActive(true);
+        AbilityMenuEntry entry = goEntry.GetComponent<AbilityMenuEntry>();
+        entry.Reset();
+        entry.Title = option.Key;
+        entry.setOnClick(option.Value);
+        menuEntries.Add(entry);
+        entry.GetComponent<Button>().interactable = enabled;
     }
 
     public void SetLocked(int index, bool value)

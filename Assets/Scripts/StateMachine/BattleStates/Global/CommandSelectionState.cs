@@ -25,6 +25,14 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected override void LoadMenu()
     {
+        abilityMenuPanelController.Show("Commands");
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(gc.currentCharacter.MovementAbility.mName, Move), gc.currentCharacter.Stats.curAP > 0);
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(gc.currentCharacter.AttackAbility.AbilityName, Attack), gc.currentCharacter.AttackAbility.ValidateCost(gc.currentCharacter));
+        if (gc.currentCharacter.Spells != null && gc.currentCharacter.Spells.Count > 0)
+            abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("Spells", Spells), true);
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("End Turn", EndTurn), true);
+
+        /*
         menuOptions = new Dictionary<string, UnityAction>();
         menuTitle = "Commands";
         menuOptions.Add("Move", Move);
@@ -33,6 +41,7 @@ public class CommandSelectionState : BaseAbilityMenuState
             menuOptions.Add("Spells", Spells);
         menuOptions.Add("End Turn", EndTurn);
         abilityMenuPanelController.Show(menuTitle, menuOptions);
+        */
     }
 
     protected override void Confirm()

@@ -22,7 +22,7 @@ public class WorldMenuPanelController : MonoBehaviour
     [SerializeField] GameObject canvas;
 
     GameController gc;
-    Protagonist protag;
+    ProtagonistController protag;
     Type currentItemType;
 
     UIPanel currentContentPanel;
@@ -58,7 +58,7 @@ public class WorldMenuPanelController : MonoBehaviour
 
     public void Init()
     {
-        protag = gc.protag.character as Protagonist;
+        protag = gc.protag;
         ShowMenu();
         LoadPartyMembers();
         LoadInventoryTypes();
@@ -164,6 +164,10 @@ public class WorldMenuPanelController : MonoBehaviour
 
     public void LoadPartyMembers()
     {
+        PartyMember protagChar = protag.character as PartyMember;
+        AddPartyMember(protagChar);
+        AddUseItemPartyMember(protagChar);
+
         foreach (PartyMember member in protag.partyMembers)
         {
             AddPartyMember(member);

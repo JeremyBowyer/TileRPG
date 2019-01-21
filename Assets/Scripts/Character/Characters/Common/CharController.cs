@@ -7,6 +7,10 @@ public abstract class CharController : StateMachine {
 
     public Tile tile;
     public float height;
+    public Vector3 direction
+    {
+        get { return transform.forward; }
+    }
 
     // References
     public Character character;
@@ -52,7 +56,7 @@ public abstract class CharController : StateMachine {
         SetAnimatorParameters();
         CreateCharacter();
         gc = GameObject.Find("GameController").GetComponent<GameController>();
-        height = transform.position.y - transform.Find("GroundChecker").transform.position.y;
+        height = GetComponent<BoxCollider>().bounds.extents.y;
     }
 
     public virtual void CreateCharacter()
@@ -64,58 +68,98 @@ public abstract class CharController : StateMachine {
 
     public virtual void InitBattle()
     {
-        Stats.Init();
+        //Stats.Init();
+        statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         animParamController.SetBool("idle");
+        GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
+        if (circleGO == null)
+            return;
+
+        circleGO.SetActive(true);
+        Projector proj = circleGO.GetComponent<Projector>();
+        proj.material = new Material(proj.material);
+        if (this is EnemyController)
+        {
+            proj.material.SetColor("_Color", Color.red);
+        }
+        else
+        {
+            proj.material.SetColor("_Color", Color.green);
+        }
+    }
+
+    public virtual void TerminateBattle()
+    {
+        GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
+        if (circleGO == null)
+            return;
+
+        circleGO.SetActive(false);
     }
 
     public virtual void SetAnimatorParameters()
     {
         animParamController = GetComponent<AnimationParameterController>();
+        /*
         animParamController._bools = new List<string> { "idle", "falling", "running" };
         animParamController._triggers = new List<string> { "jump", "die", "attack" };
+        */
+    }
+
+    public virtual void Pause()
+    {
+        animParamController.Pause();
+    }
+
+    public virtual void Resume()
+    {
+        animParamController.Resume();
     }
 
     public void Place(Tile _tile)
     {
         Vector3 _targetPos = _tile.transform.position;
-        transform.position = _tile.transform.position + new Vector3(0, height, 0);
-
-        // Leave current tile
-        if (tile != null)
-            tile.occupant = null;
-
-        // Assign new tile
-        tile = _tile;
-        tile.occupant = gameObject;
+        transform.position = _tile.transform.position;
+        OccupyTile(_tile);
     }
 
     public void Move (Tile _tile)
     {
         Stats.curAP -= _tile.node.gCost;
+        gc.battleUiController.UpdateStats();
 
+        OccupyTile(_tile);
+    }
+
+    public void OccupyTile(Tile _tile)
+    {
         // Leave current tile
         if (tile != null)
-            tile.occupant = null;
+            tile.Occupant = null;
 
         // Assign new tile
         tile = _tile;
-        tile.occupant = gameObject;
+        tile.Occupant = this;
     }
 
     public void Attack(CharController _target, AttackAbility _ability)
     {
-        Stats.curAP -= _ability.AbilityCost;
+        Stats.curAP -= _ability.ApCost;
+        gc.battleUiController.UpdateStats();
     }
 
     public void CastSpell(SpellAbility spell)
     {
-        Stats.curAP -= spell.AbilityCost;
+        Stats.curMP -= spell.ApCost;
+        gc.battleUiController.UpdateStats();
     }
 
     public void Damage(int amt)
     {
         Stats.Damage(amt);
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
+        statusIndicator.FloatText(amt.ToString(), Color.red);
+        gc.battleUiController.UpdateStats();
         if (Stats.curHealth <= 0)
         {
             Die();
@@ -126,6 +170,12 @@ public abstract class CharController : StateMachine {
     {
         Stats.Heal(amt);
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
+        statusIndicator.FloatText(amt.ToString(), Color.green);
+    }
+
+    public void TurnToward()
+    {
+
     }
 
     public void OnTurnEnd(CharController character)

@@ -64,18 +64,30 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        EnemyController target = e.info.gameObject.GetComponent<EnemyController>();
+
+        CharController target = null;
+        Color color = Color.cyan;
+
+        if(spellAbility.abilityIntent == AbilityTypes.Intent.Hostile)
+        {
+            target = e.info.gameObject.GetComponent<EnemyController>();
+            color = Color.red;
+        } else if(spellAbility.abilityIntent == AbilityTypes.Intent.Support)
+        {
+            target = e.info.gameObject.GetComponent<PlayerController>();
+            color = Color.green;
+        }
 
         if (target == null || target.tile == null)
             return;
 
-        if (spellRange.Contains(target.tile.node))
+        if (spellRange.Contains(target.tile.node) && spellAbility.ValidateTarget(target))
         {
             GameObject go = target.gameObject;
             go.AddComponent<Outline>();
             Outline outline = go.GetComponent<Outline>();
             outline.OutlineMode = Outline.Mode.OutlineAll;
-            outline.OutlineColor = Color.cyan;
+            outline.OutlineColor = color;
             outline.OutlineWidth = 5f;
 
             outlinedEnemies.Add(target.gameObject);
@@ -89,12 +101,21 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        EnemyController target = e.info.collider.gameObject.GetComponent<EnemyController>();
+        CharController target = null;
+
+        if (spellAbility.abilityIntent == AbilityTypes.Intent.Hostile)
+        {
+            target = e.info.collider.GetComponent<EnemyController>();
+        }
+        else if (spellAbility.abilityIntent == AbilityTypes.Intent.Support)
+        {
+            target = e.info.collider.GetComponent<PlayerController>();
+        }
 
         if (target == null || target.tile == null)
             return;
 
-        if (spellRange.Contains(e.info.collider.GetComponent<EnemyController>().tile.node))
+        if (spellRange.Contains(target.tile.node) && spellAbility.ValidateTarget(target))
         {
             StateArgs spellArgs = new StateArgs
             {

@@ -58,8 +58,8 @@ public class SpellEnvironmentTargetState : BattleState
 
         if (spellRange.Contains(tile.node))
         {
-            splashZone = gc.pathfinder.FindRange(tile.node, 20, true, true, true, true);
-            grid.SelectNodes(splashZone, Color.black);
+            splashZone = gc.pathfinder.FindRange(tile.node, 10, true, true, true, true);
+            grid.SelectNodes(splashZone, Color.red);
         }
     }
 

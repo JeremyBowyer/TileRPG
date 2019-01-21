@@ -48,9 +48,9 @@ public class SpellEnvironmentSequenceState : BattleState
     {
         foreach (Node node in splashZone)
         {
-            if (node.tile.occupant != null)
+            if (node.tile.Occupant != null)
             {
-                node.tile.occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
+                node.tile.Occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
             }
         }
         inTransition = false;
@@ -63,9 +63,9 @@ public class SpellEnvironmentSequenceState : BattleState
         StopCoroutine(spellCoroutine);
         foreach (Node node in splashZone)
         {
-            if (node.tile.occupant != null)
+            if (node.tile.Occupant != null)
             {
-                node.tile.occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
+                node.tile.Occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
             }
         }
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("SpellEnvironmentGO"))

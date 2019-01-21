@@ -31,9 +31,9 @@ public class PlaceUnitsState : BattleState
 
         GameObject unit = gc.unitsToPlace.Dequeue();
         unit.gameObject.transform.localScale = Vector3.one;
-        PartyMemberController character = unit.GetComponent<PartyMemberController>();
+        CharController character = unit.GetComponent<CharController>();
         character.InitBattle();
-        gc.currentCharacter = character;
+        //gc.currentCharacter = character;
         StateArgs placeUnitArgs = new StateArgs()
         {
             character = character
