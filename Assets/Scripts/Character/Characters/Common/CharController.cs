@@ -7,6 +7,7 @@ public abstract class CharController : StateMachine {
 
     public Tile tile;
     public float height;
+    public List<PlayerEffect> effects;
     public Vector3 direction
     {
         get { return transform.forward; }
@@ -14,7 +15,8 @@ public abstract class CharController : StateMachine {
 
     // References
     public Character character;
-    public GameController gc;
+    public BattleController bc;
+    public LevelController lc;
     public StatusIndicator statusIndicator;
     public AnimationParameterController animParamController;
 
@@ -55,15 +57,29 @@ public abstract class CharController : StateMachine {
         statusIndicator = transform.Find("CameraAngleTarget/StatusIndicator").gameObject.GetComponent<StatusIndicator>();
         SetAnimatorParameters();
         CreateCharacter();
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        GameObject bcGO = GameObject.Find("BattleController");
+        if (bcGO != null)
+            bc = bcGO.GetComponent<BattleController>();
+
+        GameObject lcGO = GameObject.Find("LevelController");
+        if (lcGO != null)
+            lc = lcGO.GetComponent<LevelController>();
+
         height = GetComponent<BoxCollider>().bounds.extents.y;
     }
 
     public virtual void CreateCharacter()
     {
+        Debug.Log("hi");
         character = new Character();
         character.controller = this;
         character.Init();
+        effects = new List<PlayerEffect>();
+    }
+
+    public virtual void LoadCharacter(Character _character)
+    {
+        character = _character;
     }
 
     public virtual void InitBattle()
@@ -118,15 +134,14 @@ public abstract class CharController : StateMachine {
 
     public void Place(Tile _tile)
     {
-        Vector3 _targetPos = _tile.transform.position;
-        transform.position = _tile.transform.position;
+        transform.position = _tile.WorldPosition;
         OccupyTile(_tile);
     }
 
-    public void Move (Tile _tile)
+    public void Move(Tile _tile)
     {
         Stats.curAP -= _tile.node.gCost;
-        gc.battleUiController.UpdateStats();
+        bc.battleUiController.UpdateStats();
 
         OccupyTile(_tile);
     }
@@ -145,21 +160,24 @@ public abstract class CharController : StateMachine {
     public void Attack(CharController _target, AttackAbility _ability)
     {
         Stats.curAP -= _ability.ApCost;
-        gc.battleUiController.UpdateStats();
+        bc.battleUiController.UpdateStats();
     }
 
     public void CastSpell(SpellAbility spell)
     {
         Stats.curMP -= spell.ApCost;
-        gc.battleUiController.UpdateStats();
+        bc.battleUiController.UpdateStats();
     }
 
     public void Damage(int amt)
     {
+        if (gameObject == null)
+            return;
+
         Stats.Damage(amt);
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         statusIndicator.FloatText(amt.ToString(), Color.red);
-        gc.battleUiController.UpdateStats();
+        bc.battleUiController.UpdateStats();
         if (Stats.curHealth <= 0)
         {
             Die();
@@ -168,6 +186,9 @@ public abstract class CharController : StateMachine {
 
     public void Heal(int amt)
     {
+        if (gameObject == null)
+            return;
+
         Stats.Heal(amt);
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         statusIndicator.FloatText(amt.ToString(), Color.green);
@@ -185,21 +206,25 @@ public abstract class CharController : StateMachine {
 
     public virtual void Die()
     {
+        if (gameObject == null)
+            return;
+
         statusIndicator.gameObject.SetActive(false);
-        gc.onUnitChange -= OnTurnEnd;
-        gc.battleCharacters.Remove(gameObject);
-        gc.characters.Remove(this.gameObject);
+        bc.onUnitChange -= OnTurnEnd;
+        bc.characters.Remove(gameObject);
+        bc.characters.Remove(this.gameObject);
         StateArgs deathArgs = new StateArgs()
         {
-            waitingStateMachines = new List<StateMachine> { gc }
+            waitingStateMachines = new List<StateMachine> { bc }
         };
         ChangeState<DeathSequence>(deathArgs);
     }
 
     public virtual void AfterDeath()
     {
-        gc.OnUnitDeath(this);
-        Destroy(this.gameObject);
+        bc.OnUnitDeath(this);
+        gameObject.SetActive(false);
+        //Destroy(this.gameObject);
     }
 
 }

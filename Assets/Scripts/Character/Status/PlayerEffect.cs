@@ -4,19 +4,27 @@ using UnityEngine;
 
 public abstract class PlayerEffect : MonoBehaviour
 {
-    CharController character;
-    GameController gc;
+    public CharController target;
+    BattleController bc;
 
     public abstract void Tick(CharController currentCharacter);
     public abstract void ApplyEffect(CharController _target);
+    public abstract void RefreshEffect();
+
+    public virtual void RemoveEffect()
+    {
+        bc.onUnitChange -= Tick;
+        Destroy(this);
+    }
 
     public virtual void Awake()
     {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
-    public void Init()
+    public virtual void Init(CharController _target)
     {
-        gc.onUnitChange += Tick;
+        target = _target;
+        bc.onUnitChange += Tick;
     }
 }

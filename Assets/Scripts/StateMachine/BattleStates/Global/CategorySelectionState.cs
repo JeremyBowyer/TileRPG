@@ -41,9 +41,9 @@ public class CategorySelectionState : BaseAbilityMenuState
             case 0:
                 StateArgs attackTargetArgs = new StateArgs
                 {
-                    attackAbility = gc.currentCharacter.AttackAbility
+                    attackAbility = bc.CurrentCharacter.AttackAbility
                 };
-                gc.ChangeState<AttackTargetState>(attackTargetArgs);
+                bc.ChangeState<AttackTargetState>(attackTargetArgs);
                 break;
             case 1:
                 SetCategory(0);
@@ -56,12 +56,12 @@ public class CategorySelectionState : BaseAbilityMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 
     void SetCategory(int index)
     {
         ActionSelectionState.category = index;
-        gc.ChangeState<ActionSelectionState>();
+        bc.ChangeState<ActionSelectionState>();
     }
 }

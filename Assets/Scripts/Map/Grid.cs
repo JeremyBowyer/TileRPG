@@ -5,20 +5,21 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour {
 
-    public GameController gc;
+    public BattleController bc;
     [SerializeField]
     private GameObject battleGrid;
     [SerializeField]
     private Projector battleGridProjector;
+    public Tile bottomRightTile;
 
-	private int UnWalkableLayerMask;
+    private int UnWalkableLayerMask;
     public int gridCells;
     private float gridWorldSize;
     public float nodeRadius;
 	public Node[,] grid;
     public List<GameObject> tiles;
     public List<GameObject> highlightedTiles;
-    public List<GameObject> selectedTiles;
+    public Dictionary<string, List<GameObject>> selectedTiles;
 	public List<Node> path;
     public List<Node> range;
     public Vector3 centerPoint;
@@ -31,12 +32,13 @@ public class Grid : MonoBehaviour {
 
     public enum Position { Front, Back, Left, Right, Diagonal};
 
-    float nodeDiameter;
+    public float nodeDiameter;
 	int gridSizeX, gridSizeY;
 
     void Awake()
     {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        selectedTiles = new Dictionary<string, List<GameObject>>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Grid"));
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("GridClick"));
     }
@@ -48,64 +50,62 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-    public IEnumerator CreateGrid(Action callback)
+    public IEnumerator GenerateGrid(Action callback)
     {
-        UnWalkableLayerMask = (1 << LayerMask.NameToLayer("Unwalkable"));
-        nodeDiameter = nodeRadius * 2;
-        
+        nodeDiameter = bottomRightTile.gameObject.transform.localScale.x;
+
+        gridCells = 10;
+
         gridWorldSize = gridCells * nodeDiameter;
         gridSizeX = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
 
-        rightDirection = gc.protag.transform.rotation * Vector3.right;
-        forwardDirection = gc.protag.transform.rotation * Vector3.forward;
+        rightDirection = bottomRightTile.transform.rotation * Vector3.right;
+        forwardDirection = bottomRightTile.transform.rotation * Vector3.forward;
 
         grid = new Node[gridSizeX, gridSizeY];
         List<Point> cellPath = new List<Point>();
         for (int y = 0; y < gridSizeY; y++)
         {
-            for (int x = 0; x <gridSizeX; x++)
+            for (int x = 0; x < gridSizeX; x++)
             {
                 int newX = y % 2 == 0 ? x : gridSizeX - 1 - x;
                 cellPath.Add(new Point(newX, y));
-                
+
             }
         }
         List<Vector3> pathDirections = GetPathDirections(cellPath);
-
-        GameObject tileGO = Resources.Load("Prefabs/Grid/GridTile") as GameObject;
-        Vector3 bottomRight = gc.protag.transform.position + rightDirection * (Mathf.RoundToInt((gridSizeX - 1) / 2) * nodeDiameter) + forwardDirection * nodeRadius + rightDirection * nodeRadius;
-
-        centerPoint = bottomRight + rightDirection * nodeDiameter * 0.5f + backwardDirection * nodeDiameter * 0.5f + leftDirection * gridWorldSize / 2 + forwardDirection * gridWorldSize / 2;
-
+        Vector3 bottomRight = bottomRightTile.transform.position;
+        bottomRight.y = FindHeightPoint(bottomRight);
         Vector3 cellPoint = bottomRight;
-        cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
-
         for (int i = 0; i < cellPath.Count; i++)
         {
             // Grab next cell in path
             Point cell = cellPath[i];
 
-            // Create new node
+            // Get coordinates
             int x = Mathf.RoundToInt(cell.x);
             int y = Mathf.RoundToInt(cell.y);
-            Node node = new Node(cellPoint, x, y);
 
             // Create game object
-            GameObject tileInstance = Instantiate(tileGO, cellPoint, Quaternion.identity, battleGrid.transform);
-            tileInstance.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-            tileInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
-            tileInstance.transform.localScale = tileInstance.transform.localScale * nodeDiameter;
-            tiles.Add(tileInstance.gameObject);
+            GameObject tileGO = FindTileGo(cellPoint);
+            tileGO.name = "(" + x.ToString() + " , " + y.ToString() + ")";
+            tiles.Add(tileGO.gameObject);
+            Tile tile = tileGO.gameObject.GetComponent<Tile>();
+
+            // Find Anchor point
+            Vector3 anchorPoint = tileGO.transform.Find("AnchorPoint").transform.position;
+
+            // Create new node
+            Node node = new Node(anchorPoint, x, y);
 
             // Assign appropriate values for tile and node
-            Tile tile = tileInstance.gameObject.GetComponent<Tile>();
-            tile.grid = gc.grid;
+            tile.grid = bc.grid;
             tile.node = node;
             node.tile = tile;
 
             // Is tile walkable?
-            Collider[] alertColliders = Physics.OverlapSphere(cellPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
+            Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
             if (alertColliders != null && alertColliders.Length != 0)
             {
                 tile.isWalkable = false;
@@ -123,8 +123,7 @@ public class Grid : MonoBehaviour {
             if (i % 3 == 0)
                 yield return null;
         }
-        battleGrid.gameObject.SetActive(true);
-        ProjectorSetup();
+
         callback();
         yield break;
     }
@@ -164,6 +163,22 @@ public class Grid : MonoBehaviour {
                 break;
         }
         return endPoint;
+    }
+
+    public GameObject FindTileGo(Vector3 point)
+    {
+        int layerMask = (1 << LayerMask.NameToLayer("Grid"));
+        layerMask |= (1 << LayerMask.NameToLayer("GridClick"));
+        
+        RaycastHit hit;
+        if (Physics.Raycast(point + Vector3.up * 5f, -Vector3.up, out hit, 100f, layerMask))
+        {
+            if (hit.collider.tag == "Map")
+            {
+                return hit.collider.gameObject;
+            }
+        }
+        return new GameObject();
     }
 
     public float FindHeightPoint(Vector3 point)
@@ -300,7 +315,7 @@ public class Grid : MonoBehaviour {
         float normalizedLowestDistance = lowestDistance * nodeDiameter;
         Node closestNode = null;
         worldPosition.y = FindHeightPoint(worldPosition);
-        foreach (Node node in gc.grid.grid)
+        foreach (Node node in bc.grid.grid)
         {
             float nodeDistance = Vector3.Distance(worldPosition, node.worldPosition);
             if (nodeDistance < normalizedLowestDistance)
@@ -325,55 +340,66 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public void SelectNodes(List<Node> nodes, Color color)
+    public void SelectNodes(List<Node> nodes, Color color, string set)
     {
         foreach (Node node in nodes)
         {
-            SelectNodes(node, color);
+            SelectNodes(node, color, set);
         }
     }
 
-    public void SelectNodes(Node node, Color color)
+    public void SelectNodes(Node node, Color color, string set)
     {
-        GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-        GameObject decalInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-        decalInstance.transform.localScale = decalInstance.transform.localScale * nodeDiameter;
-        decalInstance.layer = LayerMask.NameToLayer("Grid");
-        decalInstance.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
+        GameObject nodeGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
+        GameObject nodeInstance = Instantiate(nodeGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+        nodeInstance.transform.localScale = nodeInstance.transform.localScale * nodeDiameter;
+        nodeInstance.layer = LayerMask.NameToLayer("Grid");
+        nodeInstance.transform.rotation = Quaternion.LookRotation(bc.grid.forwardDirection, Vector3.up);
+        nodeInstance.name = set;
 
-        MeshRenderer mesh = decalInstance.GetComponent<MeshRenderer>();
+        MeshRenderer mesh = nodeInstance.GetComponent<MeshRenderer>();
         mesh.material = new Material(mesh.material);
         mesh.material.SetColor("_Color", color);
-        selectedTiles.Add(decalInstance);
+
+        // Add to dictionary of selected tile lists
+        if (!selectedTiles.ContainsKey(set))
+        {
+            selectedTiles[set] = new List<GameObject>();
+        }
+        selectedTiles[set].Add(nodeInstance);
     }
 
-    public void DeSelectNodes()
+    public void DeSelectNodes(string set)
     {
-        foreach (GameObject tile in selectedTiles)
+        if (!selectedTiles.ContainsKey(set))
+            return;
+
+        foreach (GameObject tile in selectedTiles[set])
         {
             DestroyImmediate(tile, true);
         }
+        selectedTiles[set].Clear();
     }
 
     public void HighlightPath(Node startingNode, List<Node> nodes, Color color)
     {
-        gc.lineRenderer.positionCount = nodes.Count + 1;
+        bc.lineRenderer.positionCount = nodes.Count + 1;
         Vector3[] points = new Vector3[nodes.Count + 1];
-        points[0] = startingNode.tile.WorldPosition + Vector3.up * gc.currentCharacter.height;
+        points[0] = startingNode.tile.WorldPosition + Vector3.up * bc.CurrentCharacter.height;
         for (int i = 0; i < nodes.Count; i++)
         {
-            points[i + 1] = nodes[i].worldPosition + Vector3.up * gc.currentCharacter.height;
+            points[i + 1] = nodes[i].worldPosition + Vector3.up * bc.CurrentCharacter.height;
         }
-        gc.lineRenderer.SetPositions(points);
+        bc.lineRenderer.SetPositions(points);
     }
 
     public void HighlightPath(Node startingNode, Node node, Color color)
     {
-        gc.lineRenderer.positionCount = 2;
+        bc.lineRenderer.positionCount = 2;
         Vector3[] points = new Vector3[2];
-        points[0] = startingNode.tile.WorldPosition + Vector3.up * gc.currentCharacter.height;
-        points[1] = node.worldPosition + Vector3.up * gc.currentCharacter.height;
-        gc.lineRenderer.SetPositions(points);
+        points[0] = startingNode.tile.WorldPosition + Vector3.up * bc.CurrentCharacter.height;
+        points[1] = node.worldPosition + Vector3.up * bc.CurrentCharacter.height;
+        bc.lineRenderer.SetPositions(points);
     }
 
     public void HighlightNodes(List<Node> nodes)
@@ -384,7 +410,7 @@ public class Grid : MonoBehaviour {
             GameObject highlightedGO = Resources.Load("Prefabs/Grid/GridTileVisible") as GameObject;
 
             GameObject hlInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-            hlInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, gc.grid.forwardDirection);
+            hlInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, bc.grid.forwardDirection);
             hlInstance.transform.localScale = hlInstance.transform.localScale * nodeDiameter;
             //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
             hlInstance.layer = LayerMask.NameToLayer("Grid");

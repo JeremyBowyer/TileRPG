@@ -34,11 +34,6 @@ public abstract class State : MonoBehaviour
     public bool isBeingDestroyed = false;
     public StateArgs args;
 
-
-    // References
-    protected GameController gc;
-    public WorldUIController worldUiController { get { return gc.worldUiController; } }
-
     // Properties
     public virtual bool isInterruptable
     {
@@ -53,13 +48,6 @@ public abstract class State : MonoBehaviour
     {
         get { return new List<Type>(); }
         set { }
-    }
-
-
-    // Methods
-    protected virtual void Awake()
-    {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
     }
 
     public virtual void Enter()

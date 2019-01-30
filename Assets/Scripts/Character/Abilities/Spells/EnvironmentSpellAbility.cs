@@ -6,4 +6,5 @@ using UnityEngine;
 public abstract class EnvironmentSpellAbility : SpellAbility
 {
     public abstract IEnumerator Initiate(Tile tile, Action callback);
+    public abstract void ApplyTileEffect(Tile tile);
 }

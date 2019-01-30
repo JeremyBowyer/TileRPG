@@ -2955,7 +2955,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934826525462144}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.3
   m_Speed: 6
@@ -3027,7 +3027,9 @@ MonoBehaviour:
   currentStateText: {fileID: 0}
   tile: {fileID: 0}
   height: 0
-  gc: {fileID: 0}
+  effects: []
+  bc: {fileID: 0}
+  lc: {fileID: 0}
   statusIndicator: {fileID: 0}
   animParamController: {fileID: 0}
   protagAgent: {fileID: 0}

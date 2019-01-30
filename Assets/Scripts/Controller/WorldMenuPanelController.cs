@@ -21,7 +21,7 @@ public class WorldMenuPanelController : MonoBehaviour
     [SerializeField] UIPanel useItemPanel;
     [SerializeField] GameObject canvas;
 
-    GameController gc;
+    LevelController lc;
     ProtagonistController protag;
     Type currentItemType;
 
@@ -35,7 +35,7 @@ public class WorldMenuPanelController : MonoBehaviour
 
     void Awake()
     {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        lc = GameObject.Find("LevelController").GetComponent<LevelController>();
     }
 
     void Start()
@@ -58,7 +58,7 @@ public class WorldMenuPanelController : MonoBehaviour
 
     public void Init()
     {
-        protag = gc.protag;
+        protag = lc.protag;
         ShowMenu();
         LoadPartyMembers();
         LoadInventoryTypes();

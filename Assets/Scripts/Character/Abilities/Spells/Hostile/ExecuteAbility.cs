@@ -26,7 +26,7 @@ public class ExecuteAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController character)
     {
         character.Damage(character.character.stats.curHealth);
     }
@@ -40,7 +40,7 @@ public class ExecuteAbility : TargetSpellAbility
     {
         character.animParamController.SetTrigger("execute");
         character.animParamController.SetBool("idle");
-        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         callback();
         yield break;
     }

@@ -23,18 +23,18 @@ public class CheckForTurnEndState : BattleState
     {
         inTransition = true;
         base.Enter();
-        if(gc.currentCharacter.NextTurn && gc.currentCharacter is EnemyController)
-            gc.NextPlayer();
-        if (gc.currentCharacter is PlayerController)
+        if(bc.CurrentCharacter.NextTurn && bc.CurrentCharacter is EnemyController)
+            bc.NextPlayer();
+        if (bc.CurrentCharacter is PlayerController)
         {
             inTransition = false;
-            gc.ChangeState<CommandSelectionState>();
+            bc.ChangeState<CommandSelectionState>();
             return;
         }
-        else if (gc.currentCharacter is EnemyController)
+        else if (bc.CurrentCharacter is EnemyController)
         {
             inTransition = false;
-            gc.ChangeState<EnemyTurnState>();
+            bc.ChangeState<EnemyTurnState>();
             return;
         }
         inTransition = false;

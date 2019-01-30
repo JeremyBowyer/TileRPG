@@ -21,14 +21,14 @@ public class ExploreBattleState : BattleState
     public override void Enter()
     {
         inTransition = true;
-        gc.cameraRig.isFollowing = false;
+        bc.cameraRig.isFollowing = false;
         base.Enter();
         inTransition = false;
     }
 
     public override void Exit()
     {
-        gc.cameraRig.isFollowing = true;
+        bc.cameraRig.isFollowing = true;
         base.Exit();
     }
 
@@ -39,7 +39,7 @@ public class ExploreBattleState : BattleState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 
 }

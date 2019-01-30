@@ -30,7 +30,7 @@ public class EnemyTurnState : BattleState
     {
         inTransition = true;
         base.Enter();
-        enemyAI = gc.currentCharacter.GetComponent<BaseAI>();
+        enemyAI = bc.CurrentCharacter.GetComponent<BaseAI>();
         enemyTurnCoroutine = ConsiderOptions();
         StartCoroutine(enemyTurnCoroutine);
     }
@@ -49,7 +49,7 @@ public class EnemyTurnState : BattleState
         if (endTurn)
         {
             inTransition = false;
-            gc.ChangeState<SelectUnitState>();
+            bc.ChangeState<SelectUnitState>();
         }
         else
         {

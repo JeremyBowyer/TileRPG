@@ -4,13 +4,20 @@ using System.Collections.Generic;
 
 public abstract class BattleState : State
 {
-    public CameraController cameraRig { get { return gc.cameraRig; } }
-    public BattleUIController battleUiController { get { return gc.battleUiController; } }
-    public SuperUIController superUiController { get { return gc.superUiController; } }
-    public Grid grid { get { return gc.grid; } }
-    public Pathfinding pathfinder { get { return gc.pathfinder; } }
-    public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
-    public List<GameObject> characters { get { return gc.characters; } }
+    public BattleController bc;
+    public CameraController cameraRig { get { return bc.cameraRig; } }
+    public BattleUIController battleUiController { get { return bc.battleUiController; } }
+    public SuperUIController superUiController { get { return bc.superUiController; } }
+    public Grid grid { get { return bc.grid; } }
+    public Pathfinding pathfinder { get { return bc.pathfinder; } }
+    public AbilityMenuPanelController abilityMenuPanelController { get { return bc.abilityMenuPanelController; } }
+    public List<GameObject> characters { get { return bc.characters; } }
+
+    // Methods
+    protected virtual void Awake()
+    {
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
+    }
 
     public override void Enter()
     {

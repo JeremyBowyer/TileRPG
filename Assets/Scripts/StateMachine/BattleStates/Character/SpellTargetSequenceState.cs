@@ -45,7 +45,7 @@ public class SpellTargetSequenceState : BattleState
 
     public void OnCoroutineFinish()
     {
-        spell.ApplyEffect(targetCharacter);
+        spell.ApplyCharacterEffect(targetCharacter);
         if (callback != null)
             callback();
         inTransition = false;
@@ -56,12 +56,12 @@ public class SpellTargetSequenceState : BattleState
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);
-        spell.ApplyEffect(targetCharacter);
+        spell.ApplyCharacterEffect(targetCharacter);
         foreach(GameObject go in GameObject.FindGameObjectsWithTag("SpellTargetGO"))
         {
             GameObject.Destroy(go);
         }
-        character.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(character.tile.node, targetCharacter.tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(bc.grid.GetDirection(character.tile.node, targetCharacter.tile.node), Vector3.up);
         character.animParamController.SetBool("idle", true);
         if (callback != null)
             callback();

@@ -26,7 +26,7 @@ public class FireboltAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController character)
     {
         character.Damage(AbilityPower);
     }
@@ -57,7 +57,7 @@ public class FireboltAbility : TargetSpellAbility
         character.animParamController.SetBool("idle");
         character.animParamController.SetTrigger("cast_end");
         GameObject.Destroy(fbPrefabClone);
-        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         callback();
         yield break;
     }

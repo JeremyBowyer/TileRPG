@@ -4,19 +4,32 @@ using UnityEngine;
 
 public abstract class TileEffect : MonoBehaviour
 {
-    Tile tile;
-    GameController gc;
+    public Tile tile;
+    public BattleController bc;
 
-    public abstract void Tick(CharController currentCharacter);
     public abstract void ApplyEffect(CharController _target);
+    public abstract void ApplyToOccupant();
+
+    public virtual void RemoveEffect()
+    {
+        bc.onUnitChange -= Tick;
+        Destroy(this);
+    }
 
     public virtual void Awake()
     {
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
-    public void Init()
+    public virtual void Tick(CharController currentCharacter)
     {
-        gc.onUnitChange += Tick;
+        ApplyToOccupant();
+    }
+
+    public virtual void Init(Tile _tile)
+    {
+        tile = _tile;
+        bc.onUnitChange += Tick;
+        ApplyToOccupant();
     }
 }

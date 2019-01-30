@@ -27,16 +27,16 @@ public class AttackTargetState : BattleState
     public override void Enter()
     {
         base.Enter();
-        character = gc.currentCharacter;
+        character = bc.CurrentCharacter;
         attackAbility = args.attackAbility;
         attackRange = pathfinder.FindRange(character.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true, false);
-        grid.HighlightNodes(attackRange);
+        grid.SelectNodes(attackRange, CustomColors.AttackRange, "attackrange");
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.UnHighlightNodes(attackRange);
+        grid.DeSelectNodes("attackrange");
         attackRange = null;
 
         foreach(GameObject enemy in outlinedEnemies)
@@ -102,16 +102,16 @@ public class AttackTargetState : BattleState
             StateArgs attackArgs = new StateArgs
             {
                 targetCharacter = e.info.collider.GetComponent<EnemyController>(),
-                waitingStateMachines = new List<StateMachine> { gc },
+                waitingStateMachines = new List<StateMachine> { bc },
                 attackAbility = attackAbility
             };
             character.ChangeState<AttackSequenceState>(attackArgs);
-            gc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<CheckForTurnEndState>();
         }
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 }

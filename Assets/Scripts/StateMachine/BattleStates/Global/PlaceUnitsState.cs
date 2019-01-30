@@ -21,15 +21,15 @@ public class PlaceUnitsState : BattleState
     public override void Enter()
     {
         inTransition = true;
-        if (gc.unitsToPlace.Count == 0)
+        if (bc.unitsToPlace.Count == 0)
         {
-            gc.protag.gameObject.transform.localScale = Vector3.one;
+            bc.protag.gameObject.transform.localScale = Vector3.one;
             inTransition = false;
-            gc.ChangeState<SelectUnitState>();
+            bc.ChangeState<SelectUnitState>();
             return;
         }
 
-        GameObject unit = gc.unitsToPlace.Dequeue();
+        GameObject unit = bc.unitsToPlace.Dequeue();
         unit.gameObject.transform.localScale = Vector3.one;
         CharController character = unit.GetComponent<CharController>();
         character.InitBattle();
@@ -39,7 +39,7 @@ public class PlaceUnitsState : BattleState
             character = character
         };
         inTransition = false;
-        gc.ChangeState<UnitPlacementState>(placeUnitArgs);
+        bc.ChangeState<UnitPlacementState>(placeUnitArgs);
 
     }
 }

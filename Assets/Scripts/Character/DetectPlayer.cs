@@ -7,12 +7,12 @@ public class DetectPlayer : MonoBehaviour {
     public float sphereRadius = 5f;
     public LayerMask layerMask;
     public GameObject[] enemies;
-    public GameController gc;
+    public BattleController gc;
     private Vector3 origin;
 
 	void Start () {
         layerMask = LayerMask.NameToLayer("Protag");
-        gc = GetComponent<CharController>().gc;
+        gc = GetComponent<CharController>().bc;
     }
 	
 	void Update () {

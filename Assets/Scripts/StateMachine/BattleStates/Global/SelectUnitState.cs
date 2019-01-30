@@ -23,17 +23,17 @@ public class SelectUnitState : BattleState
     {
         inTransition = true;
         base.Enter();
-        gc.NextPlayer();
-        if (gc.currentCharacter is PlayerController)
+        bc.NextPlayer();
+        if (bc.CurrentCharacter is PlayerController)
         {
             inTransition = false;
-            gc.ChangeState<CommandSelectionState>();
+            bc.ChangeState<CommandSelectionState>();
             return;
         }
-        else if (gc.currentCharacter is EnemyController)
+        else if (bc.CurrentCharacter is EnemyController)
         {
             inTransition = false;
-            gc.ChangeState<EnemyTurnState>();
+            bc.ChangeState<EnemyTurnState>();
             return;
         }
         inTransition = false;

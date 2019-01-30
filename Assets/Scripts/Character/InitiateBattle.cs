@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class InitiateBattle : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class InitiateBattle : MonoBehaviour
     public float sphereRadius = 5f;
     public LayerMask layerMask;
     public GameObject[] enemies;
-    public GameController gc;
+    public BattleController gc;
     private Vector3 origin;
     public NavMeshAgent protagAgent;
     public CharController character;
@@ -22,10 +23,13 @@ public class InitiateBattle : MonoBehaviour
 
     void Update()
     {
-        if (character.gc.CurrentState == null)
+        if (character.lc == null)
             return;
 
-        if (character.gc.CurrentState.GetType().Name == "WorldExploreState")
+        if (character.lc.CurrentState == null)
+            return;
+
+        if (character.lc.CurrentState.GetType().Name == "WorldExploreState")
         {
             origin = transform.position;
             Collider[] alertColliders = Physics.OverlapSphere(origin, sphereRadius, layerMask, QueryTriggerInteraction.UseGlobal);
@@ -33,10 +37,11 @@ public class InitiateBattle : MonoBehaviour
             {
                 if (col.tag == "Enemy")
                 {
-                    character.gc.battleInitiator = col.gameObject.GetComponent<EnemyController>();
+                    character.lc.battleInitiator = col.gameObject.GetComponent<EnemyController>();
                     protagAgent.SetDestination(protagAgent.transform.position);
                     protagAgent.isStopped = true;
-                    character.gc.ChangeState<InitBattleState>();
+                    //character.lc.ChangeState<InitBattleState>();
+                    SceneManager.LoadScene("Battle");
                 }
             }
         }

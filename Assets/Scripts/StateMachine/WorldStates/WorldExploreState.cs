@@ -4,15 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class WorldExploreState : State
+public class WorldExploreState : WorldState
 {
-    public CameraController cameraRig { get { return gc.cameraRig; } }
-    public BattleUIController battleUiController { get { return gc.battleUiController; } }
-    public Grid grid { get { return gc.grid; } }
-    public Pathfinding pathfinder { get { return gc.pathfinder; } }
-    public AbilityMenuPanelController abilityMenuPanelController { get { return gc.abilityMenuPanelController; } }
-    public List<GameObject> characters { get { return gc.characters; } }
-
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
 
@@ -56,20 +49,18 @@ public class WorldExploreState : State
         inTransition = true;
         base.Enter();
 
-        movementCursor = gc.movementCursor;
-        protag = gc.protag.gameObject;
+        movementCursor = lc.movementCursor;
+        protag = lc.protag.gameObject;
         protagAnimator = protag.GetComponent<AnimationParameterController>();
         protagAgent = protag.GetComponent<NavMeshAgent>();
         _transform = protag.transform;
         _controller = protag.GetComponent<CharacterController>();
         UserInputController.mouseLayer = LayerMask.NameToLayer("Terrain");
 
-        StartCoroutine(gc.cameraRig.ZoomCamera(9f, 8f, 25f));
-        battleUiController.gameObject.SetActive(false);
         worldUiController.gameObject.SetActive(true);
 
-        gc.protag.statusIndicator.gameObject.SetActive(false);
-        gc.EnableRBs(true);
+        lc.protag.statusIndicator.gameObject.SetActive(false);
+        lc.EnableRBs(true);
         //protagAgent.SetDestination(protagAgent.transform.position);
         protagAgent.isStopped = false;
 
@@ -100,7 +91,7 @@ public class WorldExploreState : State
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<WorldMenuState>();
+        lc.ChangeState<WorldMenuState>();
     }
 
     public override void Exit()

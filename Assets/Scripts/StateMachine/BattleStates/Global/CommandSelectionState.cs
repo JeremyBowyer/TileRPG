@@ -26,9 +26,9 @@ public class CommandSelectionState : BaseAbilityMenuState
     protected override void LoadMenu()
     {
         abilityMenuPanelController.Show("Commands");
-        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(gc.currentCharacter.MovementAbility.mName, Move), gc.currentCharacter.Stats.curAP > 0);
-        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(gc.currentCharacter.AttackAbility.AbilityName, Attack), gc.currentCharacter.AttackAbility.ValidateCost(gc.currentCharacter));
-        if (gc.currentCharacter.Spells != null && gc.currentCharacter.Spells.Count > 0)
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(bc.CurrentCharacter.MovementAbility.mName, Move), bc.CurrentCharacter.Stats.curAP > 0);
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(bc.CurrentCharacter.AttackAbility.AbilityName, Attack), bc.CurrentCharacter.AttackAbility.ValidateCost(bc.CurrentCharacter));
+        if (bc.CurrentCharacter.Spells != null && bc.CurrentCharacter.Spells.Count > 0)
             abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("Spells", Spells), true);
         abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("End Turn", EndTurn), true);
 
@@ -51,31 +51,31 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<ExploreBattleState>();
+        bc.ChangeState<ExploreBattleState>();
     }
 
     protected void Move()
     {
-        gc.ChangeState<MoveTargetState>();
+        bc.ChangeState<MoveTargetState>();
     }
 
     protected void Attack()
     {
         StateArgs attackTargetArgs = new StateArgs
         {
-            attackAbility = gc.currentCharacter.AttackAbility
+            attackAbility = bc.CurrentCharacter.AttackAbility
         };
-        gc.ChangeState<AttackTargetState>(attackTargetArgs);
+        bc.ChangeState<AttackTargetState>(attackTargetArgs);
     }
 
     protected void Spells()
     {
-        gc.ChangeState<SpellSelectionState>();
+        bc.ChangeState<SpellSelectionState>();
     }
 
     protected void EndTurn()
     {
-        gc.ChangeState<SelectUnitState>();
+        bc.ChangeState<SelectUnitState>();
     }
 
 }

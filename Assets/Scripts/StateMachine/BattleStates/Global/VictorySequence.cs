@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VictorySequence : BattleState
 {
@@ -33,7 +34,7 @@ public class VictorySequence : BattleState
         base.Enter();
 
         // Hide party members
-        ProtagonistController protag = gc.protag;
+        ProtagonistController protag = bc.protag;
         protag.TerminateBattle();
         foreach (PartyMember member in protag.partyMembers)
         {
@@ -41,19 +42,23 @@ public class VictorySequence : BattleState
             member.controller.TerminateBattle();
         }
 
+        PersistentObjects.SaveProtagonist(bc);
+        SceneManager.LoadScene("World");
+        /*
         // Deconstruct battle grid
-        gc.grid.ClearGrid();
+        bc.grid.ClearGrid();
 
         // Place protag back at starting location
-        gc.protag.transform.position = gc.protagStartPos;
+        bc.protag.transform.position = bc.protagStartPos;
 
         // Clear list of battle character
-        gc.battleCharacters.Clear();
+        bc.characters.Clear();
 
-        gc.TerminateBattle();
+        bc.TerminateBattle();
 
         inTransition = false;
-        gc.ChangeState<WorldExploreState>();
+        bc.ChangeState<WorldExploreState>();
+        */
     }
 
     public override void Exit()

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class WorldMenuState : WorldBaseMenuState
 {
-    public WorldMenuPanelController worldMenuPanelController { get { return gc.worldMenuPanelController; } }
+    public WorldMenuPanelController worldMenuPanelController { get { return lc.worldMenuPanelController; } }
 
     protected string menuTitle;
     protected Dictionary<string, UnityAction> menuOptions;
@@ -29,8 +29,8 @@ public class WorldMenuState : WorldBaseMenuState
     {
         inTransition = true;
         base.Enter();
-        gc.PauseGame();
-        protag = gc.protag.character as Protagonist;
+        lc.PauseGame();
+        protag = lc.protag.character as Protagonist;
         worldMenuPanelController.Init();
         LoadMenu();
         worldMenuPanelController.ShowContentPanel("Party");
@@ -39,7 +39,7 @@ public class WorldMenuState : WorldBaseMenuState
     public override void Exit()
     {
         base.Exit();
-        gc.ResumeGame();
+        lc.ResumeGame();
         worldMenuPanelController.RemoveAll();
         worldMenuPanelController.HideMenu();
     }
@@ -61,7 +61,7 @@ public class WorldMenuState : WorldBaseMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<WorldExploreState>();
+        lc.ChangeState<WorldExploreState>();
     }
 
     protected void Inventory()

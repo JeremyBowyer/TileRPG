@@ -28,9 +28,9 @@ public class SpellEnvironmentTargetState : BattleState
     {
         inTransition = true;
         spellAbility = args.spell;
-        character = gc.currentCharacter;
-        spellRange = pathfinder.FindRange(gc.currentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
-        grid.HighlightNodes(spellRange);
+        character = bc.CurrentCharacter;
+        spellRange = pathfinder.FindRange(bc.CurrentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
+        grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
         base.Enter();
         inTransition = false;
     }
@@ -38,9 +38,9 @@ public class SpellEnvironmentTargetState : BattleState
     public override void Exit()
     {
         base.Exit();
-        grid.UnHighlightNodes(spellRange);
         spellRange = null;
-        grid.DeSelectNodes();
+        grid.DeSelectNodes("spellrange");
+        grid.DeSelectNodes("splashzone");
     }
 
     protected override void AddListeners()
@@ -58,8 +58,8 @@ public class SpellEnvironmentTargetState : BattleState
 
         if (spellRange.Contains(tile.node))
         {
-            splashZone = gc.pathfinder.FindRange(tile.node, 10, true, true, true, true);
-            grid.SelectNodes(splashZone, Color.red);
+            splashZone = bc.pathfinder.FindRange(tile.node, 10, true, true, true, true);
+            grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone");
         }
     }
 
@@ -69,7 +69,7 @@ public class SpellEnvironmentTargetState : BattleState
 
         if (tile == null)
             return;
-        grid.DeSelectNodes();
+        grid.DeSelectNodes("splashzone");
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
@@ -86,15 +86,15 @@ public class SpellEnvironmentTargetState : BattleState
                 targetTile = tile,
                 spell = spellAbility,
                 splashZone = splashZone,
-                waitingStateMachines = new List<StateMachine> { gc }
+                waitingStateMachines = new List<StateMachine> { bc }
             };
             character.ChangeState<SpellEnvironmentSequenceState>(spellArgs);
-            gc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<CheckForTurnEndState>();
         }
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 }

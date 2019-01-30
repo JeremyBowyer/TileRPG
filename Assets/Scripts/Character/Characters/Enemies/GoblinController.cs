@@ -12,5 +12,6 @@ public class GoblinController : EnemyController
             controller = this
         };
         character.Init();
+        character.stats.curHealth = 1;
     }
 }

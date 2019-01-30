@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class InitLevelState : State
+public class InitLevelState : WorldState
 {
     private ProtagonistController protag;
 
@@ -26,43 +26,34 @@ public class InitLevelState : State
         base.Enter();
 
         // Set protag as camera target
-        gc.cameraRig.followTarget = gc.protag.transform;
+        lc.cameraRig.FollowTarget = lc.protag.transform;
 
         // Place protag on starting spot
         GameObject startingPlace = GameObject.FindGameObjectWithTag("StartingTilePlayer");
-        gc.protag.gameObject.transform.position = startingPlace.transform.position;
+        lc.protag.gameObject.transform.position = startingPlace.transform.position;
 
         // Instantiate Party Members
-        protag = gc.protag.GetComponent<ProtagonistController>();
-        foreach (PartyMember member in protag.partyMembers)
-        {
-            GameObject goMember = Instantiate(Resources.Load("Prefabs/Characters/"+member.model)) as GameObject;
-            PartyMemberController controller = goMember.AddComponent<PartyMemberController>();
-            member.controller = controller;
-            controller.character = member;
-            member.Init();
-            goMember.name = member.cName;
-            goMember.tag = "Player";
-            goMember.transform.localScale = Vector3.zero;
-        }
+        protag = lc.protag.GetComponent<ProtagonistController>();
+        protag.InitPartyMembers();
+        PersistentObjects.SaveProtagonist(lc);
 
         // Find Enemies and Players, add them to lists
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            gc.worldEnemies.Add(enemy);
-            gc.characters.Add(enemy);
+            lc.enemies.Add(enemy);
+            lc.characters.Add(enemy);
         }
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
-            gc.players.Add(player);
-            gc.characters.Add(player);
+            lc.players.Add(player);
+            lc.characters.Add(player);
         }
-        gc.players.Add(gc.protag.gameObject);
-        gc.characters.Add(gc.protag.gameObject);
+        lc.players.Add(lc.protag.gameObject);
+        lc.characters.Add(lc.protag.gameObject);
 
 
         inTransition = false;
-        gc.ChangeState<WorldExploreState>();
+        lc.ChangeState<WorldExploreState>();
     }
 
 }

@@ -29,9 +29,25 @@ public class MagmaBallAbility : EnvironmentSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController character)
     {
         character.Damage(AbilityPower);
+    }
+
+    public override void ApplyTileEffect(Tile tile)
+    {
+        if(tile.Occupant != null)
+        {
+            CharController character = tile.Occupant.GetComponent<CharController>();
+            if (character != null)
+                ApplyCharacterEffect(character);
+        }
+
+        TileEffect oldEffect = tile.GetComponent<TileEffect>();
+        if (oldEffect != null)
+            oldEffect.RemoveEffect();
+        TileEffect newEffect = tile.gameObject.AddComponent<BurnTileEffect>();
+        newEffect.Init(tile);
     }
 
     public override IEnumerator Initiate(Tile tile, Action callback)
@@ -66,7 +82,7 @@ public class MagmaBallAbility : EnvironmentSpellAbility
         character.animParamController.SetTrigger("cast_end");
         callback();
         GameObject.Destroy(mbPrefabClone);
-        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         yield break;
     }
 }

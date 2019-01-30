@@ -41,7 +41,7 @@ public class AttackSequenceState : BattleState
 
     public void OnAttackEnd()
     {
-        attackAbility.ApplyEffect(targetCharacter);
+        attackAbility.ApplyCharacterEffect(targetCharacter);
         if (callback != null)
             callback();
         inTransition = false;

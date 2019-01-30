@@ -28,9 +28,9 @@ public class SpellCharacterTargetState : BattleState
     {
         inTransition = true;
         spellAbility = args.spell;
-        character = gc.currentCharacter;
-        spellRange = pathfinder.FindRange(gc.currentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
-        grid.HighlightNodes(spellRange);
+        character = bc.CurrentCharacter;
+        spellRange = pathfinder.FindRange(bc.CurrentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
+        grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
         base.Enter();
         inTransition = false;
     }
@@ -38,9 +38,8 @@ public class SpellCharacterTargetState : BattleState
     public override void Exit()
     {
         base.Exit();
-        grid.UnHighlightNodes(spellRange);
         spellRange = null;
-        grid.DeSelectNodes();
+        grid.DeSelectNodes("spellrange");
         ClearOutlines();
     }
 
@@ -121,15 +120,15 @@ public class SpellCharacterTargetState : BattleState
             {
                 targetCharacter = target,
                 spell = spellAbility,
-                waitingStateMachines = new List<StateMachine> { gc }
+                waitingStateMachines = new List<StateMachine> { bc }
             };
             character.ChangeState<SpellTargetSequenceState>(spellArgs);
-            gc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<CheckForTurnEndState>();
         }
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 }

@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldBaseMenuState : State {
+public class WorldBaseMenuState : WorldState {
 
 }

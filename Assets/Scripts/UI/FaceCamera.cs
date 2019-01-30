@@ -18,7 +18,7 @@ public class FaceCamera : MonoBehaviour {
 
     void LateUpdate()
     {
-        cameraTarget = camcon.followTarget;
+        cameraTarget = camcon.FollowTarget;
         Vector3 v = cameraToLookAt.transform.position - cameraTarget.position;
         transform.LookAt(transform.position - v);
     }

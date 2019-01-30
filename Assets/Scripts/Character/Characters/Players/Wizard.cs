@@ -15,7 +15,11 @@ public class Wizard : PartyMember
 
         cName = "Wizard";
         cClass = "Wizard";
+        isInitialized = true;
+    }
 
+    public override void InitAbilities()
+    {
         spells = new List<SpellAbility>();
         spells.Add(new MagmaBallAbility(controller));
         spells.Add(new FireboltAbility(controller));

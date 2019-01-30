@@ -6,8 +6,7 @@ public abstract class EnemyController : CharController
 {
     public override void Die()
     {
-        gc.worldEnemies.Remove(this.gameObject);
-        gc.battleEnemies.Remove(this.gameObject);
+        bc.enemies.Remove(this.gameObject);
         base.Die();
     }
 }

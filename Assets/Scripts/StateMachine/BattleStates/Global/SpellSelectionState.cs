@@ -24,10 +24,10 @@ public class SpellSelectionState : BaseAbilityMenuState
     protected override void LoadMenu()
     {
         abilityMenuPanelController.Show("Spells");
-        foreach (SpellAbility spell in gc.currentCharacter.Spells)
+        foreach (SpellAbility spell in bc.CurrentCharacter.Spells)
         {
             string spellName = spell.AbilityName;
-            bool canCast = spell.ValidateCost(gc.currentCharacter);
+            bool canCast = spell.ValidateCost(bc.CurrentCharacter);
             if (spell is EnvironmentSpellAbility)
             {
                 abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironment(spell as EnvironmentSpellAbility)), canCast);
@@ -64,7 +64,7 @@ public class SpellSelectionState : BaseAbilityMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 
     protected void SpellTarget(TargetSpellAbility spell)
@@ -73,7 +73,7 @@ public class SpellSelectionState : BaseAbilityMenuState
         {
             spell = spell
         };
-        gc.ChangeState<SpellCharacterTargetState>(spellTargetArgs);
+        bc.ChangeState<SpellCharacterTargetState>(spellTargetArgs);
     }
 
     protected void SpellEnvironment(EnvironmentSpellAbility spell)
@@ -82,7 +82,7 @@ public class SpellSelectionState : BaseAbilityMenuState
         {
             spell = spell
         };
-        gc.ChangeState<SpellEnvironmentTargetState>(spellTargetArgs);
+        bc.ChangeState<SpellEnvironmentTargetState>(spellTargetArgs);
     }
 
 }

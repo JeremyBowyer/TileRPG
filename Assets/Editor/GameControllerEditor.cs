@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(GameController))]
+[CustomEditor(typeof(BattleController))]
 public class GameControllerEditor : Editor
 {
 

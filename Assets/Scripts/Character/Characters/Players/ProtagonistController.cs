@@ -16,55 +16,97 @@ public class ProtagonistController : PlayerController
         protagAgent = GetComponent<NavMeshAgent>();
     }
 
+    public override void LoadCharacter(Character _character)
+    {
+        character = _character;
+        character.controller = this;
+        character.InitAbilities();
+    }
+
+    public void LoadPartyMembers(List<PartyMember> _partyMembers)
+    {
+        partyMembers = _partyMembers;
+    }
+
+    public void LoadInventory(Inventory _inventory)
+    {
+        inventory = _inventory;
+    }
+
     public override void CreateCharacter()
     {
-        character = new Executioner
+        if(PersistentObjects.protagonist == null)
         {
-            controller = this
-        };
-        character.Init();
-        //character.stats.maxHealth = 1000;
-        //character.stats.maxAP = 10000;
-        //character.stats.Init();
-        character.cName = "Protagonist";
-
-        Rogue member1 = new Rogue()
+            character = new Executioner
+            {
+                controller = this
+            };
+            character.Init();
+            character.InitAbilities();
+            character.cName = "Protagonist";
+        }
+        else
         {
-            cName = "Wingus",
-            cClass = "Rogue",
-            model = "Rogue"
-        };
-        partyMembers.Add(member1);
+            Debug.Log("Loading character");
+            Debug.Log(PersistentObjects.protagonist.stats.curHealth);
+            LoadCharacter(PersistentObjects.protagonist);
+            Debug.Log(character.stats.curHealth);
+            Debug.Log(Stats.curHealth);
+        }
 
-        Rogue member2 = new Rogue()
+        if(PersistentObjects.partyMembers == null)
         {
-            cName = "Dingus",
-            cClass = "Rogue",
-            model = "Rogue"
-        };
-        partyMembers.Add(member2);
+            Wizard member3 = new Wizard()
+            {
+                cName = "Son of Kong",
+                cClass = "Wizard",
+                model = "Wizard"
+            };
+            partyMembers.Add(member3);
 
-        Wizard member3 = new Wizard()
+            Rogue member1 = new Rogue()
+            {
+                cName = "Wingus",
+                cClass = "Rogue",
+                model = "Rogue"
+            };
+            partyMembers.Add(member1);
+
+            Rogue member2 = new Rogue()
+            {
+                cName = "Dingus",
+                cClass = "Rogue",
+                model = "Rogue"
+            };
+            partyMembers.Add(member2);
+        }
+        else
         {
-            cName = "Son of Kong",
-            cClass = "Wizard",
-            model = "Wizard"
-        };
-        partyMembers.Add(member3);
+            LoadPartyMembers(PersistentObjects.partyMembers);
+        }
 
-        inventory = new Inventory();
-        inventory.Add(new Potion());
-        inventory.Add(new Potion());
-        inventory.Add(new Potion());
+        if(PersistentObjects.inventory == null)
+        {
+            inventory = new Inventory();
+            inventory.Add(new Potion());
+            inventory.Add(new Potion());
+            inventory.Add(new Potion());
+        } else
+        {
+            LoadInventory(PersistentObjects.inventory);
+        }
 
     }
 
     private void LateUpdate()
     {
-        if (gc.CurrentState == null)
+        if (bc != null)
             return;
 
-        if (gc.CurrentState.GetType().Name != "WorldExploreState")
+        if (lc.CurrentState == null)
+            return;
+
+        if (lc.CurrentState.GetType().Name != "WorldExploreState")
             return;
 
         float x = Input.GetAxis("Horizontal");
@@ -95,6 +137,30 @@ public class ProtagonistController : PlayerController
     public override void AfterDeath()
     {
         Application.Quit();
+    }
+
+    public void InitPartyMembers()
+    {
+        foreach(PartyMember member in partyMembers)
+        {
+            member.Init();
+        }
+    }
+
+    public void InstantiatePartyMembers()
+    {
+        foreach (PartyMember member in partyMembers)
+        {
+            GameObject goMember = Instantiate(Resources.Load("Prefabs/Characters/" + member.model)) as GameObject;
+            PartyMemberController controller = goMember.AddComponent<PartyMemberController>();
+            member.controller = controller;
+            controller.character = member;
+            member.InitAbilities();
+
+            goMember.name = member.cName;
+            goMember.tag = "Player";
+            goMember.transform.localScale = Vector3.zero;
+        }
     }
 
 }

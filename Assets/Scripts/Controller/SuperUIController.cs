@@ -13,8 +13,7 @@ public class SuperUIController : MonoBehaviour
 
     private Text messageText;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         messageText = messagePanel.GetComponent<Text>();
         backdropPanel.SetPosition(HideKey, false);

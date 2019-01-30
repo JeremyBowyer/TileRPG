@@ -26,7 +26,7 @@ public class HealRayAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController character)
     {
         character.Heal(AbilityPower);
     }
@@ -39,7 +39,7 @@ public class HealRayAbility : TargetSpellAbility
         yield return new WaitForSeconds(1f);
 
         // Clean up
-        character.transform.rotation = Quaternion.LookRotation(character.gc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
         character.animParamController.SetBool("idle");
         character.animParamController.SetTrigger("cast_end");
         callback();

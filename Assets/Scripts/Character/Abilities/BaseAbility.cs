@@ -67,7 +67,7 @@ public abstract class BaseAbility {
         _owner.Stats.curMP = Mathf.Clamp(_owner.Stats.curMP - MpCost, 0, _owner.Stats.maxMP);
     }
 
-    public abstract void ApplyEffect(CharController _target);
+    public abstract void ApplyCharacterEffect(CharController _target);
 
     public abstract bool ValidateCost(CharController _owner);
 

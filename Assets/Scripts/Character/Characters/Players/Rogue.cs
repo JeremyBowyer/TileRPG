@@ -15,7 +15,11 @@ public class Rogue : PartyMember
 
         cName = "Rogue";
         cClass = "Rogue";
+        isInitialized = true;
+    }
 
+    public override void InitAbilities()
+    {
         attackAbility = new MeleeAbility(controller);
         movementAbility = new TeleportMovement(controller);
         movementAbility.costModifier = 2f;

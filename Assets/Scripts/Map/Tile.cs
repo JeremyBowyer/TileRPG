@@ -11,7 +11,10 @@ public class Tile : MonoBehaviour {
     public Vector3 WorldPosition { get { return node.worldPosition;  } }
     public float WorldX { get { return node.worldPosition.x; } }
     public float WorldY { get { return node.worldPosition.y; } }
-    public TileEffect effect;
+    public TileEffect Effect
+    {
+        get { return GetComponent<TileEffect>(); }
+    }
     public CharController occupant;
 
     public CharController Occupant
@@ -19,11 +22,11 @@ public class Tile : MonoBehaviour {
         get { return occupant; }
         set
         {
-            if(effect != null)
+            if(Effect != null && value != null)
             {
                 CharController character = value.GetComponent<CharController>();
                 if (character != null)
-                    effect.ApplyEffect(character);
+                    Effect.ApplyEffect(character);
             }
             occupant = value;
         }

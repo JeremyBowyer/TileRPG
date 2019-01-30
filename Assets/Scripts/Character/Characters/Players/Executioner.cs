@@ -16,6 +16,11 @@ public class Executioner : PartyMember
         cName = "Executioner";
         cClass = "Executioner";
 
+        isInitialized = true;
+    }
+
+    public override void InitAbilities()
+    {
         attackAbility = new MeleeAbility(controller);
         movementAbility = new WalkMovement(controller);
         movementAbility.speed = 2f;

@@ -7,7 +7,7 @@ using System;
 public class BaseAI : MonoBehaviour {
 
     private CharController character;
-    private GameController gc;
+    private BattleController bc;
     private CharController _target;
 
     //private List<Node> moveRange;
@@ -37,15 +37,15 @@ public class BaseAI : MonoBehaviour {
 
     public void Init() {
         character = GetComponent<CharController>();
-        gc = character.gc;
-        aiAction = gc.battleUiController.transform.Find("AIAction").GetComponent<Text>();
+        bc = character.bc;
+        aiAction = bc.battleUiController.transform.Find("AIAction").GetComponent<Text>();
     }
 
     public void FindRanges()
     {
         // Establish Ranges
         //moveRange = character.movementAbility.GetNodesInRange(character.stats.moveRange, character.movementAbility.diag, false);
-        attackRange = gc.pathfinder.FindRange(character.tile.node, character.AttackAbility.AbilityRange, character.AttackAbility.diag, true, true, false);
+        attackRange = bc.pathfinder.FindRange(character.tile.node, character.AttackAbility.AbilityRange, character.AttackAbility.diag, true, true, false);
         // Further spell range
         // TODO: flesh this out so you're not simply using the spell with farthest range
         float maxSpellRange = 0;
@@ -60,7 +60,7 @@ public class BaseAI : MonoBehaviour {
         }
         if (maxSpell != null)
         {
-            spellRange = gc.pathfinder.FindRange(gc.currentCharacter.tile.node, maxSpell.AbilityRange, maxSpell.diag, true, true, false);
+            spellRange = bc.pathfinder.FindRange(bc.CurrentCharacter.tile.node, maxSpell.AbilityRange, maxSpell.diag, true, true, false);
         }
         else
         {
@@ -137,7 +137,7 @@ public class BaseAI : MonoBehaviour {
         {
             targetCharacter = _target,
             spell = spell,
-            waitingStateMachines = new List<StateMachine> { gc },
+            waitingStateMachines = new List<StateMachine> { bc },
             callback = callback
         };
         character.ChangeState<SpellTargetSequenceState>(spellArgs);
@@ -149,7 +149,7 @@ public class BaseAI : MonoBehaviour {
         StateArgs attackArgs = new StateArgs
         {
             targetCharacter = _target,
-            waitingStateMachines = new List<StateMachine> { gc },
+            waitingStateMachines = new List<StateMachine> { bc },
             callback = callback,
             attackAbility = character.AttackAbility
         };
@@ -159,8 +159,8 @@ public class BaseAI : MonoBehaviour {
     protected virtual void Chase()
     {
         aiAction.text = "Chasing...";
-        Tile tile = gc.grid.GetNeighbors(_target.tile.node, true, false)[0].tile;
-        List<Node> path = gc.pathfinder.FindPath(gc.currentCharacter.tile.node, tile.node, character.Stats.moveRange, character.MovementAbility.diag, character.MovementAbility.ignoreOccupant, character.MovementAbility.ignoreUnwalkable, false);
+        Tile tile = bc.grid.GetNeighbors(_target.tile.node, true, false)[0].tile;
+        List<Node> path = bc.pathfinder.FindPath(bc.CurrentCharacter.tile.node, tile.node, character.Stats.moveRange, character.MovementAbility.diag, character.MovementAbility.ignoreOccupant, character.MovementAbility.ignoreUnwalkable, false);
         StateArgs moveArgs = new StateArgs
         {
             path = path,
@@ -173,7 +173,7 @@ public class BaseAI : MonoBehaviour {
     {
         float curAP = character.Stats.curAP;
         float minCost = Mathf.Min(new float[] { character.AttackAbility.ApCost, maxSpell == null ? curAP+1 : maxSpell.ApCost });
-        float distanceFromTarget = gc.pathfinder.GetDistance(character.tile.node, _target.tile.node);
+        float distanceFromTarget = bc.pathfinder.GetDistance(character.tile.node, _target.tile.node);
         if ((curAP < minCost & distanceFromTarget < 20) | curAP <= 10)
         {
             return true;
@@ -183,9 +183,9 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual void AcquireTarget()
     {
-        GameObject closestPlayer = gc.players[0];
-        float closestDistance = Vector3.Distance(transform.position, gc.players[0].transform.position);
-        foreach (GameObject player in gc.players)
+        GameObject closestPlayer = bc.players[0];
+        float closestDistance = Vector3.Distance(transform.position, bc.players[0].transform.position);
+        foreach (GameObject player in bc.players)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
             if (distance < closestDistance)

@@ -27,7 +27,7 @@ public class JumpMovement : Movement
 
         Tile targetTile = path[path.Count - 1].tile;
         Vector3 startingPos = controller.transform.position;
-        Vector3 endingPos = targetTile.transform.position;
+        Vector3 endingPos = targetTile.WorldPosition;
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         controller.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
         currentTime = 0f;

@@ -48,10 +48,7 @@ public class SpellEnvironmentSequenceState : BattleState
     {
         foreach (Node node in splashZone)
         {
-            if (node.tile.Occupant != null)
-            {
-                node.tile.Occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
-            }
+            spell.ApplyTileEffect(node.tile);
         }
         inTransition = false;
         character.ChangeState<IdleState>();
@@ -63,10 +60,7 @@ public class SpellEnvironmentSequenceState : BattleState
         StopCoroutine(spellCoroutine);
         foreach (Node node in splashZone)
         {
-            if (node.tile.Occupant != null)
-            {
-                node.tile.Occupant.GetComponent<CharController>().Damage(spell.AbilityPower);
-            }
+            spell.ApplyTileEffect(node.tile);
         }
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("SpellEnvironmentGO"))
         {

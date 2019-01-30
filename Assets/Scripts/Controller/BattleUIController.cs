@@ -9,7 +9,7 @@ public class BattleUIController : MonoBehaviour {
     public Text apCost;
     public Text playerName;
     public Text aiAction;
-    private GameController gc;
+    private BattleController bc;
 
 
     // Use this for initialization
@@ -20,11 +20,11 @@ public class BattleUIController : MonoBehaviour {
         if (statusIndicator == null)
             Debug.LogError("No StatusIndicator assigned to " + gameObject.name);
 
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
+        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
         aiAction = transform.Find("AIAction").GetComponent<Text>(); ;
-        gc.onUnitChange += LoadStats;
-        gc.onUnitChange += ShowHealthBars;
-        gc.onUnitChange += ToggleAIAction;
+        bc.onUnitChange += LoadStats;
+        bc.onUnitChange += ShowCharUis;
+        bc.onUnitChange += ToggleAIAction;
     }
 	
 	// Update is called once per frame
@@ -56,9 +56,9 @@ public class BattleUIController : MonoBehaviour {
         aiAction.gameObject.SetActive(currentCharacter is EnemyController);
     }
 
-    public void ShowHealthBars(CharController currentCharacter)
+    public void ShowCharUis(CharController currentCharacter)
     {
-        foreach(GameObject charGO in gc.battleCharacters)
+        foreach(GameObject charGO in bc.characters)
         {
             CharController character = charGO.GetComponent<CharController>();
             character.statusIndicator.gameObject.SetActive(true);
@@ -68,7 +68,7 @@ public class BattleUIController : MonoBehaviour {
 
     public void UpdateStats()
     {
-        LoadStats(gc.currentCharacter);
+        LoadStats(bc.CurrentCharacter);
     }
 
     public void LoadStats(CharController currentCharacter)

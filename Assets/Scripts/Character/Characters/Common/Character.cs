@@ -10,6 +10,7 @@ public class Character
     public string cClass;
     public int experience;
     public int level;
+    protected bool isInitialized;
 
     // Stats
     public CharacterStats stats = new CharacterStats();
@@ -22,11 +23,21 @@ public class Character
     // References
     public CharController controller;
 
+    public Character()
+    {
+        isInitialized = false;
+    }
+
     public virtual void Init()
     {
         stats.Init();
         experience = 0;
         level = 1;
+        isInitialized = true;
+    }
+
+    public virtual void InitAbilities()
+    {
         spells = new List<SpellAbility>();
         attackAbility = new MeleeAbility(controller);
         movementAbility = new WalkMovement(controller);

@@ -27,6 +27,8 @@ public class StatusIndicator : MonoBehaviour {
 
     public void FloatText(string text, Color color, float duration = 1.5f)
     {
+        if (gameObject == null)
+            return;
         GameObject popUpGO = Instantiate(popupText, gameObject.transform);
         PopupText popUp = popUpGO.GetComponent<PopupText>();
         popUp.duration = duration;
@@ -44,20 +46,24 @@ public class StatusIndicator : MonoBehaviour {
     {
         float _value = (float)_cur / _max;
 
-        healthBarRect.localScale = new Vector3(_value, healthBarRect.localScale.y, healthBarRect.localScale.z);
+        if(healthBarRect != null)
+            healthBarRect.localScale = new Vector3(_value, healthBarRect.localScale.y, healthBarRect.localScale.z);
     }
 
     public void SetAP(int _cur, int _max)
     {
         float _value = (float)_cur / _max;
-        apBarRect.localScale = new Vector3(_value, apBarRect.localScale.y, healthBarRect.localScale.z);
+
+        if (apBarRect != null)
+            apBarRect.localScale = new Vector3(_value, apBarRect.localScale.y, healthBarRect.localScale.z);
     }
 
     public void SetMP(int _cur, int _max)
     {
         float _value = (float)_cur / _max;
 
-        mpBarRect.localScale = new Vector3(_value, mpBarRect.localScale.y, healthBarRect.localScale.z);
+        if (mpBarRect != null)
+            mpBarRect.localScale = new Vector3(_value, mpBarRect.localScale.y, healthBarRect.localScale.z);
     }
 
 }

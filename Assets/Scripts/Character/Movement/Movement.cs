@@ -12,9 +12,9 @@ public abstract class Movement
     public float costModifier = 1f;
     public string mName;
     protected CharController controller;
-    protected GameController gc
+    protected BattleController gc
     {
-        get { return controller.gc; }
+        get { return controller.bc; }
     }
     protected Pathfinding pathfinder;
     public abstract bool diag { get; set; }

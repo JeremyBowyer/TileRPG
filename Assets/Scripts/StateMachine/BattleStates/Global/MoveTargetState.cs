@@ -27,19 +27,19 @@ public class MoveTargetState : BattleState
     {
         inTransition = true;
         base.Enter();
-        mover = gc.currentCharacter.MovementAbility;
-        player = gc.currentCharacter as PlayerController;
+        mover = bc.CurrentCharacter.MovementAbility;
+        player = bc.CurrentCharacter as PlayerController;
         moveRange = mover.GetNodesInRange(player.Stats.moveRange, mover.diag, false, mover.costModifier);
-        grid.HighlightNodes(moveRange);
+        grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange");
         inTransition = false;
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.UnHighlightNodes(moveRange);
-        gc.lineRenderer.positionCount = 0;
-        grid.DeSelectNodes();
+        bc.lineRenderer.positionCount = 0;
+        grid.DeSelectNodes("movepath");
+        grid.DeSelectNodes("moverange");
         moveRange = null;
         battleUiController.SetApCost();
     }
@@ -61,8 +61,8 @@ public class MoveTargetState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            List<Node> path = gc.pathfinder.FindPath(
-                gc.currentCharacter.tile.node,
+            List<Node> path = bc.pathfinder.FindPath(
+                bc.CurrentCharacter.tile.node,
                 tile.node,
                 player.Stats.moveRange,
                 player.MovementAbility.diag,
@@ -74,10 +74,10 @@ public class MoveTargetState : BattleState
             StateArgs moveArgs = new StateArgs
             {
                 path = path,
-                waitingStateMachines = new List<StateMachine> { gc }
+                waitingStateMachines = new List<StateMachine> { bc }
             };
-            gc.currentCharacter.ChangeState<MoveSequenceState>(moveArgs);
-            gc.ChangeState<CheckForTurnEndState>();
+            bc.CurrentCharacter.ChangeState<MoveSequenceState>(moveArgs);
+            bc.ChangeState<CheckForTurnEndState>();
         }
         else
         {
@@ -97,13 +97,11 @@ public class MoveTargetState : BattleState
             List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false, mover.costModifier);
             if (player.MovementAbility.isPath)
             {
-                //grid.HighlightPath(player.tile.node, path, Color.black);
-                grid.SelectNodes(path, Color.cyan);
+                grid.SelectNodes(path, CustomColors.MovementPath, "movepath");
             }
             else
             {
-                //grid.HighlightPath(player.tile.node, path[path.Count - 1], Color.black);
-                grid.SelectNodes(path[path.Count - 1], Color.cyan);
+                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath");
             }
             
             battleUiController.SetApCost(path[path.Count - 1].gCost, player.Stats.moveRange);
@@ -119,8 +117,8 @@ public class MoveTargetState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            grid.DeSelectNodes();
-            gc.lineRenderer.positionCount = 0;
+            grid.DeSelectNodes("movepath");
+            bc.lineRenderer.positionCount = 0;
             battleUiController.SetApCost();
         }
     }
@@ -131,7 +129,7 @@ public class MoveTargetState : BattleState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<CommandSelectionState>();
+        bc.ChangeState<CommandSelectionState>();
     }
 
 }

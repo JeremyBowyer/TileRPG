@@ -20,6 +20,6 @@ public class WorldInventoryState : WorldBaseMenuState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
-        gc.ChangeState<WorldMenuState>();
+        lc.ChangeState<WorldMenuState>();
     }
 }

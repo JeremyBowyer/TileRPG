@@ -5,8 +5,27 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
     // References
-	public Transform followTarget = null;
-    private GameController gc;
+    private Transform followTarget;
+	public Transform FollowTarget
+    {
+        get
+        {
+            if (followTarget != null)
+                return followTarget;
+
+            if (gc.cameraTarget != null)
+                return gc.cameraTarget;
+
+            return gameObject.transform;
+        }
+
+        set
+        {
+            followTarget = value;
+        }
+
+    }
+    public GameController gc;
     private Camera _camera;
 
     //  Fields
@@ -37,7 +56,6 @@ public class CameraController : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		isFollowing = true;
-        gc = GameObject.Find("GameController").GetComponent<GameController>();
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         minSize = 8f;
         maxSize = 20f;
@@ -45,7 +63,7 @@ public class CameraController : MonoBehaviour {
 
     public void AcquireTarget()
     {
-        followTarget = gc.currentCharacter.transform;
+        FollowTarget = gc.cameraTarget;
     }
 
     public void LateUpdate()
@@ -102,12 +120,12 @@ public class CameraController : MonoBehaviour {
         // Follow Target
         if (isFollowing)
         {
-            if (gc.currentCharacter == null)
-                followTarget = gc.protag.transform;
+            if (gc.cameraTarget == null)
+                FollowTarget = gc.protag.transform;
             else
-                followTarget = gc.currentCharacter.transform;
+                FollowTarget = gc.cameraTarget.transform;
 
-            if (followTarget != null)
+            if (FollowTarget != null)
             {
                 //_target = gc.currentCharacter.transform;
 
@@ -115,12 +133,12 @@ public class CameraController : MonoBehaviour {
                 var y = transform.position.y;
                 var z = transform.position.z;
 
-                if (Mathf.Abs(x - followTarget.position.x) > Margin.x)
-                    x = Mathf.Lerp(x, followTarget.position.x, Smoothing.x * Time.deltaTime);
-                if (Mathf.Abs(y - followTarget.position.y) > Margin.y)
-                    y = Mathf.Lerp(y, followTarget.position.y, Smoothing.y * Time.deltaTime);
-                if (Mathf.Abs(z - followTarget.position.z) > Margin.z)
-                    z = Mathf.Lerp(z, followTarget.position.z, Smoothing.z * Time.deltaTime);
+                if (Mathf.Abs(x - FollowTarget.position.x) > Margin.x)
+                    x = Mathf.Lerp(x, FollowTarget.position.x, Smoothing.x * Time.deltaTime);
+                if (Mathf.Abs(y - FollowTarget.position.y) > Margin.y)
+                    y = Mathf.Lerp(y, FollowTarget.position.y, Smoothing.y * Time.deltaTime);
+                if (Mathf.Abs(z - FollowTarget.position.z) > Margin.z)
+                    z = Mathf.Lerp(z, FollowTarget.position.z, Smoothing.z * Time.deltaTime);
 
                 transform.position = new Vector3(x, y, z);
             }
