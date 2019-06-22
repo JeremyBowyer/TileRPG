@@ -7,13 +7,15 @@ public abstract class PlayerEffect : MonoBehaviour
     public CharController target;
     BattleController bc;
 
-    public abstract void Tick(CharController currentCharacter);
+    public abstract void TurnTick(CharController currentCharacter);
+    public abstract void RoundTick();
     public abstract void ApplyEffect(CharController _target);
     public abstract void RefreshEffect();
 
     public virtual void RemoveEffect()
     {
-        bc.onUnitChange -= Tick;
+        bc.onUnitChange -= TurnTick;
+        bc.onRoundChange -= RoundTick;
         Destroy(this);
     }
 
@@ -25,6 +27,7 @@ public abstract class PlayerEffect : MonoBehaviour
     public virtual void Init(CharController _target)
     {
         target = _target;
-        bc.onUnitChange += Tick;
+        bc.onUnitChange += TurnTick;
+        bc.onRoundChange += RoundTick;
     }
 }

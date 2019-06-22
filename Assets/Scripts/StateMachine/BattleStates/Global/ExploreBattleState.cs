@@ -28,18 +28,22 @@ public class ExploreBattleState : BattleState
 
     public override void Exit()
     {
-        bc.cameraRig.isFollowing = true;
         base.Exit();
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        Debug.Log("Explore State Click");
+        Debug.Log("ExploreBattleState click");
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
         bc.ChangeState<CommandSelectionState>();
+    }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
     }
 
 }

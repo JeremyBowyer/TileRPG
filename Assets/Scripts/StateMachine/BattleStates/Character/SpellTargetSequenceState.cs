@@ -69,5 +69,4 @@ public class SpellTargetSequenceState : BattleState
         inTransition = false;
         character.ChangeState<IdleState>();
     }
-
 }

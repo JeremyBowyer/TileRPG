@@ -31,6 +31,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 using UnityEngine;
 using System;
+using System.Collections;
 
 public static class EasingEquations
 {

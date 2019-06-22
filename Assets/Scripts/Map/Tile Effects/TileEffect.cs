@@ -7,12 +7,16 @@ public abstract class TileEffect : MonoBehaviour
     public Tile tile;
     public BattleController bc;
 
+    public abstract void TurnTick(CharController currentCharacter);
+    public abstract void RoundTick();
+
     public abstract void ApplyEffect(CharController _target);
     public abstract void ApplyToOccupant();
 
     public virtual void RemoveEffect()
     {
-        bc.onUnitChange -= Tick;
+        bc.onUnitChange -= TurnTick;
+        bc.onRoundChange -= RoundTick;
         Destroy(this);
     }
 
@@ -21,15 +25,11 @@ public abstract class TileEffect : MonoBehaviour
         bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
-    public virtual void Tick(CharController currentCharacter)
-    {
-        ApplyToOccupant();
-    }
-
     public virtual void Init(Tile _tile)
     {
         tile = _tile;
-        bc.onUnitChange += Tick;
+        bc.onUnitChange += TurnTick;
+        bc.onRoundChange += RoundTick;
         ApplyToOccupant();
     }
 }

@@ -12,14 +12,18 @@ public abstract class Movement
     public float costModifier = 1f;
     public string mName;
     protected CharController controller;
-    protected BattleController gc
+    protected BattleController bc
     {
         get { return controller.bc; }
     }
-    protected Pathfinding pathfinder;
+    protected Pathfinding pathfinder
+    {
+        get { return bc.pathfinder; }
+    }
     public abstract bool diag { get; set; }
     public abstract bool ignoreUnwalkable { get; set; }
     public abstract bool ignoreOccupant { get; set; }
+    public abstract bool ignoreMoveBlock { get; set; }
     public abstract bool isPath { get; set; }
     public abstract float Speed { get; set; }
 
@@ -28,10 +32,38 @@ public abstract class Movement
         controller = _character;
     }
 
-    public virtual List<Node> GetNodesInRange(int limit, bool diag, bool ignoreOccupant, float costModifier = 1f)
+    public virtual List<Node> GetNodesInRange()
     {
-        List<Node> retValue = gc.pathfinder.FindRange(controller.tile.node, limit, diag, ignoreOccupant, ignoreUnwalkable, false, costModifier);
-        return retValue;
+        List<Node> moveRange = pathfinder.FindRange(
+            controller.tile.node,
+            controller.Stats.moveRange,
+            diag,
+            ignoreOccupant,
+            ignoreUnwalkable,
+            false,
+            ignoreMoveBlock,
+            costModifier);
+
+        moveRange = bc.pathfinder.CullNodes(moveRange, true, true);
+        return moveRange;
+    }
+
+    public virtual List<Node> GetPath(Node node)
+    {
+        List<Node> path = pathfinder.FindPath(
+            controller.tile.node,
+            node,
+            controller.Stats.moveRange,
+            diag,
+            ignoreOccupant,
+            ignoreUnwalkable,
+            false,
+            ignoreMoveBlock,
+            costModifier);
+
+        path = bc.pathfinder.CullNodes(path, true, true);
+
+        return path;
     }
 
     public abstract IEnumerator Traverse(List<Node> path, Action callback);

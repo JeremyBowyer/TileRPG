@@ -8,6 +8,14 @@ public class CharacterStats
     public int maxAP = 100;
     public int maxMP = 100;
     public float movementModifier = 0.5f;
+    
+    public int agility = 100;
+    public float initiativeModifier = 1f;
+
+    public float initiative
+    {
+        get { return agility * initiativeModifier; }
+    }
 
     private int _curHealth;
     public int curHealth
@@ -32,7 +40,12 @@ public class CharacterStats
 
     public int moveRange
     {
-        get { return _curAP; }
+        get { return _curAP / 10; }
+    }
+
+    public bool IsDamaged
+    {
+        get { return curHealth < maxHealth; }
     }
 
     public void Init()
@@ -40,6 +53,7 @@ public class CharacterStats
         _curHealth = maxHealth;
         _curAP = maxAP;
         _curMP = maxMP;
+        initiativeModifier = 1f;
     }
 
     public void Damage(int amt)

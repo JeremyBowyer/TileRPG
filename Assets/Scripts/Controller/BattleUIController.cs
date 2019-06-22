@@ -63,7 +63,7 @@ public class BattleUIController : MonoBehaviour {
             CharController character = charGO.GetComponent<CharController>();
             character.statusIndicator.gameObject.SetActive(true);
         }
-        currentCharacter.statusIndicator.gameObject.SetActive(false);
+        //currentCharacter.statusIndicator.gameObject.SetActive(false);
     }
 
     public void UpdateStats()

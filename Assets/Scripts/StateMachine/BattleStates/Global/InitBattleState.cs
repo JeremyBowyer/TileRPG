@@ -94,8 +94,18 @@ public class InitBattleState : BattleState
         {
             bc.onUnitChange += character.GetComponent<CharController>().OnTurnEnd;
         }
-
+        bc.onUnitChange += bc.turnQueue.UpdateQueue;
         bc.protag.gameObject.transform.localScale = Vector3.zero;
+
+        // Initiate round
+        bc.rc.InitRound(bc.characters);
+
+        // Instantiate Turn Entries
+        foreach (GameObject go in bc.characters)
+        {
+            CharController controller = go.GetComponent<CharController>();
+            bc.turnQueue.InstantiateEntry(controller);
+        }
 
         inTransition = false;
         bc.ChangeState<PlaceUnitsState>();

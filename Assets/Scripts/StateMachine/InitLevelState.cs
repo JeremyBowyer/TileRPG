@@ -24,6 +24,7 @@ public class InitLevelState : WorldState
     {
         inTransition = true;
         base.Enter();
+        protag = lc.protag.GetComponent<ProtagonistController>();
 
         // Set protag as camera target
         lc.cameraRig.FollowTarget = lc.protag.transform;
@@ -33,7 +34,6 @@ public class InitLevelState : WorldState
         lc.protag.gameObject.transform.position = startingPlace.transform.position;
 
         // Instantiate Party Members
-        protag = lc.protag.GetComponent<ProtagonistController>();
         protag.InitPartyMembers();
         PersistentObjects.SaveProtagonist(lc);
 
@@ -51,9 +51,39 @@ public class InitLevelState : WorldState
         lc.players.Add(lc.protag.gameObject);
         lc.characters.Add(lc.protag.gameObject);
 
+        AdjustSceneObjects();
 
         inTransition = false;
         lc.ChangeState<WorldExploreState>();
+    }
+
+    public void AdjustSceneObjects()
+    {
+        // Clean up scene from battle
+        if (PersistentObjects.enemyName != null)
+        {
+            PersistentObjects.enemyName = null;
+            PersistentObjects.battleInitiator = null;
+        }
+
+        if (PersistentObjects.protagonistLocation != null && PersistentObjects.protagonistLocation != Vector3.zero)
+        {
+            protag.transform.position = PersistentObjects.protagonistLocation;
+            PersistentObjects.protagonistLocation = Vector3.zero;
+        }
+
+        if (PersistentObjects.deadObjects != null)
+        {
+            foreach(string id in PersistentObjects.deadObjects)
+            {
+                GameObject go = GameObject.Find(id);
+                go.SetActive(false);
+
+                if (lc.characters.Contains(go)) lc.characters.Remove(go);
+                if (lc.players.Contains(go)) lc.players.Remove(go);
+                if (lc.enemies.Contains(go)) lc.enemies.Remove(go);
+            }
+        }
     }
 
 }

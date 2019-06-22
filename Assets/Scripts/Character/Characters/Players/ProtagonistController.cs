@@ -47,11 +47,7 @@ public class ProtagonistController : PlayerController
         }
         else
         {
-            Debug.Log("Loading character");
-            Debug.Log(PersistentObjects.protagonist.stats.curHealth);
             LoadCharacter(PersistentObjects.protagonist);
-            Debug.Log(character.stats.curHealth);
-            Debug.Log(Stats.curHealth);
         }
 
         if(PersistentObjects.partyMembers == null)
@@ -63,7 +59,7 @@ public class ProtagonistController : PlayerController
                 model = "Wizard"
             };
             partyMembers.Add(member3);
-
+            /*
             Rogue member1 = new Rogue()
             {
                 cName = "Wingus",
@@ -79,6 +75,7 @@ public class ProtagonistController : PlayerController
                 model = "Rogue"
             };
             partyMembers.Add(member2);
+            */
         }
         else
         {
@@ -156,6 +153,7 @@ public class ProtagonistController : PlayerController
             member.controller = controller;
             controller.character = member;
             member.InitAbilities();
+            member.Init();
 
             goMember.name = member.cName;
             goMember.tag = "Player";

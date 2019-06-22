@@ -6,8 +6,9 @@ public class Goblin : Enemy
 {
     public override void Init()
     {
-        stats.maxHealth = 200;
+        stats.maxHealth = 2;
         stats.maxAP = 125;
+        stats.agility = 25;
         stats.Init();
 
         experience = 0;
@@ -19,6 +20,6 @@ public class Goblin : Enemy
         spells = new List<SpellAbility>();
 
         attackAbility = new MeleeAbility(controller);
-        movementAbility = new JumpMovement(controller);
+        movementAbility = new WalkMovement(controller);
     }
 }

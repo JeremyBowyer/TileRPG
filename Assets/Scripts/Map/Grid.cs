@@ -15,13 +15,16 @@ public class Grid : MonoBehaviour {
     private int UnWalkableLayerMask;
     public int gridCells;
     private float gridWorldSize;
-    public float nodeRadius;
-	public Node[,] grid;
+    public float nodeRadius
+    {
+        get { return nodeDiameter / 2; }
+    }
+    public float nodeDiameter;
+    public Node[,] grid;
     public List<GameObject> tiles;
     public List<GameObject> highlightedTiles;
-    public Dictionary<string, List<GameObject>> selectedTiles;
+    public Dictionary<string, List<Tile>> selectedTiles;
 	public List<Node> path;
-    public List<Node> range;
     public Vector3 centerPoint;
 
     // Directions
@@ -32,27 +35,27 @@ public class Grid : MonoBehaviour {
 
     public enum Position { Front, Back, Left, Right, Diagonal};
 
-    public float nodeDiameter;
 	int gridSizeX, gridSizeY;
+    public int MaxSize
+    {
+        get
+        {
+            return gridSizeX * gridSizeY;
+        }
+    }
 
     void Awake()
     {
-        selectedTiles = new Dictionary<string, List<GameObject>>();
+        selectedTiles = new Dictionary<string, List<Tile>>();
         bc = GameObject.Find("BattleController").GetComponent<BattleController>();
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("Grid"));
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"), LayerMask.NameToLayer("GridClick"));
+        UnWalkableLayerMask = 1 << LayerMask.NameToLayer("Unwalkable");
     }
-
-	public int MaxSize
-    {
-		get {
-			return gridSizeX * gridSizeY;
-		}
-	}
 
     public IEnumerator GenerateGrid(Action callback)
     {
-        nodeDiameter = bottomRightTile.gameObject.transform.localScale.x;
+        nodeDiameter = Mathf.Round(bottomRightTile.GetComponent<BoxCollider>().bounds.extents.x * 2);
 
         gridCells = 10;
 
@@ -60,8 +63,8 @@ public class Grid : MonoBehaviour {
         gridSizeX = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
 
-        rightDirection = bottomRightTile.transform.rotation * Vector3.right;
-        forwardDirection = bottomRightTile.transform.rotation * Vector3.forward;
+        rightDirection = bottomRightTile.transform.rotation * Vector3.left;
+        forwardDirection = bottomRightTile.transform.rotation * Vector3.back;
 
         grid = new Node[gridSizeX, gridSizeY];
         List<Point> cellPath = new List<Point>();
@@ -75,7 +78,7 @@ public class Grid : MonoBehaviour {
             }
         }
         List<Vector3> pathDirections = GetPathDirections(cellPath);
-        Vector3 bottomRight = bottomRightTile.transform.position;
+        Vector3 bottomRight = bottomRightTile.transform.Find("AnchorPoint").transform.position;
         bottomRight.y = FindHeightPoint(bottomRight);
         Vector3 cellPoint = bottomRight;
         for (int i = 0; i < cellPath.Count; i++)
@@ -93,26 +96,33 @@ public class Grid : MonoBehaviour {
             tiles.Add(tileGO.gameObject);
             Tile tile = tileGO.gameObject.GetComponent<Tile>();
 
-            // Find Anchor point
-            Vector3 anchorPoint = tileGO.transform.Find("AnchorPoint").transform.position;
-
-            // Create new node
-            Node node = new Node(anchorPoint, x, y);
-
-            // Assign appropriate values for tile and node
-            tile.grid = bc.grid;
-            tile.node = node;
-            node.tile = tile;
-
-            // Is tile walkable?
-            Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
-            if (alertColliders != null && alertColliders.Length != 0)
+            if(tile == null)
             {
-                tile.isWalkable = false;
+                grid[x, y] = null;
             }
+            else
+            {
+                // Find Anchor point
+                Vector3 anchorPoint = tileGO.transform.Find("AnchorPoint").transform.position;
 
-            // Assign to grid
-            grid[x, y] = node;
+                // Create new node
+                Node node = new Node(anchorPoint, x, y);
+
+                // Assign appropriate values for tile and node
+                tile.grid = bc.grid;
+                tile.node = node;
+                node.tile = tile;
+
+                // Is tile walkable?
+                Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
+                if (alertColliders != null && alertColliders.Length != 0)
+                {
+                    tile.isWalkable = false;
+                }
+
+                // Assign to grid
+                grid[x, y] = node;
+            }
 
             // Set up next cellPoint, if not at the end
             if (i >= pathDirections.Count)
@@ -126,14 +136,6 @@ public class Grid : MonoBehaviour {
 
         callback();
         yield break;
-    }
-
-    private void ProjectorSetup()
-    {
-        battleGridProjector.orthographicSize = gridCells + 1.5f;
-        battleGridProjector.transform.position = centerPoint + Vector3.up * 5f;
-        battleGridProjector.transform.rotation = Quaternion.LookRotation(Vector3.down, forwardDirection);
-        battleGridProjector.gameObject.SetActive(true);
     }
 
     public Vector3 MoveAlongTerrain(Vector3 startPoint, Vector3 direction, float distance = 1f, int steps = 4)
@@ -171,7 +173,7 @@ public class Grid : MonoBehaviour {
         layerMask |= (1 << LayerMask.NameToLayer("GridClick"));
         
         RaycastHit hit;
-        if (Physics.Raycast(point + Vector3.up * 5f, -Vector3.up, out hit, 100f, layerMask))
+        if (Physics.Raycast(point + Vector3.up * 50f, -Vector3.up, out hit, 100f, layerMask))
         {
             if (hit.collider.tag == "Map")
             {
@@ -185,8 +187,8 @@ public class Grid : MonoBehaviour {
     {
         int layerMask = (1 << LayerMask.NameToLayer("Grid"));
         layerMask |= (1 << LayerMask.NameToLayer("GridClick"));
-        layerMask |= (1 << LayerMask.NameToLayer("Character"));
-        layerMask = ~layerMask;
+        //layerMask |= (1 << LayerMask.NameToLayer("Character"));
+        //layerMask = ~layerMask;
 
         RaycastHit hit;
         if(Physics.Raycast(point+Vector3.up*20f, -Vector3.up, out hit, 100f, layerMask))
@@ -268,40 +270,40 @@ public class Grid : MonoBehaviour {
 
     }
 
-    public Position CompareDirection(Node nodeA, Node nodeB, Vector3 targetDirection)
+    public Position CompareDirection(Node fromNode, Node toNode, Vector3 targetFacingDirection)
     {
         // Check for back position
-        if ((targetDirection == forwardDirection && nodeA.gridY < nodeB.gridY) ||
-            (targetDirection == backwardDirection && nodeA.gridY > nodeB.gridY) ||
-            (targetDirection == leftDirection && nodeA.gridX < nodeB.gridX) ||
-            (targetDirection == rightDirection && nodeA.gridX > nodeB.gridX))
+        if ((targetFacingDirection == forwardDirection && fromNode.gridY < toNode.gridY) ||
+            (targetFacingDirection == backwardDirection && fromNode.gridY > toNode.gridY) ||
+            (targetFacingDirection == leftDirection && fromNode.gridX < toNode.gridX) ||
+            (targetFacingDirection == rightDirection && fromNode.gridX > toNode.gridX))
         {
             return Position.Back;
         }
 
         // Check for front position
-        if ((targetDirection == backwardDirection && nodeA.gridY < nodeB.gridY) ||
-            (targetDirection == forwardDirection && nodeA.gridY > nodeB.gridY) ||
-            (targetDirection == leftDirection && nodeA.gridX > nodeB.gridX) ||
-            (targetDirection == rightDirection && nodeA.gridX < nodeB.gridX))
+        if ((targetFacingDirection == backwardDirection && fromNode.gridY < toNode.gridY) ||
+            (targetFacingDirection == forwardDirection && fromNode.gridY > toNode.gridY) ||
+            (targetFacingDirection == leftDirection && fromNode.gridX > toNode.gridX) ||
+            (targetFacingDirection == rightDirection && fromNode.gridX < toNode.gridX))
         {
             return Position.Front;
         }
 
         // Check for left position
-        if ((targetDirection == backwardDirection && nodeA.gridX < nodeB.gridX) ||
-            (targetDirection == forwardDirection && nodeA.gridX > nodeB.gridX) ||
-            (targetDirection == leftDirection && nodeA.gridY < nodeB.gridY) ||
-            (targetDirection == rightDirection && nodeA.gridY > nodeB.gridY))
+        if ((targetFacingDirection == backwardDirection && fromNode.gridX < toNode.gridX) ||
+            (targetFacingDirection == forwardDirection && fromNode.gridX > toNode.gridX) ||
+            (targetFacingDirection == leftDirection && fromNode.gridY < toNode.gridY) ||
+            (targetFacingDirection == rightDirection && fromNode.gridY > toNode.gridY))
         {
             return Position.Left;
         }
 
         // Check for right position
-        if ((targetDirection == backwardDirection && nodeA.gridX > nodeB.gridX) ||
-            (targetDirection == forwardDirection && nodeA.gridX < nodeB.gridX) ||
-            (targetDirection == leftDirection && nodeA.gridY > nodeB.gridY) ||
-            (targetDirection == rightDirection && nodeA.gridY < nodeB.gridY))
+        if ((targetFacingDirection == backwardDirection && fromNode.gridX > toNode.gridX) ||
+            (targetFacingDirection == forwardDirection && fromNode.gridX < toNode.gridX) ||
+            (targetFacingDirection == leftDirection && fromNode.gridY > toNode.gridY) ||
+            (targetFacingDirection == rightDirection && fromNode.gridY < toNode.gridY))
         {
             return Position.Right;
         }
@@ -317,6 +319,8 @@ public class Grid : MonoBehaviour {
         worldPosition.y = FindHeightPoint(worldPosition);
         foreach (Node node in bc.grid.grid)
         {
+            if (node == null)
+                continue;
             float nodeDistance = Vector3.Distance(worldPosition, node.worldPosition);
             if (nodeDistance < normalizedLowestDistance)
             {
@@ -350,23 +354,14 @@ public class Grid : MonoBehaviour {
 
     public void SelectNodes(Node node, Color color, string set)
     {
-        GameObject nodeGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-        GameObject nodeInstance = Instantiate(nodeGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-        nodeInstance.transform.localScale = nodeInstance.transform.localScale * nodeDiameter;
-        nodeInstance.layer = LayerMask.NameToLayer("Grid");
-        nodeInstance.transform.rotation = Quaternion.LookRotation(bc.grid.forwardDirection, Vector3.up);
-        nodeInstance.name = set;
-
-        MeshRenderer mesh = nodeInstance.GetComponent<MeshRenderer>();
-        mesh.material = new Material(mesh.material);
-        mesh.material.SetColor("_Color", color);
-
+        node.tile.AddColor(set, color);
         // Add to dictionary of selected tile lists
         if (!selectedTiles.ContainsKey(set))
         {
-            selectedTiles[set] = new List<GameObject>();
+            selectedTiles[set] = new List<Tile>();
         }
-        selectedTiles[set].Add(nodeInstance);
+        selectedTiles[set].Add(node.tile);
+
     }
 
     public void DeSelectNodes(string set)
@@ -374,74 +369,26 @@ public class Grid : MonoBehaviour {
         if (!selectedTiles.ContainsKey(set))
             return;
 
-        foreach (GameObject tile in selectedTiles[set])
+        foreach (Tile tile in selectedTiles[set])
         {
-            DestroyImmediate(tile, true);
+            tile.RemoveColor(set);
+            //DestroyImmediate(tile, true);
         }
         selectedTiles[set].Clear();
-    }
-
-    public void HighlightPath(Node startingNode, List<Node> nodes, Color color)
-    {
-        bc.lineRenderer.positionCount = nodes.Count + 1;
-        Vector3[] points = new Vector3[nodes.Count + 1];
-        points[0] = startingNode.tile.WorldPosition + Vector3.up * bc.CurrentCharacter.height;
-        for (int i = 0; i < nodes.Count; i++)
-        {
-            points[i + 1] = nodes[i].worldPosition + Vector3.up * bc.CurrentCharacter.height;
-        }
-        bc.lineRenderer.SetPositions(points);
-    }
-
-    public void HighlightPath(Node startingNode, Node node, Color color)
-    {
-        bc.lineRenderer.positionCount = 2;
-        Vector3[] points = new Vector3[2];
-        points[0] = startingNode.tile.WorldPosition + Vector3.up * bc.CurrentCharacter.height;
-        points[1] = node.worldPosition + Vector3.up * bc.CurrentCharacter.height;
-        bc.lineRenderer.SetPositions(points);
-    }
-
-    public void HighlightNodes(List<Node> nodes)
-    {
-        foreach (Node node in nodes)
-        {
-            //GameObject highlightedGO = Resources.Load("Prefabs/Grid/HighlightedTile") as GameObject;
-            GameObject highlightedGO = Resources.Load("Prefabs/Grid/GridTileVisible") as GameObject;
-
-            GameObject hlInstance = Instantiate(highlightedGO, node.worldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-            hlInstance.transform.rotation = Quaternion.LookRotation(Vector3.up, bc.grid.forwardDirection);
-            hlInstance.transform.localScale = hlInstance.transform.localScale * nodeDiameter;
-            //decalInstance.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
-            hlInstance.layer = LayerMask.NameToLayer("Grid");
-            highlightedTiles.Add(hlInstance);
-
-        }
-    }
-
-    public void UnHighlightNodes(List<Node> nodes)
-    {
-        foreach (GameObject tile in highlightedTiles)
-        {
-            DestroyImmediate(tile, true);
-        }
-    }
-    
-    public void ResetRange()
-    {
-        range = null;
     }
 
     public void ResetCosts()
     {
         foreach (Node node in grid)
         {
+            if (node == null)
+                continue;
             node.gCost = 0;
             node.hCost = 0;
         }
     }
 
-    public List<Node> GetNeighbors(Node node, bool diag, bool ignoreOccupant) {
+    public List<Node> GetNeighbors(Node node, bool diag, bool ignoreOccupant, bool ignoreMoveBlock) {
 		List<Node> neighbors = new List<Node> ();
 		for (int x = -1; x <= 1; x++) {
 			for (int y = -1; y <= 1; y++) {
@@ -452,9 +399,26 @@ public class Grid : MonoBehaviour {
 
 				if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
                     Node neighbor = grid[checkX, checkY];
+
+                    // Invalid neighbor conditions
+
+                    // Not a tile
+                    if (neighbor == null)
+                        continue;
+
+                    // Occupied tile and can't ignore occupants
                     if (neighbor.occupant != null && !ignoreOccupant)
                         continue;
-					neighbors.Add (neighbor);
+
+                    // Neighbor is blocked from node to neighbor
+                    if (!ignoreMoveBlock && node.tile.moveBlocks.Contains(CompareDirection(neighbor, node, forwardDirection)))
+                        continue;
+
+                    // Neighbor is blocked from neighbor to node
+                    if (!ignoreMoveBlock && neighbor.tile.moveBlocks.Contains(CompareDirection(node, neighbor, forwardDirection)))
+                        continue;
+
+                    neighbors.Add (neighbor);
 				}
 			}
 		}
@@ -488,37 +452,5 @@ public class Grid : MonoBehaviour {
 
         return tile;
     }
-	
-    public void ColorTiles()
-    { 
-    // Color tiles for prototype
-        foreach (Node n in grid)
-        {
-            GameObject go = TileFromNode(n).gameObject;
-            if (LayerMask.LayerToName(go.layer) == "Unwalkable")
-            {
-                go.GetComponent<Renderer>().material.color = Color.red;
-            }
-            else if (go.tag == "StartingTilePlayer")
-            {
-                go.GetComponent<Renderer>().material.color = Color.green;
-            }
-            else
-            {
-                go.GetComponent<Renderer>().material.color = Color.grey;
-            }
-        }
-    }
 
-    /*
-	void OnDrawGizmos() {
-		Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
-		if (grid != null) {
-			foreach (Node n in grid) {
-				Gizmos.color = (n.walkable) ? Color.white : Color.red;
-				Gizmos.DrawCube (n.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
-			}
-		}
-	}
-    */
 }

@@ -8,6 +8,7 @@ public class Druid : Enemy
     {
         stats.maxHealth = 100;
         stats.maxAP = 100;
+        stats.agility = 40;
         stats.Init();
 
         experience = 0;
@@ -17,7 +18,7 @@ public class Druid : Enemy
         cClass = "Druid";
 
         spells = new List<SpellAbility>();
-        spells.Add(new FireboltAbility(controller));
+        spells.Add(new HealRayAbility(controller));
 
         attackAbility = new ArrowAbility(controller);
         movementAbility = new WalkMovement(controller);

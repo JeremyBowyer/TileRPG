@@ -29,7 +29,7 @@ public class SpellCharacterTargetState : BattleState
         inTransition = true;
         spellAbility = args.spell;
         character = bc.CurrentCharacter;
-        spellRange = pathfinder.FindRange(bc.CurrentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
+        spellRange = spellAbility.GetRange();
         grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
         base.Enter();
         inTransition = false;
@@ -70,11 +70,15 @@ public class SpellCharacterTargetState : BattleState
         if(spellAbility.abilityIntent == AbilityTypes.Intent.Hostile)
         {
             target = e.info.gameObject.GetComponent<EnemyController>();
-            color = Color.red;
-        } else if(spellAbility.abilityIntent == AbilityTypes.Intent.Support)
+            color = CustomColors.Hostile;
+        } else if(spellAbility.abilityIntent == AbilityTypes.Intent.Heal)
         {
             target = e.info.gameObject.GetComponent<PlayerController>();
-            color = Color.green;
+            color = CustomColors.Heal;
+        } else if (spellAbility.abilityIntent == AbilityTypes.Intent.Support)
+        {
+            target = e.info.gameObject.GetComponent<PlayerController>();
+            color = CustomColors.Support;
         }
 
         if (target == null || target.tile == null)
@@ -88,7 +92,6 @@ public class SpellCharacterTargetState : BattleState
             outline.OutlineMode = Outline.Mode.OutlineAll;
             outline.OutlineColor = color;
             outline.OutlineWidth = 5f;
-
             outlinedEnemies.Add(target.gameObject);
         }
     }
@@ -106,7 +109,7 @@ public class SpellCharacterTargetState : BattleState
         {
             target = e.info.collider.GetComponent<EnemyController>();
         }
-        else if (spellAbility.abilityIntent == AbilityTypes.Intent.Support)
+        else if (spellAbility.abilityIntent == AbilityTypes.Intent.Support || spellAbility.abilityIntent == AbilityTypes.Intent.Heal)
         {
             target = e.info.collider.GetComponent<PlayerController>();
         }
@@ -131,4 +134,11 @@ public class SpellCharacterTargetState : BattleState
     {
         bc.ChangeState<CommandSelectionState>();
     }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
+    }
+
+
 }

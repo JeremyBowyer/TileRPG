@@ -29,7 +29,7 @@ public class AttackTargetState : BattleState
         base.Enter();
         character = bc.CurrentCharacter;
         attackAbility = args.attackAbility;
-        attackRange = pathfinder.FindRange(character.tile.node, attackAbility.AbilityRange, attackAbility.diag, true, true, false);
+        attackRange = attackAbility.GetRange();
         grid.SelectNodes(attackRange, CustomColors.AttackRange, "attackrange");
     }
 
@@ -114,4 +114,11 @@ public class AttackTargetState : BattleState
     {
         bc.ChangeState<CommandSelectionState>();
     }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
+    }
+
+
 }

@@ -6,6 +6,8 @@ public class Rogue : PartyMember
 {
     public override void Init()
     {
+        if (isInitialized) return;
+
         stats.maxHealth = 100;
         stats.maxAP = 100;
         stats.Init();

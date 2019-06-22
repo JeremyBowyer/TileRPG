@@ -5,8 +5,8 @@ using UnityEngine;
 public class BurnPlayerEffect : PlayerEffect
 {
     private int countdown;
-    private const int MaxIterations = 6;
-    private const int Damage = 5;
+    private const int MaxIterations = 2;
+    private const int Damage = 20;
 
     public override void ApplyEffect(CharController _target)
     {
@@ -19,7 +19,11 @@ public class BurnPlayerEffect : PlayerEffect
         countdown = MaxIterations;
     }
 
-    public override void Tick(CharController currentCharacter)
+    public override void TurnTick(CharController currentCharacter)
+    {
+    }
+
+    public override void RoundTick()
     {
         if (countdown <= 0)
             RemoveEffect();

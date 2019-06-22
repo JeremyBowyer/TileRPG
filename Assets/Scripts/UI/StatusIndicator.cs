@@ -44,10 +44,26 @@ public class StatusIndicator : MonoBehaviour {
 
     public void SetHealth(int _cur, int _max)
     {
-        float _value = (float)_cur / _max;
+        
+        if(healthBarRect != null && gameObject.activeSelf)
+        {
+            StartCoroutine(DepleteHealth(_cur, _max));
+        }
+    }
 
-        if(healthBarRect != null)
-            healthBarRect.localScale = new Vector3(_value, healthBarRect.localScale.y, healthBarRect.localScale.z);
+    public IEnumerator DepleteHealth(int _cur, int _max)
+    {
+        float currentTime = 0f;
+        float speed = 5f;
+        float startingScale = healthBarRect.localScale.x;
+        float endingScale = (float)_cur / _max;
+        while (!Mathf.Approximately(currentTime, 1.0f))
+        {
+            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * speed));
+            float frameValue = startingScale - ((startingScale - endingScale) * EasingEquations.EaseOutCubic(0.0f, 1.0f, currentTime));
+            healthBarRect.localScale = new Vector3(frameValue, healthBarRect.localScale.y, healthBarRect.localScale.z);
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     public void SetAP(int _cur, int _max)

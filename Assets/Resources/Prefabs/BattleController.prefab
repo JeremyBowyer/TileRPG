@@ -67,18 +67,20 @@ MonoBehaviour:
   currentStateText: {fileID: 0}
   cameraRig: {fileID: 0}
   _camera: {fileID: 0}
+  superUiController: {fileID: 0}
+  protag: {fileID: 0}
+  players: []
+  enemies: []
+  characters: []
+  cameraTarget: {fileID: 0}
+  turnQueue: {fileID: 0}
   battleUiController: {fileID: 0}
   grid: {fileID: 0}
   pathfinder: {fileID: 0}
   statusIndicator: {fileID: 0}
   abilityMenuPanelController: {fileID: 0}
-  superUiController: {fileID: 0}
   lineRenderer: {fileID: 0}
-  currentCharacter: {fileID: 0}
-  protag: {fileID: 0}
+  selectedCharacterAura: {fileID: 0}
   currentTile: {fileID: 0}
-  players: []
-  enemies: []
-  characters: []
   battleInitiator: {fileID: 0}
   protagStartPos: {x: 0, y: 0, z: 0}

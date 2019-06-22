@@ -4,6 +4,6 @@ using UnityEngine;
 
 public struct AbilityTypes {
 
-    public enum Intent { Hostile, Support };
+    public enum Intent { Hostile, Support, Heal };
 	
 }

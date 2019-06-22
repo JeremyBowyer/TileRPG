@@ -23,6 +23,7 @@ public class AuraController : MonoBehaviour {
         projector = GetComponent<Projector>();
         //instancedMaterial = new Material(projector.material);
         //projector.material = instancedMaterial;
+        sourceMaterial = projector.material;
         projector.material = new Material(sourceMaterial);
 
         UpdateMaterialAndProjector();

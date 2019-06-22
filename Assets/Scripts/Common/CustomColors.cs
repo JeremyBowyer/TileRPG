@@ -16,7 +16,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(1f, 1f, 1f, 0.2f);
+            return new Color(0f, 1f, 1f, 0.2f);
         }
     }
     
@@ -32,7 +32,7 @@ public class CustomColors
     {
         get
         {
-            return MovementRange;
+            return new Color(1f, 0f, 0f, 0.2f);
         }
     }
 
@@ -44,11 +44,43 @@ public class CustomColors
         }
     }
 
+    public static Color Heal
+    {
+        get
+        {
+            return new Color(0f, 1f, 0f);
+        }
+    }
+
+    public static Color Support
+    {
+        get
+        {
+            return new Color(0f, 0.5f, 0.5f);
+        }
+    }
+
     public static Color Fire
     {
         get
         {
             return new Color(1f, 0.25f, 0f, 0.5f);
+        }
+    }
+
+    public static Color PlayerUI
+    {
+        get
+        {
+            return new Color(0.4f, 0.8f, 0.4f, 0.5f);
+        }
+    }
+
+    public static Color EnemyUI
+    {
+        get
+        {
+            return new Color(0.8f, 0.4f, 0.4f, 0.5f);
         }
     }
 

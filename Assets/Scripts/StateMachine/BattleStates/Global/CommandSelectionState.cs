@@ -23,6 +23,14 @@ public class CommandSelectionState : BaseAbilityMenuState
         set { }
     }
 
+    public override void Enter()
+    {
+        inTransition = true;
+        bc.cameraRig.isFollowing = true;
+        base.Enter();
+        inTransition = false;
+    }
+
     protected override void LoadMenu()
     {
         abilityMenuPanelController.Show("Commands");

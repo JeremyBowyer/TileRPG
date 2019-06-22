@@ -26,9 +26,8 @@ public class UnitPlacementState : BattleState
         inTransition = true;
         base.Enter();
         character = args.character;
-        bc.CurrentCharacter = character;
         mover = character.MovementAbility;
-        moveRange = mover.GetNodesInRange(character.Stats.moveRange, true, false, mover.costModifier);
+        moveRange = mover.GetNodesInRange();
         grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange");
         inTransition = false;
     }
@@ -59,20 +58,7 @@ public class UnitPlacementState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            /*
-            character.Place(tile);
-            character.gameObject.transform.rotation = Quaternion.LookRotation(gc.grid.forwardDirection, Vector3.up);
-            */
-
-            List<Node> path = bc.pathfinder.FindPath(
-                character.tile.node,
-                tile.node,
-                character.Stats.moveRange,
-                character.MovementAbility.diag,
-                character.MovementAbility.ignoreOccupant,
-                character.MovementAbility.ignoreUnwalkable,
-                false,
-                character.MovementAbility.costModifier);
+            List<Node> path = mover.GetPath(tile.node);
 
             StateArgs moveArgs = new StateArgs
             {
@@ -98,7 +84,7 @@ public class UnitPlacementState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(character.tile.node, tile.node, character.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false, mover.costModifier);
+            List<Node> path = mover.GetPath(tile.node);
             if (mover.isPath)
             {
                 grid.SelectNodes(path, CustomColors.MovementPath, "movepath");
@@ -107,8 +93,6 @@ public class UnitPlacementState : BattleState
             {
                 grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath");
             }
-
-            battleUiController.SetApCost(path[path.Count - 1].gCost, character.Stats.moveRange);
         }
     }
 

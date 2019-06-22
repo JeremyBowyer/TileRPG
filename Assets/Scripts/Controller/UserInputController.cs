@@ -10,6 +10,7 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<GameObject>> hoverEnterEvent;
     public static event EventHandler<InfoEventArgs<GameObject>> hoverExitEvent;
     public static event EventHandler<InfoEventArgs<Point>> moveEvent;
+    public static event EventHandler<InfoEventArgs<Vector3>> moveMouseEvent;
     public static event EventHandler<InfoEventArgs<int>> fireEvent;
     public static event EventHandler<InfoEventArgs<int>> cancelEvent;
     public static LayerMask mouseLayer;
@@ -60,9 +61,16 @@ public class UserInputController : MonoBehaviour {
 
         /* ---------------- */
         /* - Mouse Events - */
+        /* - MUST BE LAST - */
         /* ---------------- */
+
+        if (moveMouseEvent != null)
+            moveMouseEvent(this, new InfoEventArgs<Vector3>(Input.mousePosition));
+
+        // Making the cursor invisible is used to ignore click/hover events.
         if (!Cursor.visible)
-            return;
+        return;
+
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         bool wasHit = Physics.Raycast(ray, out hit, 100f, 1 << mouseLayer);
 

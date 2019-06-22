@@ -41,6 +41,10 @@ public class InitiateBattle : MonoBehaviour
                     protagAgent.SetDestination(protagAgent.transform.position);
                     protagAgent.isStopped = true;
                     //character.lc.ChangeState<InitBattleState>();
+                    PersistentObjects.enemyName = col.name;
+                    PersistentObjects.battleInitiator = col.GetComponent<EnemyController>().character as Enemy;
+                    PersistentObjects.protagonistLocation = origin;
+                    PersistentObjects.RemoveObject(col.gameObject.name);
                     SceneManager.LoadScene("Battle");
                 }
             }

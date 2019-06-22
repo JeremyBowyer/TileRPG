@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MagmaBallAbility : EnvironmentSpellAbility
+public class MagmaBallAbility : EnvironmentSplashSpellAbility
 {
 
     GameObject mbPrefabClone;
@@ -13,15 +13,28 @@ public class MagmaBallAbility : EnvironmentSpellAbility
     {
         AbilityName = "Magma Ball";
         AbilityDescription = "Attack at range with a magma ball.";
-        AbilityID = 2;
         AbilityPower = 12;
         ApCost = 25;
         MpCost = 50;
-        AbilityRange = 100;
+        AbilityRange = 4;
         diag = true;
+        ignoreOccupant = true;
+        isProjectile = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("GridClick");
         abilityIntent = AbilityTypes.Intent.Hostile;
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        return range;
+    }
+
+    public override List<Node> GetSplashZone(Tile _target)
+    {
+        List<Node> range = character.bc.pathfinder.FindRange(_target.node, 1, false, true, false, true, false);
+        return range;
     }
 
     public override bool ValidateCost(CharController _owner)
@@ -50,6 +63,25 @@ public class MagmaBallAbility : EnvironmentSpellAbility
         newEffect.Init(tile);
     }
 
+    public override Vector3[] GetPath(Vector3 _target)
+    {
+        Vector3 startingPos = character.transform.position + Vector3.up * 1f;
+        Vector3 deltaPos = _target - startingPos;
+        float fbHeight = Vector3.Distance(startingPos, _target);
+        Vector3 cp1 = startingPos + deltaPos * 0.5f + new Vector3(0, fbHeight, 0);
+
+        Vector3[] linePoints = new Vector3[100];
+        int steps = 100;
+        for (int i = 0; i < steps; i++)
+        {
+            float step = (float)i / steps;
+            Vector3 framePos = MathCurves.Bezier(startingPos, _target, cp1, step);
+            linePoints[i] = framePos;
+        }
+
+        return linePoints;
+    }
+
     public override IEnumerator Initiate(Tile tile, Action callback)
     {
         character.animParamController.SetTrigger("cast_start");
@@ -68,7 +100,7 @@ public class MagmaBallAbility : EnvironmentSpellAbility
 
         Vector3 deltaPos = endingPos - startingPos;
 
-        Vector3 cp1 = startingPos + deltaPos * -0.5f + new Vector3(0, fbHeight, 0);
+        Vector3 cp1 = startingPos + deltaPos * 0.5f + new Vector3(0, fbHeight, 0);
         while (!Mathf.Approximately(currentTime, 1.0f))
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * fbSpeed));

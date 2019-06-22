@@ -11,9 +11,21 @@ public class Node : IHeapItem<Node> {
 	public int gridX;
 	public int gridY;
 
-	public int gCost;
-	public int hCost;
-	public int fCost { get { return gCost + hCost; } }
+    public int movementCostModifier = 1;
+    private float _gCost;
+	public float gCost
+    {
+        get
+        {
+            return _gCost;
+        }
+        set
+        {
+            _gCost = value * movementCostModifier;
+        }
+    }
+	public float hCost;
+	public float fCost { get { return gCost + hCost; } }
 	int heapIndex;
 
 	public Node parent;

@@ -19,6 +19,7 @@ public abstract class CharController : StateMachine {
     public LevelController lc;
     public StatusIndicator statusIndicator;
     public AnimationParameterController animParamController;
+    public TurnEntry turnEntry;
 
     // Properties
     public bool NextTurn
@@ -70,7 +71,6 @@ public abstract class CharController : StateMachine {
 
     public virtual void CreateCharacter()
     {
-        Debug.Log("hi");
         character = new Character();
         character.controller = this;
         character.Init();
@@ -84,7 +84,7 @@ public abstract class CharController : StateMachine {
 
     public virtual void InitBattle()
     {
-        //Stats.Init();
+        Stats.initiativeModifier = 1f;
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         animParamController.SetBool("idle");
         GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
@@ -111,6 +111,11 @@ public abstract class CharController : StateMachine {
             return;
 
         circleGO.SetActive(false);
+    }
+
+    public void OnTurnEnd()
+    {
+
     }
 
     public virtual void SetAnimatorParameters()
@@ -140,7 +145,7 @@ public abstract class CharController : StateMachine {
 
     public void Move(Tile _tile)
     {
-        Stats.curAP -= _tile.node.gCost;
+        Stats.curAP -= (int)_tile.node.gCost*10;
         bc.battleUiController.UpdateStats();
 
         OccupyTile(_tile);
@@ -165,7 +170,8 @@ public abstract class CharController : StateMachine {
 
     public void CastSpell(SpellAbility spell)
     {
-        Stats.curMP -= spell.ApCost;
+        Stats.curMP -= spell.MpCost;
+        Stats.curAP -= spell.ApCost;
         bc.battleUiController.UpdateStats();
     }
 
@@ -209,10 +215,15 @@ public abstract class CharController : StateMachine {
         if (gameObject == null)
             return;
 
+        // Leave current tile
+        if (tile != null)
+            tile.Occupant = null;
+
         statusIndicator.gameObject.SetActive(false);
         bc.onUnitChange -= OnTurnEnd;
         bc.characters.Remove(gameObject);
-        bc.characters.Remove(this.gameObject);
+        bc.rc.roundChars.Remove(this);
+
         StateArgs deathArgs = new StateArgs()
         {
             waitingStateMachines = new List<StateMachine> { bc }

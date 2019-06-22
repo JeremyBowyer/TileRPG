@@ -78,6 +78,7 @@ public abstract class State : MonoBehaviour
         UserInputController.hoverEnterEvent += OnHoverEnter;
         UserInputController.hoverExitEvent += OnHoverExit;
         UserInputController.moveEvent += OnMove;
+        UserInputController.moveMouseEvent += OnMouseMove;
     }
 
     protected virtual void RemoveListeners()
@@ -87,6 +88,7 @@ public abstract class State : MonoBehaviour
         UserInputController.hoverEnterEvent -= OnHoverEnter;
         UserInputController.hoverExitEvent -= OnHoverExit;
         UserInputController.moveEvent -= OnMove;
+        UserInputController.moveMouseEvent -= OnMouseMove;
     }
 
     protected virtual void OnClick(object sender, InfoEventArgs<RaycastHit> e)
@@ -95,15 +97,17 @@ public abstract class State : MonoBehaviour
 
     protected virtual void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-
     }
 
     protected virtual void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-
     }
 
     protected virtual void OnMove(object sender, InfoEventArgs<Point> e)
+    {
+    }
+
+    protected virtual void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
     {
     }
 
@@ -114,6 +118,5 @@ public abstract class State : MonoBehaviour
     protected virtual void OnCancel(object sender, InfoEventArgs<int> e)
     {
     }
-
 
 }

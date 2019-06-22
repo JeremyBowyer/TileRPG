@@ -30,10 +30,13 @@ public class Character
 
     public virtual void Init()
     {
-        stats.Init();
-        experience = 0;
-        level = 1;
-        isInitialized = true;
+        if (!isInitialized)
+        {
+            stats.Init();
+            experience = 0;
+            level = 1;
+            isInitialized = true;
+        }
     }
 
     public virtual void InitAbilities()

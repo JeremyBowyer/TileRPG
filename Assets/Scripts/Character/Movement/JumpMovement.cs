@@ -10,6 +10,7 @@ public class JumpMovement : Movement
     public override bool isPath { get { return false; } set { isPath = value; } }
     public override bool ignoreUnwalkable { get { return true; } set { ignoreUnwalkable = value; } }
     public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
+    public override bool ignoreMoveBlock { get { return false; } set { ignoreMoveBlock = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
     private float currentTime;
@@ -29,7 +30,7 @@ public class JumpMovement : Movement
         Vector3 startingPos = controller.transform.position;
         Vector3 endingPos = targetTile.WorldPosition;
         //character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
-        controller.transform.rotation = Quaternion.LookRotation(gc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
+        controller.transform.rotation = Quaternion.LookRotation(bc.grid.GetDirection(path[0], targetTile.node), Vector3.up);
         currentTime = 0f;
         jumpHeight = Vector3.Distance(startingPos, endingPos) / 2;
         jumpSpeed = speed + speed / jumpHeight;

@@ -11,11 +11,13 @@ public abstract class BaseAbility {
     private int abilityPower;
     private int apCost;
     private int mpCost;
-    private int abilityRange;
+    private float abilityRange;
     public CharController character;
     public bool diag;
+    public bool ignoreOccupant;
     public bool inProgress;
     public bool nextTurn;
+    public bool isProjectile = false;
     public int mouseLayer;
     public AbilityTypes.Intent abilityIntent;
 
@@ -29,12 +31,6 @@ public abstract class BaseAbility {
     {
         get { return abilityDescription; }
         set { abilityDescription = value; }
-    }
-
-    public int AbilityID
-    {
-        get { return abilityID; }
-        set { abilityID = value; }
     }
 
     public int AbilityPower
@@ -55,7 +51,7 @@ public abstract class BaseAbility {
         set { mpCost = value; }
     }
 
-    public int AbilityRange
+    public float AbilityRange
     {
         get { return abilityRange; }
         set { abilityRange = value; }
@@ -71,6 +67,13 @@ public abstract class BaseAbility {
 
     public abstract bool ValidateCost(CharController _owner);
 
+    public abstract List<Node> GetRange();
+
+    public virtual Vector3[] GetPath(Vector3 _target)
+    {
+        return new Vector3[1]{ Vector3.zero };
+    }
+    
     public virtual bool ValidateTarget(CharController _target)
     {
         return true;

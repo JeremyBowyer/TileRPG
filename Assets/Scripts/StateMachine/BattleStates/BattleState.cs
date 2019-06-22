@@ -40,15 +40,17 @@ public abstract class BattleState : State
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-
     }
 
     protected override void OnMove(object sender, InfoEventArgs<Point> e)
+    {
+    }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
     {
     }
 

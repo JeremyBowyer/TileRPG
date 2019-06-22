@@ -15,7 +15,8 @@ public class SpellSelectionState : BaseAbilityMenuState
             {
             typeof(CommandSelectionState),
             typeof(SpellCharacterTargetState),
-            typeof(SpellEnvironmentTargetState)
+            typeof(SpellEnvironmentSplashTargetState),
+            typeof(SpellEnvironmentPathTargetState)
             };
         }
         set { }
@@ -28,11 +29,13 @@ public class SpellSelectionState : BaseAbilityMenuState
         {
             string spellName = spell.AbilityName;
             bool canCast = spell.ValidateCost(bc.CurrentCharacter);
-            if (spell is EnvironmentSpellAbility)
+            if (spell is EnvironmentSplashSpellAbility)
             {
-                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironment(spell as EnvironmentSpellAbility)), canCast);
-            }
-            else if (spell is TargetSpellAbility)
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentSplash(spell as EnvironmentSplashSpellAbility)), canCast);
+            } else if (spell is EnvironmentPathSpellAbility)
+            {
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentPath(spell as EnvironmentPathSpellAbility)), canCast);
+            } else if (spell is TargetSpellAbility)
             {
                 abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellTarget(spell as TargetSpellAbility)), canCast);
             }
@@ -59,7 +62,6 @@ public class SpellSelectionState : BaseAbilityMenuState
 
     protected override void Confirm()
     {
-
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
@@ -76,13 +78,22 @@ public class SpellSelectionState : BaseAbilityMenuState
         bc.ChangeState<SpellCharacterTargetState>(spellTargetArgs);
     }
 
-    protected void SpellEnvironment(EnvironmentSpellAbility spell)
+    protected void SpellEnvironmentPath(EnvironmentPathSpellAbility spell)
     {
         StateArgs spellTargetArgs = new StateArgs
         {
             spell = spell
         };
-        bc.ChangeState<SpellEnvironmentTargetState>(spellTargetArgs);
+        bc.ChangeState<SpellEnvironmentPathTargetState>(spellTargetArgs);
+    }
+
+    protected void SpellEnvironmentSplash(EnvironmentSplashSpellAbility spell)
+    {
+        StateArgs spellTargetArgs = new StateArgs
+        {
+            spell = spell
+        };
+        bc.ChangeState<SpellEnvironmentSplashTargetState>(spellTargetArgs);
     }
 
 }

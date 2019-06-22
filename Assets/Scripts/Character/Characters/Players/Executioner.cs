@@ -7,7 +7,8 @@ public class Executioner : PartyMember
     public override void Init()
     {
         stats.maxHealth = 175;
-        stats.maxAP = 100;
+        stats.maxAP = 200;
+        stats.agility = 75;
         stats.Init();
 
         experience = 0;

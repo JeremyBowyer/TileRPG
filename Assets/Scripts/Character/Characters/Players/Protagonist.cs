@@ -9,8 +9,11 @@ public class Protagonist : PartyMember
 
     public override void Init()
     {
+        if (isInitialized) return;
+
         stats.maxHealth = 1000;
         stats.maxAP = 10000;
+        stats.agility = 75;
         stats.Init();
 
         experience = 0;

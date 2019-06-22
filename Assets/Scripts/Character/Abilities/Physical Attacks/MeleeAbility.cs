@@ -10,14 +10,19 @@ public class MeleeAbility : AttackAbility
     {
         AbilityName = "Melee attack";
         AbilityDescription = "Attack at melee range.";
-        AbilityID = 2;
-        AbilityPower = 12;
-        ApCost = 25;
-        AbilityRange = 14;
+        AbilityPower = 30;
+        ApCost = 75;
+        AbilityRange = 1.5f;
         diag = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
         abilityIntent = AbilityTypes.Intent.Hostile;
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindRange(character.tile.node, AbilityRange, diag, true, false, false, false);
+        return range;
     }
 
     public override bool ValidateCost(CharController _owner)

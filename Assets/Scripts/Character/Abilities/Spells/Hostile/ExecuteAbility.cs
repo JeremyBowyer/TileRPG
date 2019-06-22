@@ -10,15 +10,20 @@ public class ExecuteAbility : TargetSpellAbility
     {
         AbilityName = "Execute";
         AbilityDescription = "Execute an enemy, if their HP is below 50%.";
-        AbilityID = 4;
         AbilityPower = 50;
         ApCost = 25;
         MpCost = 50;
-        AbilityRange = 10;
+        AbilityRange = 1f;
         diag = false;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
         abilityIntent = AbilityTypes.Intent.Hostile;
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindRange(character.tile.node, AbilityRange, diag, true, false, false, false);
+        return range;
     }
 
     public override bool ValidateCost(CharController _owner)

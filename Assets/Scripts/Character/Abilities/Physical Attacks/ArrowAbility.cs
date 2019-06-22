@@ -11,11 +11,11 @@ public class ArrowAbility : AttackAbility {
     {
         AbilityName = "Arrow attack";
         AbilityDescription = "Attack at range with an arrow.";
-        AbilityID = 2;
-        AbilityPower = 10;
-        ApCost = 50;
-        AbilityRange = 60;
+        AbilityPower = 25;
+        ApCost = 75;
+        AbilityRange = 5;
         diag = true;
+        isProjectile = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
         abilityIntent = AbilityTypes.Intent.Hostile;
@@ -29,6 +29,12 @@ public class ArrowAbility : AttackAbility {
     public override void ApplyCharacterEffect(CharController character)
     {
         character.Damage(AbilityPower);
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        return range;
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)

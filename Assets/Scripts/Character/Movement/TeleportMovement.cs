@@ -10,6 +10,7 @@ public class TeleportMovement : Movement
     public override bool isPath { get { return false; } set { isPath = value; } }
     public override bool ignoreUnwalkable { get { return true; } set { ignoreUnwalkable = value; } }
     public override bool ignoreOccupant{ get { return true; } set { ignoreOccupant = value; } }
+    public override bool ignoreMoveBlock{ get { return true; } set { ignoreMoveBlock = value; } }
     public override float Speed { get { return 1 / speed; } set { speed = value; } }
 
     public TeleportMovement(CharController controller) : base(controller)

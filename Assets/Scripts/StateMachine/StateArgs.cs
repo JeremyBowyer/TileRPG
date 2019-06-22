@@ -12,7 +12,7 @@ public struct StateArgs {
     public CharController targetCharacter;
     public List<Node> path;
 
-    public List<Node> splashZone;
+    public List<Node> affectedArea;
     public SpellAbility spell;
     public AttackAbility attackAbility;
 

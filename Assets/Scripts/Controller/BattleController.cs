@@ -5,12 +5,16 @@ using UnityEngine;
 public class BattleController : GameController
 {
     // References
+    public RoundController rc;
+    public ProjectileValidationController pvc;
+    public TurnQueueController turnQueue;
     public BattleUIController battleUiController;
     public Grid grid;
     public Pathfinding pathfinder;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public LineRenderer lineRenderer;
+    public GameObject selectedCharacterAura;
 
     // Variables
     private CharController currentCharacter;
@@ -36,9 +40,14 @@ public class BattleController : GameController
     public delegate void OnUnitChange(CharController character);
     public OnUnitChange onUnitChange;
 
+    public delegate void OnRoundChange();
+    public OnRoundChange onRoundChange;
+
     void Start()
     {
         // Assign references
+        rc = new RoundController(this);
+        pvc = new ProjectileValidationController(this);
         lineRenderer = GameObject.Find("LineRenderer").GetComponent<LineRenderer>();
         protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
@@ -51,11 +60,29 @@ public class BattleController : GameController
         cameraTarget = protag.transform;
 
         ChangeState<InitBattleState>();
-
     }
 
     public void NextPlayer()
     {
+        // If there is a currenct character, invoke relevant methods
+        if (CurrentCharacter != null)
+        {
+            turnQueue.HideEntry(CurrentCharacter.turnEntry);
+            rc.CharacterTurnEnd(CurrentCharacter);
+            CurrentCharacter.OnTurnEnd();
+        }
+
+        // If no characters left in round, initiate new round
+        if (rc.roundChars.Count < 1)
+        {
+            rc.InitRound(characters);
+        }
+
+        // Determine turn order, to find next character
+        rc.DetermineTurnOrder();
+        ChangePlayer(rc.roundChars[0]);
+
+        /*
         if (CurrentCharacter == null)
         {
             ChangePlayer(characters[0].GetComponent<CharController>());
@@ -64,12 +91,28 @@ public class BattleController : GameController
         int index = characters.IndexOf(CurrentCharacter.gameObject);
         index = (index + 2 > characters.Count) ? 0 : index + 1;
         ChangePlayer(characters[index].GetComponent<CharController>());
+        */
     }
 
     public void ChangePlayer(CharController character)
     {
         CurrentCharacter = character;
         cameraTarget = character.transform;
+
+        selectedCharacterAura.gameObject.transform.SetParent(CurrentCharacter.gameObject.transform);
+        selectedCharacterAura.transform.localPosition = new Vector3(0, 0, 0);
+        selectedCharacterAura.SetActive(true);
+        Projector projector = selectedCharacterAura.GetComponent<Projector>();
+        projector.material = new Material(projector.material);
+
+        if (character is EnemyController)
+            projector.material.SetColor("_RampColorTint", CustomColors.Hostile);
+
+        if (character is PlayerController)
+            projector.material.SetColor("_RampColorTint", CustomColors.PlayerUI);
+
+
+
         if (onUnitChange != null)
             onUnitChange(character);
     }

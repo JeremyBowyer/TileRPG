@@ -34,6 +34,10 @@ public class CameraController : MonoBehaviour {
     public Vector3 Margin, Smoothing;
     private Vector3 mouseStartingPos;
     private Vector3 mouseNewPos;
+    private float mouseEdgeWidth;
+    private float mouseEdgeHeight;
+    private float aspectRatio;
+    private float boundary = 50f;
 
     // Camera Zoom parameters
     public float minSize;
@@ -43,6 +47,12 @@ public class CameraController : MonoBehaviour {
     private float DragSpeed
     {
         get { return _dragSpeed * _camera.orthographicSize; }
+    }
+
+    private float _edgeSpeed = 5f;
+    private float EdgeSpeed
+    {
+        get { return _edgeSpeed * _camera.orthographicSize; }
     }
 
     private float _rotateSpeed = 5f;
@@ -59,6 +69,9 @@ public class CameraController : MonoBehaviour {
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         minSize = 8f;
         maxSize = 20f;
+        mouseEdgeWidth = Screen.width - boundary;
+        mouseEdgeHeight = Screen.height - boundary;
+        aspectRatio = mouseEdgeWidth / mouseEdgeHeight;
     }
 
     public void AcquireTarget()
@@ -68,36 +81,7 @@ public class CameraController : MonoBehaviour {
 
     public void LateUpdate()
     {
-        // Right click to drag
-        if (Input.GetMouseButtonDown(1))
-        {
-            mouseStartingPos = Input.mousePosition;
-        }
-
-        if (Input.GetMouseButton(1))
-        {
-            Cursor.visible = false;
-            float x;
-            float z;
-            mouseNewPos = Input.mousePosition;
-
-            x = mouseNewPos.x - mouseStartingPos.x;
-            z = mouseNewPos.y - mouseStartingPos.y;
-
-            Vector3 deltaMovement = AdjustMovementForCameraRotation(-x, -z);
-            //Vector3 deltaMovement = new Vector3(x, 0, z);
-            Vector3 moveStep = deltaMovement * DragSpeed * Time.deltaTime;
-
-            //transform.position += moveStep;
-            transform.Translate(moveStep, Space.World);
-
-            mouseStartingPos = mouseNewPos;
-            return;
-        }
-        else
-        {
-            Cursor.visible = true;
-        }
+        AddTransparency();
 
         // Zoom Camera
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
@@ -145,6 +129,76 @@ public class CameraController : MonoBehaviour {
         }
 
 	}
+
+    public void ScreenEdgeMovement(float x, float y)
+    {
+
+        if (Input.GetMouseButton(2))
+            return;
+
+        if(x < boundary || y < boundary || x > mouseEdgeWidth || y > mouseEdgeHeight)
+        {
+            isFollowing = false;
+            Cursor.visible = false;
+
+            Vector3 heading = transform.position - _camera.transform.position;
+            float distance = heading.magnitude;
+            Vector3 direction = heading / distance;
+
+            Vector3 verticalDelta = Vector3.zero;
+            Vector3 horizontalDelta = Vector3.zero;
+            Vector3 normDelta;
+            Vector3 moveStep;
+
+            if (x < boundary || x > mouseEdgeWidth)
+            {
+                x = x - mouseEdgeWidth / 2;
+                horizontalDelta = new Vector3(direction.z * x, 0, direction.x * -x);
+            }
+
+            if (y < boundary || y > mouseEdgeHeight)
+            {
+                y = y - mouseEdgeHeight;
+                verticalDelta = new Vector3(direction.x * y, 0, direction.z * y);
+            }
+
+            normDelta = Vector3.Normalize(verticalDelta + horizontalDelta);
+            normDelta.y = 0f;
+
+            moveStep = normDelta * EdgeSpeed * Time.deltaTime;
+            transform.Translate(moveStep, Space.World);
+        }
+        else
+        {
+            Cursor.visible = true;
+            return;
+        }
+    }
+
+    public void AddTransparency()
+    {
+        if (!isFollowing || FollowTarget == null)
+            return;
+
+        RaycastHit[] hits;
+        float dist = Vector3.Distance(_camera.transform.position - _camera.transform.forward * 5f, FollowTarget.transform.position);
+        // you can also use CapsuleCastAll()
+        // TODO: setup your layermask it improve performance and filter your hits.
+        hits = Physics.RaycastAll(_camera.transform.position - _camera.transform.forward * 5f, _camera.transform.forward, dist);
+        foreach (RaycastHit hit in hits)
+        {
+            MeshRenderer R = hit.collider.GetComponent<MeshRenderer>();
+            if (R == null || R.tag == "Map")
+                continue;
+
+            AutoTransparent AT = R.GetComponent<AutoTransparent>();
+            if (AT == null) // if no script is attached, attach one
+            {
+                AT = R.gameObject.AddComponent<AutoTransparent>();
+            }
+            AT.BeTransparent(); // get called every frame to reset the falloff
+        }
+    }
 
     public Vector3 AdjustMovementForCameraRotation(float x, float y)
     {

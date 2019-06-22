@@ -10,15 +10,20 @@ public class FireboltAbility : TargetSpellAbility
     {
         AbilityName = "Firebolt";
         AbilityDescription = "Attack at range with a firebolt.";
-        AbilityID = 2;
         AbilityPower = 17;
         ApCost = 25;
-        MpCost = 40;
-        AbilityRange = 100;
+        MpCost = 10;
+        AbilityRange = 5f;
         diag = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
         abilityIntent = AbilityTypes.Intent.Hostile;
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        return range;
     }
 
     public override bool ValidateCost(CharController _owner)

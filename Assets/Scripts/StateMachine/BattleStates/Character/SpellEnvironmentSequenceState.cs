@@ -8,7 +8,7 @@ public class SpellEnvironmentSequenceState : BattleState
     public static CharController targetCharacter;
     public static CharController character;
     public static Tile targetTile;
-    private List<Node> splashZone;
+    private List<Node> affectedArea;
     public static EnvironmentSpellAbility spell;
     private State stateToNotify;
 
@@ -36,7 +36,7 @@ public class SpellEnvironmentSequenceState : BattleState
         character = GetComponent<CharController>();
         spell = args.spell as EnvironmentSpellAbility;
         targetTile = args.targetTile;
-        splashZone = args.splashZone;
+        affectedArea = args.affectedArea;
         base.Enter();
 
         character.CastSpell(spell);
@@ -46,7 +46,7 @@ public class SpellEnvironmentSequenceState : BattleState
 
     public void OnCoroutineFinish()
     {
-        foreach (Node node in splashZone)
+        foreach (Node node in affectedArea)
         {
             spell.ApplyTileEffect(node.tile);
         }
@@ -58,7 +58,7 @@ public class SpellEnvironmentSequenceState : BattleState
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);
-        foreach (Node node in splashZone)
+        foreach (Node node in affectedArea)
         {
             spell.ApplyTileEffect(node.tile);
         }

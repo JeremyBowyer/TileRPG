@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class BurnTileEffect : TileEffect
 {
+    private const int MaxIterations = 2;
     private int countdown;
     private GameObject go;
 
     public override void ApplyEffect(CharController _target)
     {
+        if (_target == null)
+            return;
+
         BurnPlayerEffect existingEffect = _target.gameObject.GetComponent<BurnPlayerEffect>();
         if (existingEffect != null)
         {
@@ -20,9 +24,13 @@ public class BurnTileEffect : TileEffect
         }
     }
 
-    public override void Tick(CharController currentCharacter)
+    public override void TurnTick(CharController _currentCharacter)
     {
-        base.Tick(currentCharacter);
+    }
+
+    public override void RoundTick()
+    {
+        ApplyEffect(tile.occupant);
         if (countdown <= 0)
             RemoveEffect();
         countdown -= 1;
@@ -41,7 +49,7 @@ public class BurnTileEffect : TileEffect
         mesh.material = new Material(mesh.material);
         mesh.material.SetColor("_Color", CustomColors.Fire);
 
-        countdown = 6;
+        countdown = MaxIterations;
     }
 
     public override void RemoveEffect()

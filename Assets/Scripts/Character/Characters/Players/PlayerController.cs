@@ -13,6 +13,7 @@ public class PlayerController : CharController {
     {
         bc.players.Remove(this.gameObject);
         bc.characters.Remove(this.gameObject);
+        bc.rc.roundChars.Remove(this);
         base.Die();
     }
 

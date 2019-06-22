@@ -29,7 +29,7 @@ public class MoveTargetState : BattleState
         base.Enter();
         mover = bc.CurrentCharacter.MovementAbility;
         player = bc.CurrentCharacter as PlayerController;
-        moveRange = mover.GetNodesInRange(player.Stats.moveRange, mover.diag, false, mover.costModifier);
+        moveRange = mover.GetNodesInRange();
         grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange");
         inTransition = false;
     }
@@ -61,15 +61,7 @@ public class MoveTargetState : BattleState
 
         if (moveRange.Contains(tile.node))
         {
-            List<Node> path = bc.pathfinder.FindPath(
-                bc.CurrentCharacter.tile.node,
-                tile.node,
-                player.Stats.moveRange,
-                player.MovementAbility.diag,
-                player.MovementAbility.ignoreOccupant,
-                player.MovementAbility.ignoreUnwalkable,
-                false,
-                player.MovementAbility.costModifier);
+            List<Node> path = mover.GetPath(tile.node);
 
             StateArgs moveArgs = new StateArgs
             {
@@ -94,8 +86,10 @@ public class MoveTargetState : BattleState
 
         if(moveRange.Contains(tile.node))
         {
-            List<Node> path = pathfinder.FindPath(player.tile.node, tile.node, player.Stats.moveRange, mover.diag, false, mover.ignoreUnwalkable, false, mover.costModifier);
-            if (player.MovementAbility.isPath)
+
+            List<Node> path = mover.GetPath(tile.node);
+
+            if (mover.isPath)
             {
                 grid.SelectNodes(path, CustomColors.MovementPath, "movepath");
             }
@@ -103,8 +97,6 @@ public class MoveTargetState : BattleState
             {
                 grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath");
             }
-            
-            battleUiController.SetApCost(path[path.Count - 1].gCost, player.Stats.moveRange);
         }
     }
 
@@ -131,5 +123,11 @@ public class MoveTargetState : BattleState
     {
         bc.ChangeState<CommandSelectionState>();
     }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
+    }
+
 
 }

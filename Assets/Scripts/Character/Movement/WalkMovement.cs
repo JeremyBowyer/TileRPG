@@ -10,6 +10,7 @@ public class WalkMovement : Movement
     public override bool isPath { get { return true; } set { isPath = value; } }
     public override bool ignoreUnwalkable { get { return false; } set { ignoreUnwalkable = value; } }
     public override bool ignoreOccupant { get { return false; } set { ignoreOccupant = value; } }
+    public override bool ignoreMoveBlock { get { return false; } set { ignoreMoveBlock = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
     public WalkMovement(CharController controller) : base(controller)
@@ -36,14 +37,15 @@ public class WalkMovement : Movement
 
             float _height = node.worldPosition.y;
 
-            controller.transform.LookAt(new Vector3(node.tile.transform.position.x, controller.transform.position.y, node.tile.transform.position.z));
+            controller.transform.LookAt(new Vector3(node.tile.WorldPosition.x, controller.transform.position.y, node.tile.WorldPosition.z));
             while (!Mathf.Approximately(currentTime, 1.0f))
             {
                 currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * Speed));
                 float frameValue = (endValue - startValue) * EasingEquations.Linear(0.0f, 1.0f, currentTime) + startValue;
                 float newX = startingX + xDist * frameValue;
                 float newZ = startingZ + zDist * frameValue;
-                controller.transform.position = new Vector3(newX, _height, newZ);
+                float newY = bc.grid.FindHeightPoint(new Vector3(newX, controller.transform.position.y, newZ));
+                controller.transform.position = new Vector3(newX, newY, newZ);
                 yield return new WaitForEndOfFrame();
             }
 

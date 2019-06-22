@@ -10,7 +10,6 @@ public class HealRayAbility : TargetSpellAbility
     {
         AbilityName = "Heal Ray Ability";
         AbilityDescription = "Heal an ally for a moderate amount from range.";
-        AbilityID = 2;
         AbilityPower = 50;
         ApCost = 25;
         MpCost = 40;
@@ -18,7 +17,13 @@ public class HealRayAbility : TargetSpellAbility
         diag = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Support;
+        abilityIntent = AbilityTypes.Intent.Heal;
+    }
+
+    public override List<Node> GetRange()
+    {
+        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        return range;
     }
 
     public override bool ValidateCost(CharController _owner)

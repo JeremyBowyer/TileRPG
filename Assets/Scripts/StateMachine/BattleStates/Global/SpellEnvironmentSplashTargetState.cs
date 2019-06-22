@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpellEnvironmentTargetState : BattleState
+public class SpellEnvironmentSplashTargetState : BattleState
 {
     public List<Node> spellRange;
     public List<Node> splashZone;
-    public SpellAbility spellAbility;
+    public EnvironmentSplashSpellAbility spellAbility;
     public CharController character;
 
     public override List<Type> AllowedTransitions
@@ -27,9 +27,9 @@ public class SpellEnvironmentTargetState : BattleState
     public override void Enter()
     {
         inTransition = true;
-        spellAbility = args.spell;
+        spellAbility = args.spell as EnvironmentSplashSpellAbility;
         character = bc.CurrentCharacter;
-        spellRange = pathfinder.FindRange(bc.CurrentCharacter.tile.node, spellAbility.AbilityRange, spellAbility.diag, true, true, true);
+        spellRange = spellAbility.GetRange(); ;
         grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
         base.Enter();
         inTransition = false;
@@ -39,6 +39,7 @@ public class SpellEnvironmentTargetState : BattleState
     {
         base.Exit();
         spellRange = null;
+        bc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes("spellrange");
         grid.DeSelectNodes("splashzone");
     }
@@ -58,8 +59,12 @@ public class SpellEnvironmentTargetState : BattleState
 
         if (spellRange.Contains(tile.node))
         {
-            splashZone = bc.pathfinder.FindRange(tile.node, 10, true, true, true, true);
-            grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone");
+            // If spell isn't a projectile, or the projectile is validated, highlight splashzone because spell is valida
+            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject))
+            {
+                splashZone = spellAbility.GetSplashZone(tile);
+                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone");
+            }
         }
     }
 
@@ -69,6 +74,7 @@ public class SpellEnvironmentTargetState : BattleState
 
         if (tile == null)
             return;
+        bc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes("splashzone");
     }
 
@@ -85,7 +91,7 @@ public class SpellEnvironmentTargetState : BattleState
             {
                 targetTile = tile,
                 spell = spellAbility,
-                splashZone = splashZone,
+                affectedArea = splashZone,
                 waitingStateMachines = new List<StateMachine> { bc }
             };
             character.ChangeState<SpellEnvironmentSequenceState>(spellArgs);
@@ -97,4 +103,11 @@ public class SpellEnvironmentTargetState : BattleState
     {
         bc.ChangeState<CommandSelectionState>();
     }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
+    }
+
+
 }
