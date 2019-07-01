@@ -40,15 +40,30 @@ public class SpellEnvironmentSequenceState : BattleState
         base.Enter();
 
         character.CastSpell(spell);
-        spellCoroutine = spell.Initiate(targetTile, OnCoroutineFinish);
+        spellCoroutine = spell.Initiate(targetTile, affectedArea, OnCoroutineFinish);
         StartCoroutine(spellCoroutine);
     }
 
     public void OnCoroutineFinish()
     {
-        foreach (Node node in affectedArea)
+        Vector3 sourceDirection;
+        if (affectedArea.Count > 1)
+            sourceDirection = bc.grid.GetDirection(affectedArea[0], affectedArea[1]);
+        else
         {
-            spell.ApplyTileEffect(node.tile);
+            Vector3 facingDirection = bc.grid.GetDirection(character.tile.node, affectedArea[0]);
+            if(facingDirection == grid.forwardDirection || facingDirection == grid.backwardDirection)
+            {
+                sourceDirection = grid.leftDirection;
+            }
+            else
+            {
+                sourceDirection = grid.forwardDirection;
+            }
+        }
+        for (int i = 0; i < affectedArea.Count; i++)
+        {
+            spell.ApplyTileEffect(affectedArea[i].tile, sourceDirection, grid);
         }
         inTransition = false;
         character.ChangeState<IdleState>();
@@ -58,10 +73,17 @@ public class SpellEnvironmentSequenceState : BattleState
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);
-        foreach (Node node in affectedArea)
+
+        Vector3 sourceDirection;
+        if (affectedArea.Count > 1)
+            sourceDirection = bc.grid.GetDirection(affectedArea[0], affectedArea[1]);
+        else
+            sourceDirection = bc.grid.GetDirection(character.tile.node, affectedArea[0]);
+        for (int i = 0; i < affectedArea.Count; i++)
         {
-            spell.ApplyTileEffect(node.tile);
+            spell.ApplyTileEffect(affectedArea[i].tile, sourceDirection, grid);
         }
+
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("SpellEnvironmentGO"))
         {
             GameObject.Destroy(go);

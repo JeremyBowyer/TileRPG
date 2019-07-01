@@ -280,6 +280,11 @@ public class BaseAI : MonoBehaviour {
             character.MovementAbility.ignoreUnwalkable,
             false,
             false);
+        if(path.Count == 0)
+        {
+            nextAction = AIState.End;
+            TakeNextAction();
+        }
         StateArgs moveArgs = new StateArgs
         {
             path = path,
@@ -290,6 +295,12 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual bool CheckForEnd()
     {
+        if (nextAction == AIState.End)
+        {
+            nextAction = AIState.Attack;
+            return true;
+        }
+
         float curAP = character.Stats.curAP;
         float minCost = Mathf.Min(new float[] {
             character.AttackAbility.ApCost,

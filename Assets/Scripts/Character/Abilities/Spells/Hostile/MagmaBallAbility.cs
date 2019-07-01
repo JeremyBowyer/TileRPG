@@ -47,20 +47,20 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         character.Damage(AbilityPower);
     }
 
-    public override void ApplyTileEffect(Tile tile)
+    public override void ApplyTileEffect(Tile _tile, Vector3 _sourceDirection, Grid _grid)
     {
-        if(tile.Occupant != null)
+        if(_tile.Occupant != null)
         {
-            CharController character = tile.Occupant.GetComponent<CharController>();
+            CharController character = _tile.Occupant.GetComponent<CharController>();
             if (character != null)
                 ApplyCharacterEffect(character);
         }
 
-        TileEffect oldEffect = tile.GetComponent<TileEffect>();
+        TileEffect oldEffect = _tile.GetComponent<TileEffect>();
         if (oldEffect != null)
             oldEffect.RemoveEffect();
-        TileEffect newEffect = tile.gameObject.AddComponent<BurnTileEffect>();
-        newEffect.Init(tile);
+        TileEffect newEffect = _tile.gameObject.AddComponent<BurnTileEffect>();
+        newEffect.Init(_tile, _sourceDirection, _grid);
     }
 
     public override Vector3[] GetPath(Vector3 _target)
@@ -82,7 +82,7 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         return linePoints;
     }
 
-    public override IEnumerator Initiate(Tile tile, Action callback)
+    public override IEnumerator Initiate(Tile tile, List<Node> affectedArea, Action callback)
     {
         character.animParamController.SetTrigger("cast_start");
         character.animParamController.SetBool("cast_loop");

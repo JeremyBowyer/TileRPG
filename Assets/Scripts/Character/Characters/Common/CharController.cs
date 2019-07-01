@@ -67,6 +67,13 @@ public abstract class CharController : StateMachine {
             lc = lcGO.GetComponent<LevelController>();
 
         height = GetComponent<BoxCollider>().bounds.extents.y;
+        ScaleCharacter();
+    }
+
+    public void ScaleCharacter()
+    {
+        transform.localScale = transform.localScale / height;
+        height = GetComponent<BoxCollider>().bounds.extents.y;
     }
 
     public virtual void CreateCharacter()

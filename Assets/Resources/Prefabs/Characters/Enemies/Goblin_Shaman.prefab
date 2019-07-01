@@ -2918,8 +2918,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.45, z: 1}
-  m_Center: {x: 0, y: 0.76, z: 0}
+  m_Size: {x: 1, y: 1.8, z: 1}
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &114504051119614582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2962,6 +2962,7 @@ MonoBehaviour:
   lc: {fileID: 0}
   statusIndicator: {fileID: 114298224252580764}
   animParamController: {fileID: 114504051119614582}
+  turnEntry: {fileID: 0}
 --- !u!114 &114285520269472658
 MonoBehaviour:
   m_ObjectHideFlags: 0

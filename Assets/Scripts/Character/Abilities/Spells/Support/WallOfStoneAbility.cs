@@ -1,7 +1,7 @@
-﻿using System;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System;
 
 public class WallOfStoneAbility : EnvironmentPathSpellAbility
 {
@@ -56,23 +56,23 @@ public class WallOfStoneAbility : EnvironmentPathSpellAbility
     {
     }
 
-    public override void ApplyTileEffect(Tile tile)
+    public override void ApplyTileEffect(Tile _tile, Vector3 _sourceDirection, Grid _grid)
     {
-        if (tile.Occupant != null)
+        if (_tile.Occupant != null)
         {
-            CharController character = tile.Occupant.GetComponent<CharController>();
+            CharController character = _tile.Occupant.GetComponent<CharController>();
             if (character != null)
                 ApplyCharacterEffect(character);
         }
 
-        TileEffect oldEffect = tile.GetComponent<TileEffect>();
+        TileEffect oldEffect = _tile.GetComponent<TileEffect>();
         if (oldEffect != null)
             oldEffect.RemoveEffect();
-        TileEffect newEffect = tile.gameObject.AddComponent<WallOfStoneTileEffect>();
-        newEffect.Init(tile);
+        TileEffect newEffect = _tile.gameObject.AddComponent<WallOfStoneTileEffect>();
+        newEffect.Init(_tile, _sourceDirection, _grid);
     }
 
-    public override IEnumerator Initiate(Tile tile, Action callback)
+    public override IEnumerator Initiate(Tile tile, List<Node> affectedArea, Action callback)
     {
         character.animParamController.SetTrigger("cast_start");
         character.animParamController.SetBool("cast_loop");
@@ -87,4 +87,5 @@ public class WallOfStoneAbility : EnvironmentPathSpellAbility
         character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
         yield break;
     }
+
 }

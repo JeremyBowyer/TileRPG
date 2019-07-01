@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class InitiateBattle : MonoBehaviour
 {
 
-    public float sphereRadius = 5f;
+    public float sphereRadius = 2f;
     public LayerMask layerMask;
     public GameObject[] enemies;
     public BattleController gc;

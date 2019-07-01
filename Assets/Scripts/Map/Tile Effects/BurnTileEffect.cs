@@ -36,9 +36,9 @@ public class BurnTileEffect : TileEffect
         countdown -= 1;
     }
 
-    public override void Init(Tile _tile)
+    public override void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid)
     {
-        base.Init(_tile);
+        base.Init(_tile, _sourceDirection, _grid);
 
         GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
         go = Instantiate(highlightedGO, tile.WorldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);

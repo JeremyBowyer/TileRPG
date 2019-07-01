@@ -51,7 +51,7 @@ public class InitBattleState : BattleState
         protag = bc.protag;
         protag.transform.position = new Vector3(protag.transform.position.x, grid.FindHeightPoint(protag.transform.position), protag.transform.position.z);
         bc.protagStartPos = protag.transform.position;
-
+        
         // Place protag
         Node protagNode = bc.grid.FindNearestNode(protag.transform.position);
         protag.Place(protagNode.tile);

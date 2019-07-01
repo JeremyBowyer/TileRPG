@@ -59,7 +59,7 @@ public class ProtagonistController : PlayerController
                 model = "Wizard"
             };
             partyMembers.Add(member3);
-            /*
+
             Rogue member1 = new Rogue()
             {
                 cName = "Wingus",
@@ -75,7 +75,7 @@ public class ProtagonistController : PlayerController
                 model = "Rogue"
             };
             partyMembers.Add(member2);
-            */
+
         }
         else
         {

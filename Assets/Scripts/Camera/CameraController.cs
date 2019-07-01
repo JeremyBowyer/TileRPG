@@ -67,11 +67,12 @@ public class CameraController : MonoBehaviour {
 	void Awake () {
 		isFollowing = true;
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
-        minSize = 8f;
-        maxSize = 20f;
+        minSize = 2f;
+        maxSize = 5f;
         mouseEdgeWidth = Screen.width - boundary;
         mouseEdgeHeight = Screen.height - boundary;
         aspectRatio = mouseEdgeWidth / mouseEdgeHeight;
+        CameraSize = minSize;
     }
 
     public void AcquireTarget()
@@ -188,7 +189,7 @@ public class CameraController : MonoBehaviour {
         foreach (RaycastHit hit in hits)
         {
             MeshRenderer R = hit.collider.GetComponent<MeshRenderer>();
-            if (R == null || R.tag == "Map")
+            if (R == null || R.tag == "Map" || R.tag == "Ground")
                 continue;
 
             AutoTransparent AT = R.GetComponent<AutoTransparent>();

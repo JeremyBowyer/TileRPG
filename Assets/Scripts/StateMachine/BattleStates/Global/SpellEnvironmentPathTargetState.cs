@@ -67,8 +67,18 @@ public class SpellEnvironmentPathTargetState : BattleState
             }
             else
             {
-                abilityPath = spellAbility.GetPath(startNode.tile, tile);
-                grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath");
+                if (tile.node == startNode)
+                {
+                    abilityPath = new List<Node>() { tile.node };
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath");
+                }
+                else
+                {
+                    abilityPath = spellAbility.GetPath(startNode.tile, tile);
+                    if (abilityPath.Count == 0)
+                        return;
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath");
+                }
             }
         }
     }
@@ -102,6 +112,10 @@ public class SpellEnvironmentPathTargetState : BattleState
                 startNode = tile.node;
             } else
             {
+                if(tile.node == startNode)
+                {
+                    abilityPath = new List<Node>() { tile.node };
+                }
                 StateArgs spellArgs = new StateArgs
                 {
                     targetTile = tile,

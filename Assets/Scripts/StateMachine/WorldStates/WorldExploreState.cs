@@ -18,6 +18,7 @@ public class WorldExploreState : WorldState
     private int layerMask;
     public NavMeshAgent protagAgent;
     public GameObject movementCursor;
+    public GameObject startingPlace;
 
     // Movement parameters
     public float moveSpeed = 8f;
@@ -62,7 +63,7 @@ public class WorldExploreState : WorldState
         lc.protag.statusIndicator.gameObject.SetActive(false);
         lc.EnableRBs(true);
         //protagAgent.SetDestination(protagAgent.transform.position);
-        protagAgent.isStopped = false;
+        //protagAgent.isStopped = false;
 
         inTransition = false;
     }

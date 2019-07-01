@@ -25,7 +25,7 @@ public abstract class TileEffect : MonoBehaviour
         bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
-    public virtual void Init(Tile _tile)
+    public virtual void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid)
     {
         tile = _tile;
         bc.onUnitChange += TurnTick;

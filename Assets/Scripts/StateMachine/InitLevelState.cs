@@ -31,7 +31,9 @@ public class InitLevelState : WorldState
 
         // Place protag on starting spot
         GameObject startingPlace = GameObject.FindGameObjectWithTag("StartingTilePlayer");
-        lc.protag.gameObject.transform.position = startingPlace.transform.position;
+        NavMeshAgent protagAgent = protag.GetComponent<NavMeshAgent>();
+        protagAgent.Warp(startingPlace.transform.position);
+        protag.transform.localScale = protag.transform.localScale * 0.5f;
 
         // Instantiate Party Members
         protag.InitPartyMembers();
