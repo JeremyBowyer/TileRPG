@@ -10,7 +10,7 @@ public class InitiateBattle : MonoBehaviour
     public float sphereRadius = 2f;
     public LayerMask layerMask;
     public GameObject[] enemies;
-    public BattleController gc;
+    public BattleController bc;
     private Vector3 origin;
     public NavMeshAgent protagAgent;
     public CharController character;
@@ -37,6 +37,7 @@ public class InitiateBattle : MonoBehaviour
             {
                 if (col.tag == "Enemy")
                 {
+                    /*
                     character.lc.battleInitiator = col.gameObject.GetComponent<EnemyController>();
                     protagAgent.SetDestination(protagAgent.transform.position);
                     protagAgent.isStopped = true;
@@ -46,6 +47,8 @@ public class InitiateBattle : MonoBehaviour
                     PersistentObjects.protagonistLocation = origin;
                     PersistentObjects.RemoveObject(col.gameObject.name);
                     SceneManager.LoadScene("Battle");
+                    */
+                    character.lc.StartBattle();
                 }
             }
         }

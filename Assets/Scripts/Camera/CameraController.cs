@@ -82,7 +82,9 @@ public class CameraController : MonoBehaviour {
 
     public void LateUpdate()
     {
+        /*
         AddTransparency();
+        */
 
         // Zoom Camera
         if (Input.GetAxis("Mouse ScrollWheel") < 0)

@@ -175,7 +175,7 @@ public class Grid : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(point + Vector3.up * 50f, -Vector3.up, out hit, 100f, layerMask))
         {
-            if (hit.collider.tag == "Map")
+            if (hit.collider.tag == "Ground")
             {
                 return hit.collider.gameObject;
             }
@@ -193,7 +193,7 @@ public class Grid : MonoBehaviour {
         RaycastHit hit;
         if(Physics.Raycast(point+Vector3.up*20f, -Vector3.up, out hit, 100f, layerMask))
         {
-            if(hit.collider.tag == "Map")
+            if(hit.collider.tag == "Ground")
             {
                 return hit.point.y;
             }

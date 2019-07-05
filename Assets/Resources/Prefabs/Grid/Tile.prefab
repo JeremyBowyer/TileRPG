@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3184308107101458123}
   m_Layer: 13
   m_Name: Tile
-  m_TagString: Map
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -123,6 +123,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: AnchorPoint
       objectReference: {fileID: 0}
+    - target: {fileID: 3000633320964822266, guid: f749ad2287beefc4d9f929c8321a376d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1438091577239316054, guid: f749ad2287beefc4d9f929c8321a376d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -176,11 +181,6 @@ PrefabInstance:
     - target: {fileID: 1438091577239316054, guid: f749ad2287beefc4d9f929c8321a376d,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3000633320964822266, guid: f749ad2287beefc4d9f929c8321a376d,
-        type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -9,6 +9,7 @@ public class LevelController : GameController
     public WorldMenuPanelController worldMenuPanelController;
     public WorldUIController worldUiController;
     public EnemyController battleInitiator;
+    public BattleController bc;
 
     public void InitializeLevel()
     {
@@ -23,5 +24,11 @@ public class LevelController : GameController
         cameraTarget = protag.transform;
 
         ChangeState<InitLevelState>();
+    }
+
+    public void StartBattle()
+    {
+        ChangeState<IdleState>();
+        bc.Init();
     }
 }

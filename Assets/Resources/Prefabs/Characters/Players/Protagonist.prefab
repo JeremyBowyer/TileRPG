@@ -2929,7 +2929,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 1
-  m_Radius: 1
+  m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -3032,6 +3032,7 @@ MonoBehaviour:
   lc: {fileID: 0}
   statusIndicator: {fileID: 0}
   animParamController: {fileID: 0}
+  turnEntry: {fileID: 0}
   protagAgent: {fileID: 0}
 --- !u!1 &1962679385746514
 GameObject:

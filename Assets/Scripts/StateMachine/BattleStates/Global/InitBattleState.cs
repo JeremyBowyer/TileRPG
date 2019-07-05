@@ -35,10 +35,11 @@ public class InitBattleState : BattleState
 
         // Show Message
         superUiController.ShowMessage("Battle Start", 2f);
-
+        /*
         // Start Coroutines
         StartCoroutine(grid.GenerateGrid(OnCreateGrid));
         StartCoroutine(bc.cameraRig.ZoomCamera(5f, 3f, 15f));
+        */
     }
       
     public void OnCreateGrid()

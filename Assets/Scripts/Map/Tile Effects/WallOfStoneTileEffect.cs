@@ -7,7 +7,6 @@ public class WallOfStoneTileEffect : TileEffect
     private int countdown;
     private const int MaxIterations = 1;
     private GameObject go;
-    private int movementSlow = 999;
     private bool wasWalkable;
 
     public override void ApplyEffect(CharController _target)

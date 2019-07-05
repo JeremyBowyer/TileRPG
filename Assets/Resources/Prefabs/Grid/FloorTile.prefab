@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 6627826928775303221}
   - component: {fileID: 2136439349903172083}
   - component: {fileID: 564858554783343692}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: FloorTile
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -124,6 +124,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: AnchorPoint
       objectReference: {fileID: 0}
+    - target: {fileID: 3000633320964822266, guid: f749ad2287beefc4d9f929c8321a376d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5869189530261662136, guid: f749ad2287beefc4d9f929c8321a376d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1438091577239316054, guid: f749ad2287beefc4d9f929c8321a376d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -193,16 +203,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3000633320964822266, guid: f749ad2287beefc4d9f929c8321a376d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5869189530261662136, guid: f749ad2287beefc4d9f929c8321a376d,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f749ad2287beefc4d9f929c8321a376d, type: 3}

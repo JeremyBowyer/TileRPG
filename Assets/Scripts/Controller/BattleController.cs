@@ -56,9 +56,13 @@ public class BattleController : GameController
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         unitsToPlace = new Queue<GameObject>();
 
-        cameraRig.FollowTarget = protag.transform;
-        cameraTarget = protag.transform;
+        //cameraRig.FollowTarget = protag.transform;
+        //cameraTarget = protag.transform;
+        ChangeState<IdleState>();
+    }
 
+    public void Init()
+    {
         ChangeState<InitBattleState>();
     }
 

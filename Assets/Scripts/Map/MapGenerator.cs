@@ -27,7 +27,7 @@ public class MapGenerator : MonoBehaviour {
 			for (int y = 0; y < mapSize.y; y ++) {
 				Vector3 tilePosition = new Vector3(-mapSize.x / 2 + 0.5f + x, 0, -mapSize.y / 2 + 0.5f + y);
 				Transform newTile = Instantiate(tilePrefab, tilePosition, Quaternion.identity) as Transform;
-                newTile.gameObject.layer = LayerMask.NameToLayer("Map");
+                newTile.gameObject.layer = LayerMask.NameToLayer("Ground");
                 newTile.gameObject.name = "(" + x.ToString () + " , " + y.ToString () + ")";
 				newTile.localScale = Vector3.one * (1-outlinePercent);
 				newTile.parent = mapHolder;

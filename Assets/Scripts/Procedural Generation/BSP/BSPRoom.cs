@@ -33,7 +33,7 @@ public class BSPRoom : BSPArea
 	
 	private void AddFloor(){
         Vector3 midPoint = transform.position;
-
+        
 		for (int i = 0; i < xSize; i++){
 			for (int j = 0; j < zSize; j++){
 				GameObject floor = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Map/Floors/SM_Env_Tiles_07"));
@@ -50,10 +50,21 @@ public class BSPRoom : BSPArea
 
 			}
 		}
-	}
+        
+        /*
+        GameObject floor = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Floors/SM_Env_Tiles_07"));
+        float xMod = floor.GetComponent<BoxCollider>().bounds.size.x;
+        floor.transform.localScale = new Vector3(floor.transform.localScale.x / xMod * xSize, floor.transform.localScale.y / xMod, floor.transform.localScale.z / xMod * zSize);
+
+        floor.transform.position = midPoint + new Vector3(xSize / 2, 0f, -(zSize / 2));
+
+        floor.transform.parent = transform;
+        */
+    }
 
     public void AddProps()
     {
+        /*
         foreach (GameObject wall in walls)
         {
             float rnd = Random.value;
@@ -79,12 +90,10 @@ public class BSPRoom : BSPArea
                 }
             }
         }
-
-        /*
+        */
         GameObject chandelier = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Props/Chandelier"));
         chandelier.transform.position = GetRoundedCenter() + Vector3.up * 5f;
         chandelier.transform.parent = transform;
-        */
     }
 
     public Vector3 GetRoundedCenter()
