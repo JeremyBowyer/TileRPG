@@ -20,7 +20,7 @@ public class DeathSequence : BattleState
             {
             typeof(SelectUnitState),
             typeof(CommandSelectionState),
-            typeof(EnemyTurnState)
+            typeof(EnemyTurnStateGlobal)
             };
         }
         set { }
@@ -28,7 +28,7 @@ public class DeathSequence : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         //character = args.character;
         character = GetComponent<CharController>();
@@ -38,7 +38,7 @@ public class DeathSequence : BattleState
     public void OnAnimationFinish()
     {
         character.AfterDeath();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void InterruptTransition()

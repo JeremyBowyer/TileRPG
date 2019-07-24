@@ -17,8 +17,11 @@ public class Tile : MonoBehaviour {
     public bool isWalkable = true;
     private Material originalMat;
     public Projector projector;
+    public Texture emptyTex;
+    public Texture filledTex;
 
     public Dictionary<string, Color> colorDict;
+    public Dictionary<string, Texture> textureDict;
     public List<string> colorHierarchy;
     
     public CharController occupant;
@@ -72,23 +75,50 @@ public class Tile : MonoBehaviour {
 
     }
 
-    void Start() {
+    void Awake() {
         if (projector == null)
             projector = transform.Find("AnchorPoint").transform.Find("Projector").GetComponent<Projector>();
 
+        moveBlocks = new List<Grid.Position>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         originalMat = projector.material;
         colorDict = new Dictionary<string, Color>();
+        textureDict = new Dictionary<string, Texture>();
         colorHierarchy = new List<string>();
+
+        emptyTex = (Texture) Resources.Load("Sprites/ThickSquare");
+        filledTex = (Texture) Resources.Load("Sprites/SquareFilledSmall");
     }
 
-    public void AddColor(string set, Color color)
+    public void AddColor(string set, Color color, string type)
     {
         projector.gameObject.SetActive(true);
         if(!colorDict.ContainsKey(set))
             colorDict.Add(set, color);
+        if (!textureDict.ContainsKey(set))
+        {
+            switch (type)
+            {
+                case "empty":
+                    textureDict.Add(set, emptyTex);
+                    break;
+                case "filled":
+                    textureDict.Add(set, filledTex);
+                    break;
+                default:
+                    textureDict.Add(set, emptyTex);
+                    break;
+            }
+        }
+
         colorHierarchy.Add(set);
         ColorTile(color);
+        SetProjectorTexture(textureDict[set]);
+    }
+
+    public void SetProjectorTexture(Texture _tex)
+    {
+        projector.material.SetTexture("_ShadowTex", _tex);
     }
 
     public void ColorTile(Color color)
@@ -97,15 +127,17 @@ public class Tile : MonoBehaviour {
         projector.material.SetColor("_Color", color);
     }
 
-    public void RemoveColor(string set)
+    public void RemoveSelection(string set)
     {
         if (colorHierarchy.Contains(set))
         {
             colorHierarchy.Remove(set);
             colorDict.Remove(set);
+            textureDict.Remove(set);
             if(colorHierarchy.Count > 0)
             {
                 ColorTile(colorDict[colorHierarchy[0]]);
+                SetProjectorTexture(textureDict[colorHierarchy[0]]);
             }
             else
             {

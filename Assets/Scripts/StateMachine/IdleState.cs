@@ -5,7 +5,7 @@ using UnityEngine;
 public class IdleState : State
 {
 
-    public override bool isInterruptable
+    public override bool IsInterruptible
     {
         get { return true; }
     }
@@ -13,7 +13,7 @@ public class IdleState : State
     public override void Enter()
     {
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()

@@ -28,22 +28,25 @@ public class SpellEnvironmentPathTargetState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         spellAbility = args.spell as EnvironmentPathSpellAbility;
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
-        grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
+
+        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
+        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()
     {
         base.Exit();
-        spellRange = null;
-        grid.DeSelectNodes("spellrange");
+        //grid.DeSelectNodes("spellrange");
+        grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("startnode");
         grid.DeSelectNodes("abilitypath");
+        spellRange = null;
     }
 
     protected override void AddListeners()
@@ -63,21 +66,21 @@ public class SpellEnvironmentPathTargetState : BattleState
         {
             if(startNode == null)
             {
-                grid.SelectNodes(tile.node, CustomColors.Support, "startnode");
+                grid.SelectNodes(tile.node, CustomColors.Support, "startnode", "filled");
             }
             else
             {
                 if (tile.node == startNode)
                 {
                     abilityPath = new List<Node>() { tile.node };
-                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath");
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "filled");
                 }
                 else
                 {
                     abilityPath = spellAbility.GetPath(startNode.tile, tile);
                     if (abilityPath.Count == 0)
                         return;
-                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath");
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "filled");
                 }
             }
         }

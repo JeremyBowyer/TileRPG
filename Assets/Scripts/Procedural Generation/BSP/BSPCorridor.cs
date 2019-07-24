@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class BSPCorridor : BSPArea
 {
-
+    public override void AddProps()
+    {
+        AddTorches();
+    }
 }

@@ -7,21 +7,26 @@ public abstract class State : MonoBehaviour
 {
     // Fields
     private bool _inTransition;
-    public bool inTransition
+    public bool InTransition
     {
         get { return _inTransition; }
         set
         {
             _inTransition = value;
+            // If there are no waiting SM, return
             if (args.waitingStateMachines == null)
                 return;
-            foreach(StateMachine sm in args.waitingStateMachines)
+
+            // If there are SM waiting...
+            foreach (StateMachine sm in args.waitingStateMachines)
             {
+                // ...and this state is being entered into, add this state to their waiting list
                 if (_inTransition)
                 {
                     if(!sm.IsInWaitingList(this))
                         sm.AddToWaitingList(this);
                 }
+                // ...and this state is being exited, remove from their waiting list
                 else
                 {
                     while(sm.IsInWaitingList(this))
@@ -35,7 +40,7 @@ public abstract class State : MonoBehaviour
     public StateArgs args;
 
     // Properties
-    public virtual bool isInterruptable
+    public virtual bool IsInterruptible
     {
         get { return false; }
     }

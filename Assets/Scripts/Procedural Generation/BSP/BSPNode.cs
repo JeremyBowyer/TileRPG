@@ -127,4 +127,28 @@ public class BSPNode {
         }
     }
 
+    public BSPNode FindLeftLeaf()
+    {
+        if (GetLeftChild() == null)
+        {
+            return this;
+        }
+        else
+        {
+            return GetLeftChild().FindLeftLeaf();
+        }
+    }
+
+    public BSPNode FindRightLeaf()
+    {
+        if (GetRightChild() == null)
+        {
+            return this;
+        }
+        else
+        {
+            return GetRightChild().FindRightLeaf();
+        }
+    }
+
 }

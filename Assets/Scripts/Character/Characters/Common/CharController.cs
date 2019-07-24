@@ -20,6 +20,8 @@ public abstract class CharController : StateMachine {
     public StatusIndicator statusIndicator;
     public AnimationParameterController animParamController;
     public TurnEntry turnEntry;
+    public BSPRoom room;
+    public SkinnedMeshRenderer mesh;
 
     // Properties
     public bool NextTurn
@@ -66,6 +68,8 @@ public abstract class CharController : StateMachine {
         if (lcGO != null)
             lc = lcGO.GetComponent<LevelController>();
 
+        mesh = gameObject.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
+
         height = GetComponent<BoxCollider>().bounds.extents.y;
         ScaleCharacter();
     }
@@ -92,7 +96,6 @@ public abstract class CharController : StateMachine {
     public virtual void InitBattle()
     {
         Stats.initiativeModifier = 1f;
-        statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         animParamController.SetBool("idle");
         GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
         if (circleGO == null)
@@ -153,7 +156,7 @@ public abstract class CharController : StateMachine {
     public void Move(Tile _tile)
     {
         Stats.curAP -= (int)_tile.node.gCost*10;
-        bc.battleUiController.UpdateStats();
+        bc.battleUI.UpdateStats();
 
         OccupyTile(_tile);
     }
@@ -172,14 +175,14 @@ public abstract class CharController : StateMachine {
     public void Attack(CharController _target, AttackAbility _ability)
     {
         Stats.curAP -= _ability.ApCost;
-        bc.battleUiController.UpdateStats();
+        bc.battleUI.UpdateStats();
     }
 
     public void CastSpell(SpellAbility spell)
     {
         Stats.curMP -= spell.MpCost;
         Stats.curAP -= spell.ApCost;
-        bc.battleUiController.UpdateStats();
+        bc.battleUI.UpdateStats();
     }
 
     public void Damage(int amt)
@@ -190,7 +193,7 @@ public abstract class CharController : StateMachine {
         Stats.Damage(amt);
         statusIndicator.SetHealth(Stats.curHealth, Stats.maxHealth);
         statusIndicator.FloatText(amt.ToString(), Color.red);
-        bc.battleUiController.UpdateStats();
+        bc.battleUI.UpdateStats();
         if (Stats.curHealth <= 0)
         {
             Die();
@@ -228,8 +231,6 @@ public abstract class CharController : StateMachine {
 
         statusIndicator.gameObject.SetActive(false);
         bc.onUnitChange -= OnTurnEnd;
-        bc.characters.Remove(gameObject);
-        bc.rc.roundChars.Remove(this);
 
         StateArgs deathArgs = new StateArgs()
         {
@@ -242,7 +243,13 @@ public abstract class CharController : StateMachine {
     {
         bc.OnUnitDeath(this);
         gameObject.SetActive(false);
-        //Destroy(this.gameObject);
+        Destroy(this.gameObject);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = CustomColors.Hostile;
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + direction * 1f + Vector3.up * 0.5f);
     }
 
 }

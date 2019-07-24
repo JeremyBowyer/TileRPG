@@ -97,19 +97,17 @@ public class ProtagonistController : PlayerController
 
     private void LateUpdate()
     {
-        if (bc != null)
+        if (bc.InBattle)
             return;
 
-        if (lc.CurrentState == null)
-            return;
-
-        if (lc.CurrentState.GetType().Name != "WorldExploreState")
+        if (lc.CurrentState == null || lc.CurrentState.GetType().Name != "WorldExploreState")
             return;
 
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
 
         float dist = protagAgent.remainingDistance;
+
         if (x == 0 && y == 0 && dist < 0.1f)
         {
             animParamController.SetBool("idle", true);

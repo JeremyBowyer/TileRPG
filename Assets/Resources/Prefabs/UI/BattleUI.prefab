@@ -1026,15 +1026,15 @@ RectTransform:
   m_GameObject: {fileID: 5954155550411084214}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6812962889418322792}
-  m_RootOrder: 1
+  m_Father: {fileID: 284386875505390414}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0, y: 0}
-  m_SizeDelta: {x: 587.5, y: 112.79}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 423.3, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6397545871444831581
 CanvasRenderer:
@@ -1066,7 +1066,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 86
+    m_FontSize: 32
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -1281,14 +1281,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7732e8d9e4c4aba4f842f366816306c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bc: {fileID: 0}
   slots:
   - {fileID: 6248355505744047047}
   - {fileID: 8155883491963635786}
   - {fileID: 6020284457335585088}
   - {fileID: 3280544914255431868}
   - {fileID: 4478795375199961225}
-  entries: []
   hideSlot: {fileID: 2379758549167395870}
+  entries: []
 --- !u!1 &6351432990724985724
 GameObject:
   m_ObjectHideFlags: 0
@@ -1318,7 +1319,6 @@ Transform:
   m_LocalScale: {x: 1.1993997, y: 1.1993997, z: 1.1993997}
   m_Children:
   - {fileID: 284386875505390414}
-  - {fileID: 1512799071376986304}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1354,8 +1354,6 @@ GameObject:
   - component: {fileID: 5879526098307992903}
   - component: {fileID: 2654739388737805137}
   - component: {fileID: 1139714134902916159}
-  - component: {fileID: 294277811337003292}
-  - component: {fileID: 4453042983936886842}
   m_Layer: 5
   m_Name: Ability Menu Panel
   m_TagString: Untagged
@@ -1502,48 +1500,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e420a0a0a8bf78c499a31c06a67f14b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  easingControl: {fileID: 4453042983936886842}
+  easingControl: {fileID: 0}
   destroyOnComplete: 1
   startValue: {x: 0, y: 20, z: 0}
   endValue: {x: 180, y: 20, z: 0}
---- !u!114 &294277811337003292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7156290599983577239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 244ef9f9212625d44b12ab08104fcb2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeType: 0
-  endBehaviour: 0
-  loopType: 0
-  startValue: 0
-  endValue: 1
-  duration: 0.5
-  loopCount: 0
---- !u!114 &4453042983936886842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7156290599983577239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 244ef9f9212625d44b12ab08104fcb2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeType: 0
-  endBehaviour: 0
-  loopType: 0
-  startValue: 0
-  endValue: 1
-  duration: 1
-  loopCount: 0
 --- !u!1 &7472804773890625501
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,6 +1637,7 @@ RectTransform:
   - {fileID: 4724649822613113713}
   - {fileID: 2683370144289668051}
   - {fileID: 1487466357223238499}
+  - {fileID: 1512799071376986304}
   m_Father: {fileID: 6812962889418322792}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

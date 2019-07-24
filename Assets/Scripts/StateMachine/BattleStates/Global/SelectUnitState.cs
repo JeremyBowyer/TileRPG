@@ -13,7 +13,7 @@ public class SelectUnitState : BattleState
             return new List<Type>
             {
             typeof(CommandSelectionState),
-            typeof(EnemyTurnState)
+            typeof(IdleState)
             };
         }
         set { }
@@ -21,21 +21,22 @@ public class SelectUnitState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         bc.NextPlayer();
         if (bc.CurrentCharacter is PlayerController)
         {
-            inTransition = false;
+            InTransition = false;
             bc.ChangeState<CommandSelectionState>();
             return;
         }
         else if (bc.CurrentCharacter is EnemyController)
         {
-            inTransition = false;
-            bc.ChangeState<EnemyTurnState>();
+            InTransition = false;
+            bc.CurrentCharacter.ChangeState<EnemyTurnState>();
+            bc.ChangeState<IdleState>();
             return;
         }
-        inTransition = false;
+        InTransition = false;
     }
 }

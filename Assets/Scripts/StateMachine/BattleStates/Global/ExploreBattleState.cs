@@ -20,10 +20,10 @@ public class ExploreBattleState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         bc.cameraRig.isFollowing = false;
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()

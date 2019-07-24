@@ -13,10 +13,11 @@ public class ProjectileValidationController
         bc = _bc;
     }
 
-    public bool ValidateProjectile(Vector3[] path, GameObject target)
+    public bool ValidateProjectile(Vector3[] path, GameObject target, bool display = true)
     {
         List<Vector3> validPath = new List<Vector3>();
-        int layerMask = (1 << LayerMask.NameToLayer("Character"));
+        int layerMask = 1 << LayerMask.NameToLayer("Character");
+        layerMask |= (1 << LayerMask.NameToLayer("Ignore Raycast"));
         layerMask = ~layerMask;
 
 
@@ -33,13 +34,15 @@ public class ProjectileValidationController
             {
                 if (col.gameObject != target)
                 {
-                    DisplayTrajectory(validPath, Color.gray);
+                    if(display)
+                        DisplayTrajectory(validPath, Color.gray);
                     return false;
                 }
             }
         }
 
-        DisplayTrajectory(validPath, CustomColors.Hostile);
+        if (display)
+            DisplayTrajectory(validPath, CustomColors.Hostile);
         return true;
     }
 

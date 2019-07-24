@@ -16,7 +16,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(0f, 1f, 1f, 0.2f);
+            return new Color(0f, 1f, 1f, 0.4f);
         }
     }
     

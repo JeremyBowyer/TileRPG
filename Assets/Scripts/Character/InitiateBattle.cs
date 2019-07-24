@@ -48,7 +48,9 @@ public class InitiateBattle : MonoBehaviour
                     PersistentObjects.RemoveObject(col.gameObject.name);
                     SceneManager.LoadScene("Battle");
                     */
-                    character.lc.StartBattle();
+                    EnemyController controller = col.GetComponent<EnemyController>();
+                    BSPBattleRoom battleRoom = controller.room as BSPBattleRoom;
+                    character.lc.StartBattle(battleRoom);
                 }
             }
         }

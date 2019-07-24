@@ -31,6 +31,11 @@ public class RoundController
         roundChars.Remove(character);
     }
 
+    public void RemoveCharacter(CharController character)
+    {
+        roundChars.Remove(character);
+    }
+
     public void DetermineTurnOrder()
     {
         bool sorted = false;

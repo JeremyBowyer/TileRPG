@@ -53,6 +53,103 @@ public class Grid : MonoBehaviour {
         UnWalkableLayerMask = 1 << LayerMask.NameToLayer("Unwalkable");
     }
 
+    public void ClearGrid()
+    {
+        grid = null;
+
+        foreach (GameObject tileGO in tiles)
+        {
+            while (true)
+            {
+                TileEffect effect = tileGO.GetComponent<TileEffect>();
+                if (effect == null)
+                    break;
+                effect.RemoveEffect();
+                DestroyImmediate(effect, true);
+            }
+            tileGO.layer = LayerMask.NameToLayer("Terrain");
+            Destroy(tileGO.GetComponent<Tile>());
+        }
+    }
+
+    public IEnumerator GenerateGrid(BSPRoom room, Action callback)
+    {
+        gridSizeX = Mathf.RoundToInt(room.GetXSize());
+        gridSizeY = Mathf.RoundToInt(room.GetZSize());
+        grid = new Node[gridSizeX, gridSizeY];
+
+        nodeDiameter = room.floors[0].GetComponent<BoxCollider>().bounds.size.x;
+
+        int cnt = 0;
+        foreach (GameObject floorGO in room.floors)
+        {
+            cnt++;
+            floorGO.layer = LayerMask.NameToLayer("GridClick");
+            Tile tile = floorGO.AddComponent<Tile>();
+            BSPFloor floor = floorGO.GetComponent<BSPFloor>();
+            tiles.Add(floorGO);
+            int x = floor.x;
+            int y = floor.y;
+
+            if (tile == null)
+            {
+                grid[x, y] = null;
+            }
+            else
+            {
+                // Find Anchor point
+                Vector3 anchorPoint = floorGO.transform.Find("AnchorPoint").transform.position;
+
+                // Create new node
+                Node node = new Node(anchorPoint, x, y);
+
+                // Assign appropriate values for tile and node
+                tile.grid = bc.grid;
+                tile.node = node;
+                node.tile = tile;
+
+                // Is tile walkable?
+                Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
+                if (alertColliders != null && alertColliders.Length != 0)
+                {
+                    tile.isWalkable = false;
+                }
+
+                // Assign to grid
+                grid[x, y] = node;
+            }
+            if(cnt % 4 == 0)
+                yield return null;
+        }
+
+
+        // Establish directions
+        Vector3 fromPos;
+        Vector3 toPos;
+
+        // Forward direction;
+        fromPos = grid[0, 0].worldPosition;
+        toPos = grid[0, 1].worldPosition;
+        fromPos.y = 0;
+        toPos.y = 0;
+        Vector3 forwardHeading = toPos - fromPos;
+        float forwardDistance = forwardHeading.magnitude;
+        forwardDirection = forwardHeading / forwardDistance;
+
+        // Right Direction
+        fromPos = grid[0, 0].worldPosition;
+        toPos = grid[1, 0].worldPosition;
+        fromPos.y = 0;
+        toPos.y = 0;
+        Vector3 rightHeading = toPos - fromPos;
+        float rightDistance = rightHeading.magnitude;
+        rightDirection = rightHeading / rightDistance;
+
+        if (callback != null)
+            callback();
+        yield break;
+    }
+
     public IEnumerator GenerateGrid(Action callback)
     {
         nodeDiameter = Mathf.Round(bottomRightTile.GetComponent<BoxCollider>().bounds.extents.x * 2);
@@ -256,9 +353,9 @@ public class Grid : MonoBehaviour {
         if(Mathf.Abs(xDist) > Mathf.Abs(yDist))
         {
             if (xDist > 0)
-                return leftDirection;
-            else
                 return rightDirection;
+            else
+                return leftDirection;
         }
         else
         {
@@ -296,7 +393,7 @@ public class Grid : MonoBehaviour {
             (targetFacingDirection == leftDirection && fromNode.gridY < toNode.gridY) ||
             (targetFacingDirection == rightDirection && fromNode.gridY > toNode.gridY))
         {
-            return Position.Left;
+            return Position.Right;
         }
 
         // Check for right position
@@ -305,21 +402,21 @@ public class Grid : MonoBehaviour {
             (targetFacingDirection == leftDirection && fromNode.gridY > toNode.gridY) ||
             (targetFacingDirection == rightDirection && fromNode.gridY < toNode.gridY))
         {
-            return Position.Right;
+            return Position.Left;
         }
 
         return Position.Diagonal;
 
     }
 
-    public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 1f)
+    public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 5f, bool ignoreOccupant = true)
     {
         float normalizedLowestDistance = lowestDistance * nodeDiameter;
         Node closestNode = null;
-        worldPosition.y = FindHeightPoint(worldPosition);
+        //worldPosition.y = FindHeightPoint(worldPosition);
         foreach (Node node in bc.grid.grid)
         {
-            if (node == null)
+            if (node == null || (node.occupant != null && !ignoreOccupant))
                 continue;
             float nodeDistance = Vector3.Distance(worldPosition, node.worldPosition);
             if (nodeDistance < normalizedLowestDistance)
@@ -332,29 +429,55 @@ public class Grid : MonoBehaviour {
         return closestNode;
     }
 
-    public void ClearGrid()
+    public void OutlineNodes(List<Node> _nodes, Color _color, Outline.Mode _mode = Outline.Mode.OutlineAll, float _width = 1f)
     {
-        battleGrid.gameObject.SetActive(false);
-        battleGridProjector.gameObject.SetActive(false);
-        grid = null;
-
-        foreach(GameObject tileGO in tiles)
+        foreach(Node node in _nodes)
         {
-            DestroyImmediate(tileGO, true);
+            OutlineNodes(node, _color, _mode, _width);
         }
     }
 
-    public void SelectNodes(List<Node> nodes, Color color, string set)
+    public void OutlineNodes(Node _node, Color _color, Outline.Mode _mode = Outline.Mode.OutlineVisible, float _width = 1f)
+    {
+        Outline ol;
+        ol = _node.tile.gameObject.GetComponent<Outline>();
+
+        if(ol == null)
+            ol = _node.tile.gameObject.AddComponent<Outline>();
+
+        ol.OutlineMode = _mode;
+        ol.OutlineColor = _color;
+        ol.OutlineWidth = _width;
+    }
+
+    public void RemoveOutline(List<Node> _nodes)
+    {
+        foreach(Node node in _nodes)
+        {
+            RemoveOutline(node);
+        }
+    }
+    
+    public void RemoveOutline(Node _node)
+    {
+        Outline ol = _node.tile.gameObject.GetComponent<Outline>();
+
+        if (ol != null)
+            Destroy(ol);
+
+    }
+
+    public void SelectNodes(List<Node> nodes, Color color, string set, string type)
     {
         foreach (Node node in nodes)
         {
-            SelectNodes(node, color, set);
+            SelectNodes(node, color, set, type);
         }
     }
 
-    public void SelectNodes(Node node, Color color, string set)
+    public void SelectNodes(Node node, Color color, string set, string type)
     {
-        node.tile.AddColor(set, color);
+        node.tile.AddColor(set, color, type);
         // Add to dictionary of selected tile lists
         if (!selectedTiles.ContainsKey(set))
         {
@@ -371,7 +494,7 @@ public class Grid : MonoBehaviour {
 
         foreach (Tile tile in selectedTiles[set])
         {
-            tile.RemoveColor(set);
+            tile.RemoveSelection(set);
             //DestroyImmediate(tile, true);
         }
         selectedTiles[set].Clear();

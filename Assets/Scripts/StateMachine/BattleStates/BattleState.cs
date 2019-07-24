@@ -6,8 +6,8 @@ public abstract class BattleState : State
 {
     public BattleController bc;
     public CameraController cameraRig { get { return bc.cameraRig; } }
-    public BattleUIController battleUiController { get { return bc.battleUiController; } }
-    public SuperUIController superUiController { get { return bc.superUiController; } }
+    public BattleUIController battleUI { get { return bc.battleUI; } }
+    public SuperUIController superUI { get { return bc.lc.superUI; } }
     public Grid grid { get { return bc.grid; } }
     public Pathfinding pathfinder { get { return bc.pathfinder; } }
     public AbilityMenuPanelController abilityMenuPanelController { get { return bc.abilityMenuPanelController; } }

@@ -13,7 +13,7 @@ public class CheckForTurnEndState : BattleState
             return new List<Type>
             {
             typeof(CommandSelectionState),
-            typeof(EnemyTurnState)
+            typeof(EnemyTurnStateGlobal)
             };
         }
         set { }
@@ -21,22 +21,22 @@ public class CheckForTurnEndState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         if(bc.CurrentCharacter.NextTurn && bc.CurrentCharacter is EnemyController)
             bc.NextPlayer();
         if (bc.CurrentCharacter is PlayerController)
         {
-            inTransition = false;
+            InTransition = false;
             bc.ChangeState<CommandSelectionState>();
             return;
         }
         else if (bc.CurrentCharacter is EnemyController)
         {
-            inTransition = false;
-            bc.ChangeState<EnemyTurnState>();
+            InTransition = false;
+            bc.ChangeState<EnemyTurnStateGlobal>();
             return;
         }
-        inTransition = false;
+        InTransition = false;
     }
 }

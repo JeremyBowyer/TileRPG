@@ -10,10 +10,10 @@ public abstract class BaseAbilityMenuState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         LoadMenu();
-        inTransition = false;
+        InTransition = false;
     }
     public override void Exit()
     {

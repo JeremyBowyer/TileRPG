@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class EnemyTurnState : BattleState
+public class EnemyTurnStateGlobal : BattleState
 {
     private IEnumerator enemyTurnCoroutine;
     private BaseAI enemyAI;
@@ -28,33 +28,23 @@ public class EnemyTurnState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         enemyAI = bc.CurrentCharacter.GetComponent<BaseAI>();
-        enemyTurnCoroutine = ConsiderOptions();
-        StartCoroutine(enemyTurnCoroutine);
     }
 
-    public IEnumerator ConsiderOptions()
-    {
-        enemyAI.aiAction.text = "Thinking...";
-        yield return new WaitForSeconds(2f);
-        enemyAI.ConsiderOptions(OnDecide);
-        yield break;
-    }
 
     public void OnDecide()
     {
         bool endTurn = enemyAI.EndOfTurn;
         if (endTurn)
         {
-            inTransition = false;
+            InTransition = false;
             bc.ChangeState<SelectUnitState>();
         }
         else
         {
             StopCoroutine(enemyTurnCoroutine);
-            enemyTurnCoroutine = ConsiderOptions();
             StartCoroutine(enemyTurnCoroutine);
         }
     }
@@ -62,7 +52,7 @@ public class EnemyTurnState : BattleState
     public override void InterruptTransition()
     {
         StopCoroutine(enemyTurnCoroutine);
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()

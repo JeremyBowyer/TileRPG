@@ -16,12 +16,9 @@ public class AttackSequenceState : BattleState
         {
             return new List<Type>
             {
-            typeof(SelectUnitState),
-            typeof(EnemyTurnState),
-            typeof(CommandSelectionState),
-            typeof(VictorySequence),
             typeof(DeathSequence),
-            typeof(CheckForTurnEndState)
+            typeof(EnemyTurnState),
+            typeof(IdleState)
             };
         }
         set { }
@@ -29,7 +26,7 @@ public class AttackSequenceState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         character = GetComponent<CharController>();
         targetCharacter = args.targetCharacter;
@@ -44,7 +41,7 @@ public class AttackSequenceState : BattleState
         attackAbility.ApplyCharacterEffect(targetCharacter);
         if (callback != null)
             callback();
-        inTransition = false;
+        InTransition = false;
         character.ChangeState<IdleState>();
     }
 

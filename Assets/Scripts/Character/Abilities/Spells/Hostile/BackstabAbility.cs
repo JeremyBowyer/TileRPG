@@ -36,9 +36,11 @@ public class BackstabAbility : TargetSpellAbility
         _target.Damage(AbilityPower);
     }
 
-    public override bool ValidateTarget(CharController _character)
+    public override bool ValidateTarget(CharController _target)
     {
-        return character.bc.grid.CompareDirection(character.tile.node, _character.tile.node, _character.direction) == Grid.Position.Back;
+        Grid.Position pos = character.bc.grid.CompareDirection(character.tile.node, _target.tile.node, _target.direction);
+
+        return pos == Grid.Position.Back;
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)

@@ -11,8 +11,8 @@ public class PlayerController : CharController {
 
     public override void Die()
     {
-        bc.players.Remove(this.gameObject);
-        bc.characters.Remove(this.gameObject);
+        bc.players.Remove(gameObject);
+        lc.players.Remove(gameObject);
         bc.rc.roundChars.Remove(this);
         base.Die();
     }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BSPConnectionHandler
+public class BSPConnectionHandler : MonoBehaviour
 {
     public struct BSPConnection : IEquatable<BSPConnection>
     {
@@ -29,7 +29,7 @@ public class BSPConnectionHandler
     private GameObject folder;
     private BSPController controller;
 
-    public BSPConnectionHandler(GameObject _folder, BSPController _controller)
+    public void Init(GameObject _folder, BSPController _controller)
     {
         controller = _controller;
         folder = _folder;
@@ -127,8 +127,11 @@ public class BSPConnectionHandler
         BSPRoom roomA = _connection.roomA;
         BSPRoom roomB = _connection.roomB;
 
-        BSPCorridor corridor = roomA.GetData().AddComponent<BSPCorridor>();
-        controller.AddRoom(corridor);
+        
+        GameObject corridorGO = new GameObject("corridor");
+        corridorGO.transform.position = roomA.transform.position;
+        BSPCorridor corridor = corridorGO.AddComponent<BSPCorridor>();
+        controller.AddCorridor(corridor);
 
         Vector3 pos = roomA.GetRoundedCenter();
         Vector3 endPos = roomB.GetRoundedCenter();
@@ -172,6 +175,8 @@ public class BSPConnectionHandler
             while (pos.x > _roomB.GetRoundedCenter().x)
             {
                 PlaceFloor(pos, _corridor);
+                PlaceWalls(pos, _corridor, new Vector3[] { Vector3.forward, Vector3.back });
+                DestroyWall(pos - Vector3.right * 0.5f, new Vector3[] { Vector3.left, Vector3.right });
                 points.Add(pos + Vector3.up * 0.1f);
                 pos.x -= 1;
             }
@@ -181,6 +186,8 @@ public class BSPConnectionHandler
             while (pos.x < _roomB.GetRoundedCenter().x)
             {
                 PlaceFloor(pos, _corridor);
+                PlaceWalls(pos, _corridor, new Vector3[] { Vector3.forward, Vector3.back });
+                DestroyWall(pos + Vector3.right * 0.5f, new Vector3[] { Vector3.left, Vector3.right });
                 points.Add(pos + Vector3.up * 0.1f);
                 pos.x += 1;
             }
@@ -209,6 +216,8 @@ public class BSPConnectionHandler
             while (pos.z > _roomB.GetRoundedCenter().z)
             {
                 PlaceFloor(pos, _corridor);
+                PlaceWalls(pos, _corridor, new Vector3[] { Vector3.left, Vector3.right });
+                DestroyWall(pos - Vector3.forward * 0.5f, new Vector3[] { Vector3.forward, Vector3.back });
                 points.Add(pos + Vector3.up * 0.1f);
                 pos.z -= 1;
             }
@@ -218,6 +227,8 @@ public class BSPConnectionHandler
             while (pos.z < _roomB.GetRoundedCenter().z)
             {
                 PlaceFloor(pos, _corridor);
+                PlaceWalls(pos, _corridor, new Vector3[] { Vector3.left, Vector3.right });
+                DestroyWall(pos + Vector3.forward * 0.5f, new Vector3[] { Vector3.forward, Vector3.back });
                 points.Add(pos + Vector3.up * 0.1f);
                 pos.z += 1;
             }
@@ -235,6 +246,52 @@ public class BSPConnectionHandler
         }
 
         outPos = pos;
+    }
+
+    public void DestroyWall(Vector3 _pos, Vector3[] directions)
+    {
+        // Check for existing floor.
+        Collider[] cols = Physics.OverlapSphere(_pos, 0.4f);
+        bool foundWall = false;
+        if (cols.Length > 0)
+        {
+            foreach (Collider col in cols)
+            {
+                if (col.tag == "Wall")
+                {
+                    foundWall = true;
+                    MapObject obj = col.gameObject.GetComponent<MapObject>();
+                    if(obj != null)
+                    {
+                        obj.area.RemoveWall(col.gameObject);
+                    }
+                    Destroy(col.gameObject);
+                }
+            }
+        }
+
+        if (foundWall)
+        {
+            foreach(Vector3 direction in directions)
+            {
+                Vector3 floorPos = _pos + direction * 0.5f;
+                Collider[] floorCols = Physics.OverlapSphere(floorPos, 0.4f);
+                if (cols.Length > 0)
+                {
+                    foreach (Collider col in floorCols)
+                    {
+                        if (col.tag == "Ground")
+                        {
+                            BSPFloor floor = col.gameObject.GetComponent<BSPFloor>();
+                            if (floor == null)
+                                continue;
+                            floor.isDoorway = true;
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     public void PlaceFloor(Vector3 _pos, BSPCorridor _corridor)
@@ -258,7 +315,76 @@ public class BSPConnectionHandler
 
         // Place floor, adjusting for floor offset
         floor.transform.position = _pos + new Vector3(0.5f, 0f, -0.5f);
-        floor.transform.parent = folder.transform;
+        floor.transform.parent = _corridor.transform;
+        _corridor.AddFloor(floor);
         _corridor.AddEdgeFloor(floor);
     }
+
+    public void PlaceWalls(Vector3 _pos, BSPCorridor _corridor, Vector3[] directions)
+    {
+        foreach (Vector3 direction in directions)
+        {
+            // Check for existing floor.
+            bool foundFloor = false;
+            Collider[] cols = Physics.OverlapSphere(_pos + direction * 1f, 0.4f);
+            if (cols.Length > 0)
+            {
+                foreach (Collider col in cols)
+                {
+                    if (col.tag == "Ground")
+                    {
+                        foundFloor = true;
+                    }
+                }
+            }
+
+            // Check for existing Wall.
+            bool foundWall = false;
+            Collider[] wallCols = Physics.OverlapSphere(_pos + direction * 0.5f, 0.4f);
+            if (wallCols.Length > 0)
+            {
+                foreach (Collider col in wallCols)
+                {
+                    if (col.tag == "Wall")
+                    {
+                        foundWall = true;
+                    }
+                }
+            }
+
+            // If no floor was found, spawn a wall
+            if (!foundFloor && !foundWall)
+            {
+                GameObject wall = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Walls/SM_Env_Wall_01_DoubleSided"));
+                float xMod = wall.GetComponent<BoxCollider>().bounds.size.x;
+                wall.transform.localScale = new Vector3(wall.transform.localScale.x / xMod, wall.transform.localScale.y / xMod, wall.transform.localScale.z / xMod) * 1.1f;
+
+                // Place floor, adjusting for floor offset
+                wall.transform.position = _pos + direction * 0.5f + Vector3.right * 0.5f;
+
+                if (direction == Vector3.left)
+                {
+                    wall.transform.Rotate(new Vector3(0f, 90f, 0f));
+                    wall.transform.position += Vector3.back * 0.5f + Vector3.left * 0.5f;
+                }
+                else if (direction == Vector3.right)
+                {
+                    wall.transform.Rotate(new Vector3(0f, -90f, 0f));
+                    wall.transform.position += Vector3.forward * 0.5f + Vector3.left * 0.5f;
+                }
+                else if (direction == Vector3.forward)
+                {
+                    wall.transform.Rotate(new Vector3(0f, 180f, 0f));
+                    wall.transform.position += Vector3.left * 1f;
+                }
+
+                BSPWall wallObj = wall.AddComponent<BSPWall>();
+                wallObj.facingDirection = direction;
+                wall.transform.parent = _corridor.transform;
+                _corridor.AddWall(wall);
+            }
+
+        }
+    }
+
 }

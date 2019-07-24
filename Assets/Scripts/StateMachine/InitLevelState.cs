@@ -22,7 +22,7 @@ public class InitLevelState : WorldState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         protag = lc.protag.GetComponent<ProtagonistController>();
 
@@ -55,7 +55,7 @@ public class InitLevelState : WorldState
 
         AdjustSceneObjects();
 
-        inTransition = false;
+        InTransition = false;
         lc.ChangeState<WorldExploreState>();
     }
 

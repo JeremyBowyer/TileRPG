@@ -25,14 +25,7 @@ public class BaseAI : MonoBehaviour {
     private TargetSpellAbility maxHostileSpell;
     private TargetSpellAbility maxHealSpell;
 
-    static System.Random rnd = new System.Random();
-
-    private Action callback;
-
-    private AIState nextAction;
-    enum AIState { Attack, SpellAttack, Chase, HealSelf, HealAlly, End };
-
-    public Text aiAction;
+    private Text aiAction;
 
     public bool EndOfTurn
     {
@@ -48,21 +41,69 @@ public class BaseAI : MonoBehaviour {
     {
         character = GetComponent<CharController>();
         bc = character.bc;
-        aiAction = bc.battleUiController.transform.Find("AIAction").GetComponent<Text>();
-
+        aiAction = bc.battleUI.aiAction;
         SortAndValidateSpells();
     }
 
-    public virtual void ConsiderOptions(Action _callback)
+    public virtual void ConsiderOptions()
     {
-        aiAction.text = "Thinking...";
-        callback = _callback;
+        aiAction.gameObject.SetActive(true);
         SortAndValidateSpells();
         ClearTargets();
         AcquireTargets();
         FindRanges();
         DecideAction();
-        TakeNextAction();
+    }
+
+    protected virtual void DecideAction()
+    {
+
+        if (CheckForEnd())
+        {
+            character.ChangeState<IdleState>();
+            EndTurn();
+            return;
+        }
+
+        if (maxHealSpell != null && character.Stats.IsDamaged)
+        {
+            HealSelf();
+            return;
+        }
+
+        if (maxHealSpell != null && DamagedAllyInRange())
+        {
+            HealAlly();
+            return;
+        }
+
+        if (attackRange.Contains(enemyTarget.tile.node) && hostileSpellRange.Contains(enemyTarget.tile.node))
+        {
+            float r = UnityEngine.Random.value;
+            if (r >= 0.5f)
+            {
+                Attack();
+            }
+            else
+            {
+                HostileTargetSpell();
+            }
+            return;
+        }
+
+        if (attackRange.Contains(enemyTarget.tile.node))
+        {
+            Attack();
+            return;
+        }
+
+        if (hostileSpellRange.Contains(enemyTarget.tile.node))
+        {
+            HostileTargetSpell();
+            return;
+        }
+
+        Chase();
     }
 
     public void SortAndValidateSpells()
@@ -164,42 +205,20 @@ public class BaseAI : MonoBehaviour {
         }
     }
 
-    public virtual void TakeNextAction()
-    {
-        switch(nextAction)
-        {
-            case AIState.Attack:
-                Attack(enemyTarget);
-                break;
-            case AIState.SpellAttack:
-                CastSpell(maxHostileSpell, enemyTarget);
-                break;
-            case AIState.Chase:
-                Chase();
-                break;
-            case AIState.End:
-                EndTurn();
-                break;
-            case AIState.HealAlly:
-                HealAlly();
-                break;
-            case AIState.HealSelf:
-                HealSelf();
-                break;
-            default:
-                EndTurn();
-                break;
-        }
-    }
-
     private void EndTurn()
     {
-        callback();
+        aiAction.gameObject.SetActive(false);
+        bc.ChangeState<SelectUnitState>();
     }
 
     private void HealSelf()
     {
-        CastSpell(maxHealSpell, character);
+        StateArgs args = new StateArgs()
+        {
+            spell = maxHealSpell,
+            waitingStateMachines = new List<StateMachine> { bc }
+        };
+        character.ChangeState<HealSelfState>(args);
     }
 
     private void HealAlly()
@@ -230,7 +249,12 @@ public class BaseAI : MonoBehaviour {
 
         if(lowestAllyInRange != null)
         {
-            CastSpell(maxHealSpell, lowestAllyInRange);
+            StateArgs args = new StateArgs()
+            {
+                spell = maxHealSpell,
+                targetCharacter = lowestAllyInRange
+            };
+            character.ChangeState<HealAllyState>(args);
         } else
         {
             EndTurn();
@@ -238,69 +262,41 @@ public class BaseAI : MonoBehaviour {
 
     }
 
-    protected virtual void CastSpell(TargetSpellAbility spell, CharController _target)
+    protected virtual void Attack()
     {
-        aiAction.text = "Casting spell...";
-        Debug.Log(spell.AbilityName);
-        Debug.Log(spell.MpCost);
-        Debug.Log(character.Stats.curMP);
-        StateArgs spellArgs = new StateArgs
-        {
-            targetCharacter = _target,
-            spell = spell,
-            waitingStateMachines = new List<StateMachine> { bc },
-            callback = callback
-        };
-        character.ChangeState<SpellTargetSequenceState>(spellArgs);
-    }
-
-    protected virtual void Attack(CharController _target)
-    {
-        aiAction.text = "Attacking...";
         StateArgs attackArgs = new StateArgs
         {
-            targetCharacter = _target,
+            targetCharacter = enemyTarget,
             waitingStateMachines = new List<StateMachine> { bc },
-            callback = callback,
-            attackAbility = character.AttackAbility
+            callback = ConsiderOptions,
+            attackAbility = character.AttackAbility,
+            character = character
         };
-        character.ChangeState<AttackSequenceState>(attackArgs);
+        character.ChangeState<AttackState>(attackArgs);
+    }
+
+    protected virtual void HostileTargetSpell()
+    {
+        StateArgs args = new StateArgs()
+        {
+            spell = maxHostileSpell,
+            targetCharacter = enemyTarget
+        };
+        character.ChangeState<HostileTargetSpellState>(args);
     }
 
     protected virtual void Chase()
     {
-        aiAction.text = "Chasing...";
-        Tile tile = bc.grid.GetNeighbors(enemyTarget.tile.node, true, false, false)[0].tile;
-        List<Node> path = bc.pathfinder.FindPath(
-            bc.CurrentCharacter.tile.node,
-            tile.node,
-            character.Stats.moveRange,
-            character.MovementAbility.diag,
-            character.MovementAbility.ignoreOccupant,
-            character.MovementAbility.ignoreUnwalkable,
-            false,
-            false);
-        if(path.Count == 0)
+        StateArgs chaseArgs = new StateArgs
         {
-            nextAction = AIState.End;
-            TakeNextAction();
-        }
-        StateArgs moveArgs = new StateArgs
-        {
-            path = path,
-            callback = callback
+            targetCharacter = enemyTarget,
+            character = character
         };
-        character.ChangeState<MoveSequenceState>(moveArgs);
+        character.ChangeState<ChaseState>(chaseArgs);
     }
 
     protected virtual bool CheckForEnd()
     {
-        if (nextAction == AIState.End)
-        {
-            nextAction = AIState.Attack;
-            return true;
-        }
-
         float curAP = character.Stats.curAP;
         float minCost = Mathf.Min(new float[] {
             character.AttackAbility.ApCost,
@@ -358,55 +354,13 @@ public class BaseAI : MonoBehaviour {
 
     }
 
-    protected virtual void DecideAction()
-    {
-
-        if (CheckForEnd())
-        {
-            nextAction = AIState.End;
-            return;
-        }
-
-        if (maxHealSpell != null && character.Stats.IsDamaged)
-        {
-            nextAction = AIState.HealSelf;
-            return;
-        }
-
-        if (maxHealSpell != null && DamagedAllyInRange())
-        {
-            nextAction = AIState.HealAlly;
-            return;
-        }
-
-        if(attackRange.Contains(enemyTarget.tile.node) && hostileSpellRange.Contains(enemyTarget.tile.node))
-        {
-            List<AIState> stateList = new List<AIState> { AIState.Attack, AIState.SpellAttack }; 
-            int r = rnd.Next(stateList.Count);
-            nextAction = stateList[r];
-            return;
-        }
-
-        if (attackRange.Contains(enemyTarget.tile.node))
-        {
-            nextAction = AIState.Attack;
-            return;
-        }
-
-        if (hostileSpellRange.Contains(enemyTarget.tile.node))
-        {
-            nextAction = AIState.SpellAttack;
-            return;
-        }
-        nextAction = AIState.Chase;
-    }
-
     private bool DamagedAllyInRange()
     {
         foreach (GameObject enemyGO in bc.enemies)
         {
             EnemyController enemyController = enemyGO.GetComponent<EnemyController>();
-            if (enemyController.Stats.IsDamaged && healSpellRange.Contains(enemyController.tile.node)) return true;
+            if (enemyController.Stats.IsDamaged && healSpellRange.Contains(enemyController.tile.node))
+                return true;
         }
 
         return false;

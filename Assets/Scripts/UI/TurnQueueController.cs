@@ -9,12 +9,6 @@ public class TurnQueueController : MonoBehaviour
     public GameObject hideSlot;
     public List<TurnEntry> entries;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     public void UpdateQueue(CharController character)
     {
         int maxSlots = slots.Count;
@@ -25,22 +19,6 @@ public class TurnQueueController : MonoBehaviour
                 StartCoroutine(MoveEntryToSlot(bc.rc.roundChars[i].turnEntry, slots[i]));
             }
         }
-
-        /*
-        foreach(TurnEntry entry in entries)
-        {
-            GameObject emptySlot = FindEmptySlot();
-            if (slots.Contains(emptySlot))
-            {
-                StartCoroutine(MoveEntryToSlot(entry, emptySlot));
-                continue;
-            }
-            if (!bc.rc.roundChars.Contains(entry.character))
-            {
-                HideEntry(entry);
-            }
-        }
-        */
     }
 
     public void InstantiateEntry(CharController controller)
@@ -63,6 +41,15 @@ public class TurnQueueController : MonoBehaviour
         return new GameObject();
     }
 
+    public void HideEntry(CharController controller)
+    {
+        foreach(TurnEntry entry in entries)
+        {
+            if (entry.character = controller)
+                HideEntry(entry);
+        }
+    }
+
     public void HideEntry(TurnEntry entry)
     {
         StartCoroutine(MoveEntryToSlot(entry, hideSlot));
@@ -70,6 +57,9 @@ public class TurnQueueController : MonoBehaviour
 
     public IEnumerator MoveEntryToSlot(TurnEntry entry, GameObject slot)
     {
+        if (entry.gameObject.transform.parent == slot.transform)
+            yield break;
+
         entry.gameObject.transform.SetParent(slot.transform);
 
         float currentTime = 0f;
@@ -88,6 +78,15 @@ public class TurnQueueController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         yield break;
+    }
+
+    public void EndBattle()
+    {
+        foreach(TurnEntry entry in entries)
+        {
+            Destroy(entry.gameObject);
+        }
+        entries.Clear();
     }
 
 }

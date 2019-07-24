@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BattleController : GameController
 {
@@ -8,13 +9,15 @@ public class BattleController : GameController
     public RoundController rc;
     public ProjectileValidationController pvc;
     public TurnQueueController turnQueue;
-    public BattleUIController battleUiController;
+    public BattleUIController battleUI { get { return lc.uiController.battleUI; } }
     public Grid grid;
     public Pathfinding pathfinder;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public LineRenderer lineRenderer;
     public GameObject selectedCharacterAura;
+    public LevelController lc;
+    public BSPBattleRoom battleRoom;
 
     // Variables
     private CharController currentCharacter;
@@ -27,14 +30,19 @@ public class BattleController : GameController
         set
         {
             currentCharacter = value;
-            if (battleUiController != null)
-                battleUiController.UpdateStats();
+            if (battleUI != null)
+                battleUI.UpdateStats();
         }
     }
     public Tile currentTile;
     public Queue<GameObject> unitsToPlace; // Queue of party members to be placed on the grid
-    public EnemyController battleInitiator;
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
+    private bool inBattle;
+    public bool InBattle
+    {
+        get { return inBattle; }
+        set { inBattle = value; }
+    }
 
     // Delegates
     public delegate void OnUnitChange(CharController character);
@@ -54,6 +62,7 @@ public class BattleController : GameController
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
+        lc = GameObject.Find("LevelController").GetComponent<LevelController>();
         unitsToPlace = new Queue<GameObject>();
 
         //cameraRig.FollowTarget = protag.transform;
@@ -61,9 +70,15 @@ public class BattleController : GameController
         ChangeState<IdleState>();
     }
 
-    public void Init()
+    public void Init(BSPBattleRoom _room)
     {
-        ChangeState<InitBattleState>();
+        battleRoom = _room;
+        StateArgs args = new StateArgs()
+        {
+            room = _room
+        };
+        InBattle = true;
+        ChangeState<InitBattleState>(args);
     }
 
     public void NextPlayer()
@@ -101,7 +116,7 @@ public class BattleController : GameController
     public void ChangePlayer(CharController character)
     {
         CurrentCharacter = character;
-        cameraTarget = character.transform;
+        lc.cameraTarget = character.transform;
 
         selectedCharacterAura.gameObject.transform.SetParent(CurrentCharacter.gameObject.transform);
         selectedCharacterAura.transform.localPosition = new Vector3(0, 0, 0);
@@ -123,6 +138,11 @@ public class BattleController : GameController
 
     public void OnUnitDeath(CharController character)
     {
+        characters.Remove(character.gameObject);
+        lc.characters.Remove(character.gameObject);
+        rc.RemoveCharacter(character);
+        turnQueue.HideEntry(character);
+        turnQueue.UpdateQueue(character);
         CheckEndCondition();
     }
 
@@ -141,6 +161,21 @@ public class BattleController : GameController
 
     public void TerminateBattle()
     {
+        lc.bspController.ShowAllRooms();
+        grid.ClearGrid();
+        characters.Clear();
+        selectedCharacterAura.SetActive(false);
+        turnQueue.EndBattle();
+        // Set protag as camera target
+        lc.cameraTarget = protag.transform;
+
+        // Place protag on starting spot
+        NavMeshAgent protagAgent = protag.GetComponent<NavMeshAgent>();
+        //protagAgent.Warp(lc.startingPos);
+        protagAgent.Warp(protagAgent.transform.position);
+        battleRoom.completed = true;
+        battleRoom = null;
+        InBattle = false;
         CurrentCharacter = null;
     }
 

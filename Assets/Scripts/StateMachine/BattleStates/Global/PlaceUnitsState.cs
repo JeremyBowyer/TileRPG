@@ -20,17 +20,17 @@ public class PlaceUnitsState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         if (bc.unitsToPlace.Count == 0)
         {
-            bc.protag.gameObject.transform.localScale = Vector3.one;
-            inTransition = false;
+            bc.protag.gameObject.transform.localScale = Vector3.one / 2;
+            InTransition = false;
             bc.ChangeState<SelectUnitState>();
             return;
         }
 
         GameObject unit = bc.unitsToPlace.Dequeue();
-        unit.gameObject.transform.localScale = Vector3.one;
+        unit.gameObject.transform.localScale = Vector3.one / 2;
         CharController character = unit.GetComponent<CharController>();
         character.InitBattle();
         //gc.currentCharacter = character;
@@ -38,7 +38,7 @@ public class PlaceUnitsState : BattleState
         {
             character = character
         };
-        inTransition = false;
+        InTransition = false;
         bc.ChangeState<UnitPlacementState>(placeUnitArgs);
 
     }

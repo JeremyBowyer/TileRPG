@@ -23,22 +23,27 @@ public class UnitPlacementState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         character = args.character;
+
+        bc.lc.cameraTarget = character.transform;
+
         mover = character.MovementAbility;
         moveRange = mover.GetNodesInRange();
-        grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange");
-        inTransition = false;
+        //grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange", "empty");
+        grid.OutlineNodes(moveRange, CustomColors.MovementRange);
+        InTransition = false;
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectNodes("moverange");
+        //grid.DeSelectNodes("moverange");
+        grid.RemoveOutline(moveRange);
         grid.DeSelectNodes("movepath");
         moveRange = null;
-        battleUiController.SetApCost();
+        battleUI.SetApCost();
     }
 
     protected override void AddListeners()
@@ -87,11 +92,11 @@ public class UnitPlacementState : BattleState
             List<Node> path = mover.GetPath(tile.node);
             if (mover.isPath)
             {
-                grid.SelectNodes(path, CustomColors.MovementPath, "movepath");
+                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "filled");
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath");
+                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "filled");
             }
         }
     }
@@ -106,8 +111,13 @@ public class UnitPlacementState : BattleState
         if (moveRange.Contains(tile.node))
         {
             grid.DeSelectNodes("movepath");
-            battleUiController.SetApCost();
+            battleUI.SetApCost();
         }
+    }
+
+    protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
+    {
+        cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
     }
 
     protected override void OnFire(object sender, InfoEventArgs<int> e)

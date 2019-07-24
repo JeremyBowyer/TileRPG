@@ -27,14 +27,14 @@ public class WorldMenuState : WorldBaseMenuState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         lc.PauseGame();
         protag = lc.protag.character as Protagonist;
         worldMenuPanelController.Init();
         LoadMenu();
         worldMenuPanelController.ShowContentPanel("Party");
-        inTransition = false;
+        InTransition = false;
     }
     public override void Exit()
     {

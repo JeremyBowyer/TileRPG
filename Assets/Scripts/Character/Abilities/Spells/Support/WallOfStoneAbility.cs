@@ -78,7 +78,7 @@ public class WallOfStoneAbility : EnvironmentPathSpellAbility
         character.animParamController.SetBool("cast_loop");
         character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
         
-        inProgress = true;
+        //inProgress = true;
         yield return new WaitForSeconds(1);
 
         character.animParamController.SetBool("idle");

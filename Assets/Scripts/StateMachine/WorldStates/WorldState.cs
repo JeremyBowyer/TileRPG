@@ -6,8 +6,8 @@ public class WorldState : State
 {
     public LevelController lc;
     public CameraController cameraRig { get { return lc.cameraRig; } }
-    public WorldUIController worldUiController { get { return lc.worldUiController; } }
-    public SuperUIController superUiController { get { return lc.superUiController; } }
+    public WorldUIController worldUI { get { return lc.worldUI; } }
+    public SuperUIController superUI { get { return lc.superUI; } }
     public List<GameObject> characters { get { return lc.characters; } }
 
     // Methods

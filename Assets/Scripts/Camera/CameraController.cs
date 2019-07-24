@@ -68,7 +68,7 @@ public class CameraController : MonoBehaviour {
 		isFollowing = true;
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         minSize = 2f;
-        maxSize = 5f;
+        maxSize = 3f;
         mouseEdgeWidth = Screen.width - boundary;
         mouseEdgeHeight = Screen.height - boundary;
         aspectRatio = mouseEdgeWidth / mouseEdgeHeight;
@@ -135,7 +135,7 @@ public class CameraController : MonoBehaviour {
 
     public void ScreenEdgeMovement(float x, float y)
     {
-
+        return;
         if (Input.GetMouseButton(2))
             return;
 

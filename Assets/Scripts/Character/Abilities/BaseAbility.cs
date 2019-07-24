@@ -7,16 +7,14 @@ public abstract class BaseAbility {
 
     private string abilityName;
     private string abilityDescription;
-    private int abilityID;
     private int abilityPower;
     private int apCost;
     private int mpCost;
     private float abilityRange;
     public CharController character;
-    public bool diag;
-    public bool ignoreOccupant;
-    public bool inProgress;
-    public bool nextTurn;
+    public bool diag = true;
+    public bool ignoreOccupant = true;
+    //public bool inProgress;
     public bool isProjectile = false;
     public int mouseLayer;
     public AbilityTypes.Intent abilityIntent;
@@ -69,11 +67,41 @@ public abstract class BaseAbility {
 
     public abstract List<Node> GetRange();
 
+    public virtual List<Node> PathToGetInRange(CharController _target)
+    {
+
+        List<Node> neighbors = character.bc.grid.GetNeighbors(_target.tile.node, diag, false, true);
+        if (neighbors.Count == 0)
+            return null;
+
+        Node closestNode = neighbors[0];
+        foreach(Node neighbor in neighbors)
+        {
+            float dist = character.bc.pathfinder.GetDistance(character.tile.node, neighbor);
+            if (dist < character.bc.pathfinder.GetDistance(character.tile.node, closestNode))
+                closestNode = neighbor;
+        }
+
+
+        List<Node> range = character.bc.pathfinder.FindRange(_target.tile.node, AbilityRange, diag, ignoreOccupant, true, false, true);
+
+        List<Node> path = character.MovementAbility.GetPath(closestNode);
+        List<Node> shortPath = new List<Node>();
+
+        foreach (Node node in path)
+        {
+            shortPath.Add(node);
+            if (range.Contains(node))
+                break;
+        }
+
+        return shortPath;
+    }
     public virtual Vector3[] GetPath(Vector3 _target)
     {
         return new Vector3[1]{ Vector3.zero };
     }
-    
+
     public virtual bool ValidateTarget(CharController _target)
     {
         return true;

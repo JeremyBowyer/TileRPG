@@ -21,7 +21,6 @@ public class BattleUIController : MonoBehaviour {
             Debug.LogError("No StatusIndicator assigned to " + gameObject.name);
 
         bc = GameObject.Find("BattleController").GetComponent<BattleController>();
-        aiAction = transform.Find("AIAction").GetComponent<Text>(); ;
         bc.onUnitChange += LoadStats;
         bc.onUnitChange += ShowCharUis;
         bc.onUnitChange += ToggleAIAction;
@@ -60,10 +59,13 @@ public class BattleUIController : MonoBehaviour {
     {
         foreach(GameObject charGO in bc.characters)
         {
-            CharController character = charGO.GetComponent<CharController>();
-            character.statusIndicator.gameObject.SetActive(true);
+            if (charGO.activeSelf)
+            {
+                CharController character = charGO.GetComponent<CharController>();
+                character.statusIndicator.gameObject.SetActive(true);
+                character.statusIndicator.SetHealth(character.Stats.curHealth, character.Stats.maxHealth);
+            }
         }
-        //currentCharacter.statusIndicator.gameObject.SetActive(false);
     }
 
     public void UpdateStats()

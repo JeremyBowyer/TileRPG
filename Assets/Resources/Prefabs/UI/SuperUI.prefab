@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 6825262663939378475}
   - component: {fileID: 37037598835958602}
   - component: {fileID: 7382958501583367891}
-  - component: {fileID: 7090904468562915902}
   m_Layer: 5
   m_Name: Backdrop
   m_TagString: Untagged
@@ -166,25 +165,6 @@ MonoBehaviour:
   destroyOnComplete: 1
   startValue: {x: 0, y: 20, z: 0}
   endValue: {x: 180, y: 20, z: 0}
---- !u!114 &7090904468562915902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4022999318740137280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 244ef9f9212625d44b12ab08104fcb2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeType: 0
-  endBehaviour: 0
-  loopType: 0
-  startValue: 0
-  endValue: 1
-  duration: 0.4
-  loopCount: 0
 --- !u!1 &5340859113932362167
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +180,6 @@ GameObject:
   - component: {fileID: 9090012318083980966}
   - component: {fileID: 8294853717679247633}
   - component: {fileID: 6143017912620871966}
-  - component: {fileID: 597641629914670820}
   - component: {fileID: 615707309245879943}
   m_Layer: 5
   m_Name: Message
@@ -322,25 +301,6 @@ MonoBehaviour:
   destroyOnComplete: 1
   startValue: {x: 0, y: 20, z: 0}
   endValue: {x: 180, y: 20, z: 0}
---- !u!114 &597641629914670820
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5340859113932362167}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 244ef9f9212625d44b12ab08104fcb2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeType: 0
-  endBehaviour: 0
-  loopType: 0
-  startValue: 0
-  endValue: 1
-  duration: 0.4
-  loopCount: 0
 --- !u!114 &615707309245879943
 MonoBehaviour:
   m_ObjectHideFlags: 0

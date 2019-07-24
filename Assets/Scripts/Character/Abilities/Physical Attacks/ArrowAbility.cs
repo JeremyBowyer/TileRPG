@@ -13,7 +13,7 @@ public class ArrowAbility : AttackAbility {
         AbilityDescription = "Attack at range with an arrow.";
         AbilityPower = 25;
         ApCost = 75;
-        AbilityRange = 5;
+        AbilityRange = 3;
         diag = true;
         isProjectile = true;
         character = _character;

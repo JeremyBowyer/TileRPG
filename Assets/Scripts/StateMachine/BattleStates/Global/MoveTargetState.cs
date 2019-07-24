@@ -25,13 +25,14 @@ public class MoveTargetState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         mover = bc.CurrentCharacter.MovementAbility;
         player = bc.CurrentCharacter as PlayerController;
         moveRange = mover.GetNodesInRange();
-        grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange");
-        inTransition = false;
+        //grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange", "empty");
+        grid.OutlineNodes(moveRange, CustomColors.MovementRange);
+        InTransition = false;
     }
 
     public override void Exit()
@@ -39,9 +40,10 @@ public class MoveTargetState : BattleState
         base.Exit();
         bc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes("movepath");
-        grid.DeSelectNodes("moverange");
+        //grid.DeSelectNodes("moverange");
+        grid.RemoveOutline(moveRange);
+        battleUI.SetApCost();
         moveRange = null;
-        battleUiController.SetApCost();
     }
 
     protected override void AddListeners()
@@ -91,11 +93,11 @@ public class MoveTargetState : BattleState
 
             if (mover.isPath)
             {
-                grid.SelectNodes(path, CustomColors.MovementPath, "movepath");
+                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "filled");
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath");
+                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "filled");
             }
         }
     }
@@ -111,7 +113,7 @@ public class MoveTargetState : BattleState
         {
             grid.DeSelectNodes("movepath");
             bc.lineRenderer.positionCount = 0;
-            battleUiController.SetApCost();
+            battleUI.SetApCost();
         }
     }
 

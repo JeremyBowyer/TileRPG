@@ -40,7 +40,7 @@ public class DetectPlayer : MonoBehaviour {
                         enemy.GetComponent<DetectPlayer>().enabled = false;
                     }
                     */
-                    gc.battleInitiator = gameObject.GetComponent<EnemyController>();
+                    //gc.battleInitiator = gameObject.GetComponent<EnemyController>();
                     
                     gc.ChangeState<InitBattleState>();
                 }

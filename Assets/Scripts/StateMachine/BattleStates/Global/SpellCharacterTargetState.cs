@@ -26,21 +26,24 @@ public class SpellCharacterTargetState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         spellAbility = args.spell;
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
-        grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
+
+        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
+        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()
     {
         base.Exit();
-        spellRange = null;
-        grid.DeSelectNodes("spellrange");
+        //grid.DeSelectNodes("spellrange");
+        grid.RemoveOutline(spellRange);
         ClearOutlines();
+        spellRange = null;
     }
 
     public void ClearOutlines()
@@ -49,7 +52,7 @@ public class SpellCharacterTargetState : BattleState
         {
             if (enemy == null)
                 return;
-            Destroy(enemy.GetComponent<Outline>());
+            Destroy(enemy.GetComponent<Highlight>());
         }
         outlinedEnemies = new List<GameObject>();
 
@@ -87,11 +90,8 @@ public class SpellCharacterTargetState : BattleState
         if (spellRange.Contains(target.tile.node) && spellAbility.ValidateTarget(target))
         {
             GameObject go = target.gameObject;
-            go.AddComponent<Outline>();
-            Outline outline = go.GetComponent<Outline>();
-            outline.OutlineMode = Outline.Mode.OutlineAll;
-            outline.OutlineColor = color;
-            outline.OutlineWidth = 5f;
+            Highlight hl = go.AddComponent<Highlight>();
+            hl.HighlightObject(color);
             outlinedEnemies.Add(target.gameObject);
         }
     }

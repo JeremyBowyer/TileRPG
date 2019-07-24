@@ -40,7 +40,7 @@ public class StateMachine : MonoBehaviour
             if (_currentState == null)
                 return false;
             else
-                return _currentState.inTransition;
+                return _currentState.InTransition;
         }
         set { }
     }
@@ -52,7 +52,7 @@ public class StateMachine : MonoBehaviour
             if (_currentState == null)
                 return false;
             else
-                return _currentState.isInterruptable;
+                return _currentState.IsInterruptible;
         }
         set { }
     }
@@ -110,9 +110,15 @@ public class StateMachine : MonoBehaviour
     // Methods
     public void Update()
     {
+        // If there is no current state and no state in queue
+        // OR
+        // This state machine is waiting for another state machine's state to finish
+        // THEN do nothing
         if ((CurrentState == null && stateQueue.Count == 0) || _waitForStates)
             return;
 
+        // If this state machine isn't currently transitioning and the queue isn't empty,
+        // then transition to a queued state.
         if(!_inTransition && stateQueue.Count > 0)
         {
             QueuedTransition qt = stateQueue[0];
@@ -121,6 +127,7 @@ public class StateMachine : MonoBehaviour
             Transition(qt.state, qt.args);
         }
     }
+
     public virtual T GetState<T>() where T : State
     {
         T target = GetComponent<T>();
@@ -291,8 +298,8 @@ public class StateMachine : MonoBehaviour
         // If current state is in transition, interrupt if allowed.
         if (_inTransition && _isInterruptable)
         {
-            CurrentState.InterruptTransition();
             Debug.Log("Interrupting state: " + CurrentState.GetType().Name);
+            CurrentState.InterruptTransition();
             CurrentState.Exit();
         }
         else

@@ -25,10 +25,10 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         bc.cameraRig.isFollowing = true;
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     protected override void LoadMenu()

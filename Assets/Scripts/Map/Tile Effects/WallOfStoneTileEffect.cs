@@ -51,18 +51,18 @@ public class WallOfStoneTileEffect : TileEffect
     public IEnumerator SpawnWall(Tile _tile, Vector3 direction, Grid _grid)
     {
         GameObject wallPrefab = Resources.Load("Prefabs/Abilities/WallOfStone") as GameObject;
-        go = Instantiate(wallPrefab, _tile.WorldPosition, Quaternion.identity, GameObject.Find("BattleGrid").transform);
+        go = Instantiate(wallPrefab, _tile.WorldPosition, Quaternion.identity);
         float xMod = go.GetComponent<BoxCollider>().bounds.extents.x;
-        go.transform.localScale = new Vector3(go.transform.localScale.x / xMod, go.transform.localScale.y / xMod, go.transform.localScale.z / xMod);
+        go.transform.localScale = new Vector3(go.transform.localScale.x / xMod * 0.5f, go.transform.localScale.y / xMod * 0.5f, go.transform.localScale.z / xMod * 0.5f);
 
         if (direction == _grid.leftDirection || direction == _grid.rightDirection)
         {
-            go.transform.position += _grid.leftDirection * 1f;
+            go.transform.position += _grid.rightDirection * 0.5f;
         }
         else if (direction == _grid.forwardDirection || direction == _grid.backwardDirection)
         {
             go.transform.Rotate(new Vector3(0f, -90f, 0f));
-            go.transform.position += _grid.backwardDirection * 1f;
+            go.transform.position += _grid.forwardDirection * 0.5f;
         }
 
         // Raise from ground
@@ -74,7 +74,7 @@ public class WallOfStoneTileEffect : TileEffect
             go.transform.position = new Vector3(go.transform.position.x, newY, go.transform.position.z);
             yield return new WaitForEndOfFrame();
         }
-
+        go.transform.parent = bc.battleRoom.transform;
         yield break;
     }
 

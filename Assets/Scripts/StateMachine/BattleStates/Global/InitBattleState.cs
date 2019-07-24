@@ -9,8 +9,8 @@ public class InitBattleState : BattleState
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
     private ProtagonistController protag;
-
-    public override bool isInterruptable
+    private BSPRoom room;
+    public override bool IsInterruptible
     {
         get { return false; }
     }
@@ -29,23 +29,25 @@ public class InitBattleState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         bc.protag.animParamController.SetBool("idle");
 
+        // Get args
+        room = args.room;
         // Show Message
-        superUiController.ShowMessage("Battle Start", 2f);
-        /*
+        superUI.ShowMessage("Battle Start", 2f);
+
         // Start Coroutines
-        StartCoroutine(grid.GenerateGrid(OnCreateGrid));
-        StartCoroutine(bc.cameraRig.ZoomCamera(5f, 3f, 15f));
-        */
+        StartCoroutine(grid.GenerateGrid(room, OnCreateGrid));
+        StartCoroutine(bc.cameraRig.ZoomCamera(5f, 2f, 5f));
+
     }
       
     public void OnCreateGrid()
     {
         bc.EnableRBs(false);
-        battleUiController.gameObject.SetActive(true);
+        battleUI.gameObject.SetActive(true);
 
         // Re-position protag
         // Set up protag
@@ -75,11 +77,14 @@ public class InitBattleState : BattleState
         // Setup Nearby Enemies
         foreach (GameObject enemyGO in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            Node node = bc.grid.FindNearestNode(enemyGO.transform.position);
+            EnemyController enemy = enemyGO.GetComponent<EnemyController>();
+            if (enemy.room != room)
+                continue;
 
+            Node node = bc.grid.FindNearestNode(enemyGO.transform.position, lowestDistance: 1f, ignoreOccupant: false);
             if (node != null)
             {
-                EnemyController enemy = enemyGO.GetComponent<EnemyController>();
+                enemy = enemyGO.GetComponent<EnemyController>();
                 enemyGO.gameObject.transform.rotation = Quaternion.LookRotation(bc.grid.backwardDirection, Vector3.up);
                 enemy.Place(node.tile);
                 enemy.InitBattle();
@@ -108,7 +113,7 @@ public class InitBattleState : BattleState
             bc.turnQueue.InstantiateEntry(controller);
         }
 
-        inTransition = false;
+        InTransition = false;
         bc.ChangeState<PlaceUnitsState>();
     }
 

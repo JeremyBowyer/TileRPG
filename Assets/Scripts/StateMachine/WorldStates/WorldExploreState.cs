@@ -21,16 +21,7 @@ public class WorldExploreState : WorldState
     public GameObject startingPlace;
 
     // Movement parameters
-    public float moveSpeed = 8f;
-    public float JumpHeight = 2f;
-    public float Gravity = -9.81f;
-    public float GroundDistance = 0.3f;
-    public float DashDistance = 5f;
-    public Vector3 Drag;
-
-    private Vector3 _velocity;
-    public bool _isGrounded = true;
-    //private Transform _groundChecker;
+    public float moveSpeed = 3.5f;
 
     public override List<Type> AllowedTransitions
     {
@@ -47,7 +38,7 @@ public class WorldExploreState : WorldState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
 
         movementCursor = lc.movementCursor;
@@ -57,15 +48,15 @@ public class WorldExploreState : WorldState
         _transform = protag.transform;
         _controller = protag.GetComponent<CharacterController>();
         UserInputController.mouseLayer = LayerMask.NameToLayer("Terrain");
-
-        worldUiController.gameObject.SetActive(true);
+        lc.cameraRig.isFollowing = true;
+        lc.uiController.SwitchTo("world");
 
         lc.protag.statusIndicator.gameObject.SetActive(false);
-        lc.EnableRBs(true);
+        lc.EnableRBs(false);
         //protagAgent.SetDestination(protagAgent.transform.position);
         //protagAgent.isStopped = false;
 
-        inTransition = false;
+        InTransition = false;
     }
 
     protected override void OnMove(object sender, InfoEventArgs<Point> e)
@@ -98,6 +89,7 @@ public class WorldExploreState : WorldState
     public override void Exit()
     {
         base.Exit();
+        lc.protag.protagAgent.isStopped = true;
     }
 
     protected override void AddListeners()

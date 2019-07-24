@@ -30,14 +30,15 @@ public class AttackTargetState : BattleState
         character = bc.CurrentCharacter;
         attackAbility = args.attackAbility;
         attackRange = attackAbility.GetRange();
-        grid.SelectNodes(attackRange, CustomColors.AttackRange, "attackrange");
+        //grid.SelectNodes(attackRange, CustomColors.AttackRange, "attackrange", "empty");
+        grid.OutlineNodes(attackRange, CustomColors.AttackRange);
     }
 
     public override void Exit()
     {
         base.Exit();
-        grid.DeSelectNodes("attackrange");
-        attackRange = null;
+        //grid.DeSelectNodes("attackrange");
+        grid.RemoveOutline(attackRange);
 
         foreach(GameObject enemy in outlinedEnemies)
         {
@@ -46,6 +47,7 @@ public class AttackTargetState : BattleState
             Destroy(enemy.GetComponent<Outline>());
         }
         outlinedEnemies = new List<GameObject>();
+        attackRange = null;
     }
 
     protected override void AddListeners()
@@ -68,7 +70,7 @@ public class AttackTargetState : BattleState
             Outline outline = go.GetComponent<Outline>();
             outline.OutlineMode = Outline.Mode.OutlineAll;
             outline.OutlineColor = Color.red;
-            outline.OutlineWidth = 5f;
+            outline.OutlineWidth = 3f;
             
             outlinedEnemies.Add(enemy.gameObject);
         }

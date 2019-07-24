@@ -10,6 +10,8 @@ public class BSPController : MonoBehaviour
     public Vector2 gridSize;
     [SerializeField]
     public int numberOfSplits;
+    [SerializeField]
+    public Vector2 roomBufferBounds;
 
     private GameObject partitionFolder;
 
@@ -22,6 +24,7 @@ public class BSPController : MonoBehaviour
 	private BSPNode rootNode;
 	
 	private ArrayList roomList = new ArrayList();
+	private ArrayList corridorList = new ArrayList();
 
     private void Start()
     {
@@ -32,6 +35,8 @@ public class BSPController : MonoBehaviour
     {
         Destroy(partitionFolder);
         connections.HideConnections();
+        roomList = new ArrayList();
+        corridorList = new ArrayList();
     }
 
     public void GenerateMap ()
@@ -54,7 +59,9 @@ public class BSPController : MonoBehaviour
         partitionFolder.tag = "BSPPartitionSections";
 
         splitter = new BSPSplitHandler(partitionFolder);
-		connections = new BSPConnectionHandler(partitionFolder, this);
+
+        connections = gameObject.AddComponent<BSPConnectionHandler>();
+        connections.Init(partitionFolder, this);
 
         GameObject theSection = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Procedural Generation/BSP/PartitionSection"));
 		theSection.transform.localScale = new Vector3(gridSize.x,gridSize.y,0.2f);
@@ -74,12 +81,13 @@ public class BSPController : MonoBehaviour
 
         AddRoomToLeafs(rootNode);
 
+        AddWalls();
         ConnectRooms(rootNode);
         connections.BuildAllCorridors();
-        AddWalls();
+
         AddProps();
         SetStartingPlace();
-        SpawnEnemies();
+        AddEnemies();
 
         lc = GetComponent<LevelController>();
         navMesh = GetComponent<NavMeshSurface>();
@@ -89,9 +97,36 @@ public class BSPController : MonoBehaviour
         //connections.DisplayConnections();
 	}
 	
-    public void AddRoom(BSPArea _area)
+    public void ShowRoom(BSPRoom _room)
     {
-        roomList.Add(_area);
+        foreach(BSPRoom room in roomList)
+        {
+            if (room != _room)
+                room.HideRoom();
+        }
+
+        foreach (BSPCorridor corridor in corridorList)
+        {
+            corridor.HideRoom();
+        }
+    }
+
+    public void ShowAllRooms()
+    {
+        foreach (BSPRoom room in roomList)
+        {
+            room.ShowRoom();
+        }
+
+        foreach (BSPCorridor corridor in corridorList)
+        {
+            corridor.ShowRoom();
+        }
+    }
+
+    public void AddRoom(BSPRoom _room)
+    {
+        roomList.Add(_room);
     }
 
     private void SetStartingPlace()
@@ -101,18 +136,6 @@ public class BSPController : MonoBehaviour
         GameObject startingPlace = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/StartingPlace"));
         startingPlace.transform.position = midPoint;
         startingPlace.transform.parent = partitionFolder.transform;
-    }
-
-    private void SpawnEnemies()
-    {
-        BSPRoom leftRoom = rootNode.FindLeftRoom();
-        List<BSPRoom> connectingRooms = connections.GetConnectingRooms(leftRoom);
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        if(connectingRooms.Count > 0)
-        {
-            enemies[0].transform.position = connectingRooms[0].GetRoundedCenter();
-            enemies[0].transform.localScale = enemies[0].transform.localScale * 0.5f;
-        }
     }
 
 	//sub divide the leafs of the BSP tree
@@ -177,23 +200,36 @@ public class BSPController : MonoBehaviour
 	private void CreateRoom(BSPNode _node)
     {
 		GameObject roomGO  = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        roomGO.layer = LayerMask.NameToLayer("Ignore Raycast");
         roomGO.transform.localScale = new Vector3(_node.GetData().transform.localScale.x, 1 ,_node.GetData().transform.localScale.y);
         roomGO.transform.position = new Vector3(_node.GetData().transform.position.x , 0, _node.GetData().transform.position.z );
         roomGO.GetComponent<BoxCollider>().isTrigger = true;
+        int roomId = roomList.Count + 1;
 
-        BSPRoom room = roomGO.AddComponent<BSPRoom>();
-        _node.SetRoom(room);
-        room.Node = _node;
-        room.Init();
-        AddRoom(room);
+        if (roomGO.GetComponent<BoxCollider>().bounds.size.x > 9 && roomGO.GetComponent<BoxCollider>().bounds.size.z > 9 && _node != rootNode.FindLeftLeaf())
+        {
+            BSPBattleRoom room = roomGO.AddComponent<BSPBattleRoom>();
+            _node.SetRoom(room);
+            room.Node = _node;
+            room.Init(roomId, roomBufferBounds);
+            AddRoom(room);
+        }
+        else
+        {
+            BSPRoom room = roomGO.AddComponent<BSPRoom>();
+            _node.SetRoom(room);
+            room.Node = _node;
+            room.Init(roomId, roomBufferBounds);
+            AddRoom(room);
+        }
         
-        roomGO.name = "Room_" + roomList.Count;
+        roomGO.name = "Room_" + roomId;
         roomGO.transform.parent = partitionFolder.transform;
 	}
 
     private void AddWalls()
     {
-        foreach(BSPArea room in roomList)
+        foreach(BSPRoom room in roomList)
         {
             room.AddWalls();
         }
@@ -202,14 +238,34 @@ public class BSPController : MonoBehaviour
 
     private void AddProps()
     {
-        foreach (BSPArea area in roomList)
+        foreach (BSPRoom room in roomList)
         {
-            if (area is BSPRoom)
+            room.AddProps();
+        }
+
+        foreach (BSPCorridor corridor in corridorList)
+        {
+            corridor.AddProps();
+        }
+    }
+
+    private void AddEnemies()
+    {
+        foreach (BSPRoom room in roomList)
+        {
+            if (room is BSPBattleRoom)
             {
-                BSPRoom room = area as BSPRoom;
-                room.AddProps();
+                BSPBattleRoom battleRoom = room as BSPBattleRoom;
+                battleRoom.AddEnemies();
             }
         }
+    }
+
+    public void AddCorridor(BSPCorridor _corridor)
+    {
+        _corridor.transform.parent = partitionFolder.transform;
+        corridorList.Add(_corridor);
+        _corridor.gameObject.name = "corridor_" + corridorList.Count;
     }
 	
 }

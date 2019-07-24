@@ -18,12 +18,9 @@ public class SpellTargetSequenceState : BattleState
         {
             return new List<Type>
             {
-            typeof(SelectUnitState),
-            typeof(CommandSelectionState),
-            typeof(EnemyTurnState),
-            typeof(VictorySequence),
             typeof(DeathSequence),
-            typeof(CheckForTurnEndState)
+            typeof(CheckForTurnEndState),
+            typeof(EnemyTurnState)
             };
         }
         set { }
@@ -31,7 +28,7 @@ public class SpellTargetSequenceState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         spell = args.spell as TargetSpellAbility;
         targetCharacter = args.targetCharacter;
         callback = args.callback;
@@ -48,7 +45,7 @@ public class SpellTargetSequenceState : BattleState
         spell.ApplyCharacterEffect(targetCharacter);
         if (callback != null)
             callback();
-        inTransition = false;
+        InTransition = false;
         character.ChangeState<IdleState>();
     }
 
@@ -66,7 +63,7 @@ public class SpellTargetSequenceState : BattleState
         if (callback != null)
             callback();
         isInterrupting = false;
-        inTransition = false;
+        InTransition = false;
         character.ChangeState<IdleState>();
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class VictorySequence : BattleState
 {
 
-    public override bool isInterruptable
+    public override bool IsInterruptible
     {
         get { return false; }
     }
@@ -30,7 +30,7 @@ public class VictorySequence : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
 
         // Hide party members
@@ -43,22 +43,13 @@ public class VictorySequence : BattleState
         }
 
         PersistentObjects.SaveProtagonist(bc);
-        SceneManager.LoadScene("World");
-        /*
-        // Deconstruct battle grid
-        bc.grid.ClearGrid();
-
-        // Place protag back at starting location
-        bc.protag.transform.position = bc.protagStartPos;
-
-        // Clear list of battle character
-        bc.characters.Clear();
+        //SceneManager.LoadScene("World");
 
         bc.TerminateBattle();
 
-        inTransition = false;
-        bc.ChangeState<WorldExploreState>();
-        */
+        InTransition = false;
+        bc.ChangeState<IdleState>();
+        bc.lc.ChangeState<WorldExploreState>();
     }
 
     public override void Exit()

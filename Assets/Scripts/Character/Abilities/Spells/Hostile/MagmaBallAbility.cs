@@ -90,7 +90,7 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 2f, character.transform.position.z);
         mbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/MagmaBallPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
         mbPrefabClone.gameObject.tag = "SpellEnvironmentGO";
-        inProgress = true;
+        //inProgress = true;
         Vector3 startingPos = mbPrefabClone.transform.position;
         Vector3 endingPos = tile.WorldPosition;
         float currentTime = 0f;
@@ -114,7 +114,8 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         character.animParamController.SetTrigger("cast_end");
         callback();
         GameObject.Destroy(mbPrefabClone);
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, tile.node), Vector3.up);
+        Vector3 faceDirection = character.bc.grid.GetDirection(character.tile.node, tile.node);
+        character.transform.rotation = Quaternion.LookRotation(faceDirection, Vector3.up);
         yield break;
     }
 }

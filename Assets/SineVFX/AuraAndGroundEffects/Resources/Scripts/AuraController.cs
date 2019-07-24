@@ -27,7 +27,7 @@ public class AuraController : MonoBehaviour {
         projector.material = new Material(sourceMaterial);
 
         UpdateMaterialAndProjector();
-
+        gameObject.transform.localScale = new Vector3(0.8f, 1f, 1f);
     }
 	
 	void Update () {

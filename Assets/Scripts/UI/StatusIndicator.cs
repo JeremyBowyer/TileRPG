@@ -24,7 +24,6 @@ public class StatusIndicator : MonoBehaviour {
 
     }
 
-
     public void FloatText(string text, Color color, float duration = 1.5f)
     {
         if (gameObject == null)

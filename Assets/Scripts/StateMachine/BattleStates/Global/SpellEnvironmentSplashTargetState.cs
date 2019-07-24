@@ -26,22 +26,25 @@ public class SpellEnvironmentSplashTargetState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         spellAbility = args.spell as EnvironmentSplashSpellAbility;
         character = bc.CurrentCharacter;
-        spellRange = spellAbility.GetRange(); ;
-        grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange");
+        spellRange = spellAbility.GetRange();
+
+        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
+        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
         base.Enter();
-        inTransition = false;
+        InTransition = false;
     }
 
     public override void Exit()
     {
         base.Exit();
-        spellRange = null;
         bc.lineRenderer.positionCount = 0;
-        grid.DeSelectNodes("spellrange");
+        //grid.DeSelectNodes("spellrange");
+        grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("splashzone");
+        spellRange = null;
     }
 
     protected override void AddListeners()
@@ -59,11 +62,11 @@ public class SpellEnvironmentSplashTargetState : BattleState
 
         if (spellRange.Contains(tile.node))
         {
-            // If spell isn't a projectile, or the projectile is validated, highlight splashzone because spell is valida
-            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject))
+            // If spell isn't a projectile, or the projectile is validated, highlight splashzone because spell is valid
+            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, true))
             {
                 splashZone = spellAbility.GetSplashZone(tile);
-                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone");
+                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "filled");
             }
         }
     }
@@ -87,7 +90,13 @@ public class SpellEnvironmentSplashTargetState : BattleState
 
         if (spellRange.Contains(tile.node))
         {
-            StateArgs spellArgs = new StateArgs
+            // If spell is a projectile and path isn't valid, return
+            if (spellAbility.isProjectile && !bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, false))
+            {
+                return;
+            }
+
+                StateArgs spellArgs = new StateArgs
             {
                 targetTile = tile,
                 spell = spellAbility,

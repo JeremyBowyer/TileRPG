@@ -209,9 +209,9 @@ public class Pathfinding : MonoBehaviour {
         float distY = Mathf.Abs (nodeA.gridY - nodeB.gridY);
 
 		if (distX > distY)
-			return (1.4f * distY * costModifier) + (1 * (distX - distY) * costModifier);
+			return (1.4f * distY * costModifier) + (1f * (distX - distY) * costModifier);
 
-		return (1.4f * distX * costModifier) + (1 * (distY - distX) * costModifier);
+		return (1.4f * distX * costModifier) + (1f * (distY - distX) * costModifier);
 	}
 
     public void ResetCosts()

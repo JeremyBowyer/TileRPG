@@ -8,7 +8,6 @@ public class GameController : StateMachine
     // References
     public CameraController cameraRig;
     public Camera _camera;
-    public SuperUIController superUiController;
     public ProtagonistController protag;
 
     // Variables
@@ -30,6 +29,8 @@ public class GameController : StateMachine
     {
         foreach (GameObject character in characters)
         {
+            if (character == null)
+                continue;
             CharController controller = character.GetComponent<CharController>();
             controller.Pause();
         }
@@ -39,6 +40,8 @@ public class GameController : StateMachine
     {
         foreach (GameObject character in characters)
         {
+            if (character == null)
+                continue;
             CharController controller = character.GetComponent<CharController>();
             controller.Resume();
         }
@@ -48,6 +51,9 @@ public class GameController : StateMachine
     {
         foreach (GameObject character in characters)
         {
+            if (character == null)
+                continue;
+
             Rigidbody rb = character.GetComponent<Rigidbody>();
 
             if (rb != null)

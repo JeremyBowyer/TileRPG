@@ -41,10 +41,9 @@ public class BurnTileEffect : TileEffect
         base.Init(_tile, _sourceDirection, _grid);
 
         GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-        go = Instantiate(highlightedGO, tile.WorldPosition + Vector3.up * 0.1f, Quaternion.identity, GameObject.Find("BattleGrid").transform);
-        go.transform.localScale = go.transform.localScale * bc.grid.nodeDiameter;
+        go = Instantiate(highlightedGO, tile.WorldPosition + Vector3.up * 0.1f, Quaternion.identity);
         go.transform.rotation = Quaternion.LookRotation(bc.grid.forwardDirection, Vector3.up);
-
+        go.transform.parent = bc.battleRoom.transform;
         MeshRenderer mesh = go.GetComponent<MeshRenderer>();
         mesh.material = new Material(mesh.material);
         mesh.material.SetColor("_Color", CustomColors.Fire);

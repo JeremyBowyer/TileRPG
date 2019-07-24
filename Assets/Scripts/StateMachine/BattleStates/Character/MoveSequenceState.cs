@@ -13,7 +13,7 @@ public class MoveSequenceState : BattleState
 
     private IEnumerator traverseCoroutine;
 
-    public override bool isInterruptable
+    public override bool IsInterruptible
     {
         get { return true; }
     }
@@ -24,9 +24,9 @@ public class MoveSequenceState : BattleState
         {
             return new List<Type>
             {
-            typeof(SelectUnitState),
-            typeof(CommandSelectionState),
-            typeof(EnemyTurnState)
+            typeof(DeathSequence),
+            typeof(EnemyTurnState),
+            typeof(IdleState)
             };
         }
         set { }
@@ -34,7 +34,7 @@ public class MoveSequenceState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         base.Enter();
         character = GetComponent<CharController>();
         path = args.path;
@@ -52,9 +52,9 @@ public class MoveSequenceState : BattleState
 
     public void OnCoroutineFinish()
     {
+        InTransition = false;
         if (callback != null)
             callback();
-        inTransition = false;
         character.ChangeState<IdleState>();
     }
 

@@ -16,6 +16,8 @@ public struct StateArgs {
     public SpellAbility spell;
     public AttackAbility attackAbility;
 
+    public BSPRoom room;
+
     public List<StateMachine> waitingStateMachines;
     public Action callback;
 }

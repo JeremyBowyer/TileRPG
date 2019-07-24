@@ -22,7 +22,7 @@ public class SpellEnvironmentSequenceState : BattleState
             {
             typeof(SelectUnitState),
             typeof(CommandSelectionState),
-            typeof(EnemyTurnState),
+            typeof(EnemyTurnStateGlobal),
             typeof(VictorySequence),
             typeof(DeathSequence)
             };
@@ -32,7 +32,7 @@ public class SpellEnvironmentSequenceState : BattleState
 
     public override void Enter()
     {
-        inTransition = true;
+        InTransition = true;
         character = GetComponent<CharController>();
         spell = args.spell as EnvironmentSpellAbility;
         targetTile = args.targetTile;
@@ -65,7 +65,7 @@ public class SpellEnvironmentSequenceState : BattleState
         {
             spell.ApplyTileEffect(affectedArea[i].tile, sourceDirection, grid);
         }
-        inTransition = false;
+        InTransition = false;
         character.ChangeState<IdleState>();
     }
 
@@ -89,7 +89,7 @@ public class SpellEnvironmentSequenceState : BattleState
             GameObject.Destroy(go);
         }
         character.animParamController.SetBool("idle", true);
-        inTransition = false;
+        InTransition = false;
         isInterrupting = false;
         character.ChangeState<IdleState>();
     }

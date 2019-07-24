@@ -5,83 +5,261 @@ using UnityEngine;
 public class BSPArea : MonoBehaviour
 {
     protected List<GameObject> edgeFloors { get; set; }
+    protected List<GameObject> cornerFloors { get; set; }
     protected List<GameObject> walls { get; set; }
+    public List<GameObject> floors;
+    protected List<GameObject> props;
+    protected List<GameObject> characters;
+    protected LevelController lc;
+
+    protected bool hidden;
+
+    public float xSize;
+    public float ySize;
+    public float zSize;
+
+    private int buffer;
+    private Vector2 bufferBounds;
+
+    protected int Id;
 
     public void Awake()
     {
+        hidden = false;
         edgeFloors = new List<GameObject>();
+        cornerFloors = new List<GameObject>();
         walls = new List<GameObject>();
+        floors = new List<GameObject>();
+        props = new List<GameObject>();
+        characters = new List<GameObject>();
+        lc = GameObject.Find("LevelController").GetComponent<LevelController>();
     }
 
-    public void AddWalls()
+    public virtual void Init(int _id, Vector2 _bufferBounds)
     {
-        foreach (GameObject floor in edgeFloors)
+        Id = _id;
+        bufferBounds = _bufferBounds;
+        System.Random random = new System.Random(Id);
+        buffer = random.Next(Mathf.RoundToInt(bufferBounds.x), Mathf.RoundToInt(bufferBounds.y));
+        // Get initial size, so we know what % to scale down, based on buffer size
+        xSize = GetComponent<BoxCollider>().bounds.size.x;
+        ySize = GetComponent<BoxCollider>().bounds.size.y;
+        zSize = GetComponent<BoxCollider>().bounds.size.z;
+        gameObject.transform.localScale = new Vector3(gameObject.transform.localScale.x * ((xSize - buffer * 2) / xSize), gameObject.transform.localScale.y, gameObject.transform.localScale.z * ((zSize - buffer * 2) / zSize));
+
+        // Get scaled down size
+        xSize = Mathf.Round(GetComponent<BoxCollider>().bounds.size.x);
+        ySize = Mathf.Round(GetComponent<BoxCollider>().bounds.size.y);
+        zSize = Mathf.Round(GetComponent<BoxCollider>().bounds.size.z);
+    }
+
+    public virtual void AddProps()
+    {
+
+    }
+
+    public void AddTorches()
+    {
+
+        for (int i = 0; i < walls.Count; i++)
         {
-            Vector3 midPoint = floor.transform.position + Vector3.left * 0.5f + Vector3.forward * 0.5f;
-            // Check for neighboring floors
-            foreach (Vector3 direction in new Vector3[] { Vector3.forward, Vector3.back, Vector3.left, Vector3.right })
+            GameObject wall = walls[i];
+            BSPWall wallObj = wall.GetComponent<BSPWall>();
+            if (wallObj.prop != null)
+                continue;
+            if (i % 3 == 0)
             {
-                // Check for existing floor.
-                bool foundFloor = false;
-                Collider[] cols = Physics.OverlapSphere(midPoint + direction * 1f, 0.4f);
-                if (cols.Length > 0)
+                GameObject torch = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Props/Wall_Torch"));
+                torch.transform.position = wall.transform.Find("TorchAnchor").transform.position;
+                torch.transform.parent = wall.transform.Find("TorchAnchor").transform;
+                torch.transform.localScale = Vector3.one * 2f;
+
+                if (wallObj.facingDirection == Vector3.left)
                 {
-                    foreach (Collider col in cols)
-                    {
-                        if (col.tag == "Ground")
-                        {
-                            foundFloor = true;
-                        }
-                    }
+                    torch.transform.Rotate(new Vector3(0f, 90f, 0f));
                 }
-
-                // If no floor was found, spawn a wall
-                if (!foundFloor)
+                else if (wallObj.facingDirection == Vector3.right)
                 {
-                    GameObject wall = (GameObject) GameObject.Instantiate(Resources.Load("Prefabs/Map/Walls/SM_Env_Wall_01_DoubleSided"));
-                    float xMod = wall.GetComponent<BoxCollider>().bounds.size.x;
-                    wall.transform.localScale = new Vector3(wall.transform.localScale.x / xMod, wall.transform.localScale.y / xMod, wall.transform.localScale.z / xMod) * 1.1f;
-
-                    // Place floor, adjusting for floor offset
-                    wall.transform.position = midPoint + direction * 0.5f + Vector3.right * 0.5f;
-
-                    if(direction == Vector3.left)
-                    {
-                        wall.transform.Rotate(new Vector3(0f, 90f, 0f));
-                        wall.transform.position += Vector3.back * 0.5f + Vector3.left * 0.5f;
-                    } else if(direction == Vector3.right)
-                    {
-                        wall.transform.Rotate(new Vector3(0f, -90f, 0f));
-                        wall.transform.position += Vector3.forward * 0.5f + Vector3.left * 0.5f;
-                    } else if(direction == Vector3.forward)
-                    {
-                        wall.transform.Rotate(new Vector3(0f, 180f, 0f));
-                        wall.transform.position += Vector3.left * 1f;
-                    }
-
-                    /*
-                    if (direction == Vector3.left || direction == Vector3.right)
-                    {
-                        wall.transform.Rotate(new Vector3(0f, 90f, 0f));
-                        wall.transform.position += Vector3.back * 0.5f + Vector3.left * 0.5f;
-                    }
-                    */
-                    wall.transform.parent = floor.transform.parent;
-                    BSPWall wallObj = wall.AddComponent<BSPWall>();
-                    wallObj.facingDirection = direction;
-                    AddWall(wall);
+                    torch.transform.Rotate(new Vector3(0f, -90f, 0f));
                 }
+                else if (wallObj.facingDirection == Vector3.forward)
+                {
+                    torch.transform.Rotate(new Vector3(0f, 180f, 0f));
+                }
+                wallObj.prop = torch;
+                AddProp(torch);
             }
         }
+
     }
 
-    public void AddEdgeFloor(GameObject _edgeFloor)
+    public void SignObject(GameObject _obj)
     {
-        edgeFloors.Add(_edgeFloor);
+        MapObject obj = _obj.AddComponent<MapObject>();
+        obj.startingPos = _obj.transform.position;
+        obj.area = this;
+    }
+
+    public void AddCornerFloor(GameObject _floor)
+    {
+        cornerFloors.Add(_floor);
+    }
+
+    public void AddFloor(GameObject _floor)
+    {
+        SignObject(_floor);
+        floors.Add(_floor);
     }
 
     public void AddWall(GameObject _wall)
     {
+        SignObject(_wall);
         walls.Add(_wall);
     }
+
+    public void AddProp(GameObject _prop)
+    {
+        SignObject(_prop);
+        props.Add(_prop);
+    }
+
+    public void AddCharacter(GameObject _character)
+    {
+        SignObject(_character);
+        characters.Add(_character);
+    }
+
+    public void AddEdgeFloor(GameObject _edgeFloor)
+    {
+        if(!edgeFloors.Contains(_edgeFloor))
+            edgeFloors.Add(_edgeFloor);
+    }
+
+    public void RemoveFloor(GameObject _floor)
+    {
+        if (floors.Contains(_floor))
+            floors.Remove(_floor);
+    }
+
+    public void RemoveProp(GameObject _prop)
+    {
+        if (props.Contains(_prop))
+            props.Remove(_prop);
+    }
+
+    public void RemoveCharacter(GameObject _character)
+    {
+        if (characters.Contains(_character))
+            characters.Remove(_character);
+    }
+
+    public void RemoveWall(GameObject _wall)
+    {
+        if(walls.Contains(_wall))
+            walls.Remove(_wall);
+    }
+
+    public void ShowRoom()
+    {
+        foreach (GameObject floor in floors)
+        {
+            StartCoroutine(ShowObject(floor));
+        }
+
+        foreach (GameObject wall in walls)
+        {
+            StartCoroutine(ShowObject(wall));
+        }
+
+        foreach (GameObject prop in props)
+        {
+            StartCoroutine(ShowObject(prop));
+        }
+
+        foreach (GameObject character in characters)
+        {
+            StartCoroutine(ShowObject(character));
+        }
+    }
+
+    public void HideRoom()
+    {
+        foreach (GameObject floor in floors)
+        {
+            StartCoroutine(HideObject(floor));
+        }
+
+        foreach (GameObject wall in walls)
+        {
+            StartCoroutine(HideObject(wall));
+        }
+
+        foreach (GameObject prop in props)
+        {
+            StartCoroutine(HideObject(prop));
+        }
+
+        foreach (GameObject character in characters)
+        {
+            StartCoroutine(HideObject(character));
+        }
+    }
+
+    public IEnumerator HideObject(GameObject _obj)
+    {
+        if (_obj == null || hidden)
+            yield break;
+
+        yield return new WaitForSeconds(Random.value / 2);
+
+        float currentTime = 0f;
+        float speed = 0.5f;
+        float startingY = _obj.transform.position.y;
+        float deltaY = 10f;
+        float destinationY = startingY - deltaY;
+
+        while (!Mathf.Approximately(currentTime, 1.0f))
+        {
+            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * speed));
+            float frameValue = (1f - 0f) * EasingEquations.EaseInExpo(0.0f, 1.0f, currentTime);
+            _obj.transform.position = new Vector3(_obj.transform.position.x, startingY - deltaY * frameValue, _obj.transform.position.z);
+            yield return new WaitForEndOfFrame();
+        }
+
+        _obj.transform.position = new Vector3(_obj.transform.position.x, destinationY, _obj.transform.position.z);
+        _obj.SetActive(false);
+        hidden = true;
+        yield break;
+    }
+
+    public IEnumerator ShowObject(GameObject _obj)
+    {
+        if (_obj == null || !hidden)
+            yield break;
+
+        yield return new WaitForSeconds(Random.value / 2);
+
+        _obj.SetActive(true);
+
+        MapObject mapObj = _obj.GetComponent<MapObject>();
+
+        float currentTime = 0f;
+        float speed = 0.5f;
+        float startingY = _obj.transform.position.y;
+        float destinationY = mapObj.startingPos.y;
+        float deltaY = destinationY - startingY;
+
+        while (!Mathf.Approximately(currentTime, 1.0f))
+        {
+            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * speed));
+            float frameValue = (1f - 0f) * EasingEquations.EaseOutExpo(0.0f, 1.0f, currentTime);
+            _obj.transform.position = new Vector3(_obj.transform.position.x, startingY + deltaY * frameValue, _obj.transform.position.z);
+            yield return new WaitForEndOfFrame();
+        }
+
+        _obj.transform.position = new Vector3(_obj.transform.position.x, destinationY, _obj.transform.position.z);
+        hidden = false;
+        yield break;
+    }
+
 }
