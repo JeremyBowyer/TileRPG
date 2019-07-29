@@ -81,12 +81,13 @@ public class Grid : MonoBehaviour {
         nodeDiameter = room.floors[0].GetComponent<BoxCollider>().bounds.size.x;
 
         int cnt = 0;
-        foreach (GameObject floorGO in room.floors)
+        foreach (GameObject baseFloorGO in room.floors)
         {
             cnt++;
-            floorGO.layer = LayerMask.NameToLayer("GridClick");
+            BSPFloor floor = room.FindFloorFromWorldPoint(baseFloorGO.transform.position);
+            GameObject floorGO = floor.gameObject;
             Tile tile = floorGO.AddComponent<Tile>();
-            BSPFloor floor = floorGO.GetComponent<BSPFloor>();
+            floorGO.layer = LayerMask.NameToLayer("GridClick");
             tiles.Add(floorGO);
             int x = floor.x;
             int y = floor.y;
@@ -147,91 +148,6 @@ public class Grid : MonoBehaviour {
 
         if (callback != null)
             callback();
-        yield break;
-    }
-
-    public IEnumerator GenerateGrid(Action callback)
-    {
-        nodeDiameter = Mathf.Round(bottomRightTile.GetComponent<BoxCollider>().bounds.extents.x * 2);
-
-        gridCells = 10;
-
-        gridWorldSize = gridCells * nodeDiameter;
-        gridSizeX = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
-        gridSizeY = Mathf.RoundToInt(gridWorldSize / nodeDiameter);
-
-        rightDirection = bottomRightTile.transform.rotation * Vector3.left;
-        forwardDirection = bottomRightTile.transform.rotation * Vector3.back;
-
-        grid = new Node[gridSizeX, gridSizeY];
-        List<Point> cellPath = new List<Point>();
-        for (int y = 0; y < gridSizeY; y++)
-        {
-            for (int x = 0; x < gridSizeX; x++)
-            {
-                int newX = y % 2 == 0 ? x : gridSizeX - 1 - x;
-                cellPath.Add(new Point(newX, y));
-
-            }
-        }
-        List<Vector3> pathDirections = GetPathDirections(cellPath);
-        Vector3 bottomRight = bottomRightTile.transform.Find("AnchorPoint").transform.position;
-        bottomRight.y = FindHeightPoint(bottomRight);
-        Vector3 cellPoint = bottomRight;
-        for (int i = 0; i < cellPath.Count; i++)
-        {
-            // Grab next cell in path
-            Point cell = cellPath[i];
-
-            // Get coordinates
-            int x = Mathf.RoundToInt(cell.x);
-            int y = Mathf.RoundToInt(cell.y);
-
-            // Create game object
-            GameObject tileGO = FindTileGo(cellPoint);
-            tileGO.name = "(" + x.ToString() + " , " + y.ToString() + ")";
-            tiles.Add(tileGO.gameObject);
-            Tile tile = tileGO.gameObject.GetComponent<Tile>();
-
-            if(tile == null)
-            {
-                grid[x, y] = null;
-            }
-            else
-            {
-                // Find Anchor point
-                Vector3 anchorPoint = tileGO.transform.Find("AnchorPoint").transform.position;
-
-                // Create new node
-                Node node = new Node(anchorPoint, x, y);
-
-                // Assign appropriate values for tile and node
-                tile.grid = bc.grid;
-                tile.node = node;
-                node.tile = tile;
-
-                // Is tile walkable?
-                Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
-                if (alertColliders != null && alertColliders.Length != 0)
-                {
-                    tile.isWalkable = false;
-                }
-
-                // Assign to grid
-                grid[x, y] = node;
-            }
-
-            // Set up next cellPoint, if not at the end
-            if (i >= pathDirections.Count)
-                break;
-
-            cellPoint = cellPoint + pathDirections[i] * nodeDiameter;
-            cellPoint.y = FindHeightClear(cellPoint, nodeRadius);
-            if (i % 3 == 0)
-                yield return null;
-        }
-
-        callback();
         yield break;
     }
 
@@ -448,6 +364,7 @@ public class Grid : MonoBehaviour {
         ol.OutlineMode = _mode;
         ol.OutlineColor = _color;
         ol.OutlineWidth = _width;
+        ol.enabled = true;
     }
 
     public void RemoveOutline(List<Node> _nodes)
@@ -463,7 +380,7 @@ public class Grid : MonoBehaviour {
         Outline ol = _node.tile.gameObject.GetComponent<Outline>();
 
         if (ol != null)
-            Destroy(ol);
+            DestroyImmediate(ol);
 
     }
 

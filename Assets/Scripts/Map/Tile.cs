@@ -18,6 +18,7 @@ public class Tile : MonoBehaviour {
     private Material originalMat;
     public Projector projector;
     public Texture emptyTex;
+    public Texture innerTex;
     public Texture filledTex;
 
     public Dictionary<string, Color> colorDict;
@@ -87,7 +88,8 @@ public class Tile : MonoBehaviour {
         colorHierarchy = new List<string>();
 
         emptyTex = (Texture) Resources.Load("Sprites/ThickSquare");
-        filledTex = (Texture) Resources.Load("Sprites/SquareFilledSmall");
+        innerTex = (Texture) Resources.Load("Sprites/SquareFilledSmall");
+        filledTex = (Texture) Resources.Load("Sprites/SquareFilledFull");
     }
 
     public void AddColor(string set, Color color, string type)
@@ -101,6 +103,9 @@ public class Tile : MonoBehaviour {
             {
                 case "empty":
                     textureDict.Add(set, emptyTex);
+                    break;
+                case "inner":
+                    textureDict.Add(set, innerTex);
                     break;
                 case "filled":
                     textureDict.Add(set, filledTex);

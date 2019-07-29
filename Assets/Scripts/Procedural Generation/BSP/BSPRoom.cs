@@ -136,6 +136,23 @@ public class BSPRoom : BSPArea
         }
     }
 
+    public BSPFloor FindFloorFromWorldPoint(Vector3 point)
+    {
+        int layerMask = (1 << LayerMask.NameToLayer("Terrain"));
+
+        RaycastHit hit;
+        if (Physics.Raycast(point + Vector3.up * 20f, -Vector3.up, out hit, 100f, layerMask))
+        {
+            if (hit.collider.tag == "Ground")
+            {
+                BSPFloor floor = hit.collider.gameObject.GetComponent<BSPFloor>();
+                if (floor != null)
+                    return floor;
+            }
+        }
+        return null;
+    }
+
     public List<GameObject> GetNeighborFloors(GameObject _floor)
     {
         List<GameObject> neighbors = new List<GameObject>();

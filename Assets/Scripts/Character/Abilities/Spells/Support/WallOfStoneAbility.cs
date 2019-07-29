@@ -32,7 +32,7 @@ public class WallOfStoneAbility : EnvironmentPathSpellAbility
         ignoreOccupant = false;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("GridClick");
-        abilityIntent = AbilityTypes.Intent.Hostile;
+        abilityIntent = AbilityTypes.Intent.Support;
     }
 
     public override List<Node> GetRange()

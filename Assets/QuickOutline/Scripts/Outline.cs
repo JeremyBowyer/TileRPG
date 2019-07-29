@@ -81,26 +81,27 @@ public class Outline : MonoBehaviour {
   private bool needsUpdate;
 
   void Awake() {
+        this.enabled = false;
+        // Cache renderers
+        renderers = GetComponentsInChildren<Renderer>();
 
-    // Cache renderers
-    renderers = GetComponentsInChildren<Renderer>();
+        // Instantiate outline materials
+        outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
+        outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
 
-    // Instantiate outline materials
-    outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
-    outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
+        outlineMaskMaterial.name = "OutlineMask (Instance)";
+        outlineFillMaterial.name = "OutlineFill (Instance)";
 
-    outlineMaskMaterial.name = "OutlineMask (Instance)";
-    outlineFillMaterial.name = "OutlineFill (Instance)";
+        // Retrieve or generate smooth normals
+        LoadSmoothNormals();
 
-    // Retrieve or generate smooth normals
-    LoadSmoothNormals();
-
-    // Apply material properties immediately
-    needsUpdate = true;
+        // Apply material properties immediately
+        needsUpdate = true;
   }
 
   void OnEnable() {
-    foreach (var renderer in renderers) {
+        UpdateMaterialProperties();
+        foreach (var renderer in renderers) {
 
       // Append outline shaders
       var materials = renderer.sharedMaterials.ToList();
@@ -137,18 +138,20 @@ public class Outline : MonoBehaviour {
     }
   }
 
-  void OnDisable() {
-    foreach (var renderer in renderers) {
+    void OnDisable() {
+        if (renderers == null)
+            return;
+        foreach (var renderer in renderers) {
 
-      // Remove outline shaders
-      var materials = renderer.sharedMaterials.ToList();
+            // Remove outline shaders
+            var materials = renderer.sharedMaterials.ToList();
 
-      materials.Remove(outlineMaskMaterial);
-      materials.Remove(outlineFillMaterial);
+            materials.Remove(outlineMaskMaterial);
+            materials.Remove(outlineFillMaterial);
 
-      renderer.materials = materials.ToArray();
+            renderer.materials = materials.ToArray();
+        }
     }
-  }
 
   void OnDestroy() {
 

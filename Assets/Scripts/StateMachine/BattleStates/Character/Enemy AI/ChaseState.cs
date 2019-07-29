@@ -26,15 +26,17 @@ public class ChaseState : AIBattleState
         target = args.targetCharacter;
 
         List<Node> path = character.AttackAbility.PathToGetInRange(target);
-
+        Debug.Log("starting chase");
         if (path.Count == 0)
         {
             Debug.Log("couldn't find path from " + character.name + " to " + target.name);
             character.ChangeState<IdleState>();
             bc.ChangeState<SelectUnitState>();
+            InTransition = false;
         }
         else
         {
+            Debug.Log("found path");
             aiAction.text = "Chasing...";
             StateArgs moveArgs = new StateArgs
             {

@@ -31,8 +31,9 @@ public class SpellCharacterTargetState : BattleState
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
 
-        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
-        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
+        Color color = AbilityTypes.GetIntentColor(spellAbility.abilityIntent);
+        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.04f), "spellrange", "inner");
+        grid.OutlineNodes(spellRange, color);
         base.Enter();
         InTransition = false;
     }
@@ -40,7 +41,7 @@ public class SpellCharacterTargetState : BattleState
     public override void Exit()
     {
         base.Exit();
-        //grid.DeSelectNodes("spellrange");
+        grid.DeSelectNodes("spellrange");
         grid.RemoveOutline(spellRange);
         ClearOutlines();
         spellRange = null;

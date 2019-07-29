@@ -97,7 +97,7 @@ public abstract class CharController : StateMachine {
     {
         Stats.initiativeModifier = 1f;
         animParamController.SetBool("idle");
-        GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
+        GameObject circleGO = transform.Find("UnitCircle").gameObject;
         if (circleGO == null)
             return;
 
@@ -116,7 +116,7 @@ public abstract class CharController : StateMachine {
 
     public virtual void TerminateBattle()
     {
-        GameObject circleGO = transform.Find("SelectionCirclePrefab").gameObject;
+        GameObject circleGO = transform.Find("UnitCircle").gameObject;
         if (circleGO == null)
             return;
 

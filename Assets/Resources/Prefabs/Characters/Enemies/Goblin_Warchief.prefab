@@ -1804,6 +1804,7 @@ GameObject:
   - component: {fileID: 114574359889543828}
   - component: {fileID: 114301415031790612}
   - component: {fileID: 114966278543867960}
+  - component: {fileID: 6576783293462710137}
   m_Layer: 9
   m_Name: Goblin_Warchief
   m_TagString: Enemy
@@ -1921,6 +1922,8 @@ MonoBehaviour:
   statusIndicator: {fileID: 114117796978557260}
   animParamController: {fileID: 114574359889543828}
   turnEntry: {fileID: 0}
+  room: {fileID: 0}
+  mesh: {fileID: 0}
 --- !u!114 &114966278543867960
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1933,7 +1936,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0139e0d30e2e07949a1ba7b4a723d361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aiAction: {fileID: 0}
+--- !u!114 &6576783293462710137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666983237943974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55d546bc04feab947ad2513a04cefa45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1669502785934468
 GameObject:
   m_ObjectHideFlags: 0
@@ -3079,7 +3093,7 @@ PrefabInstance:
     - target: {fileID: 198402116184471508, guid: a97488243f758e84e8d38a7a432bd9e2,
         type: 3}
       propertyPath: m_Name
-      value: SelectionCirclePrefab
+      value: UnitCircle
       objectReference: {fileID: 0}
     - target: {fileID: 6843722231524619337, guid: a97488243f758e84e8d38a7a432bd9e2,
         type: 3}

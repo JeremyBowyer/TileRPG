@@ -215,6 +215,9 @@ public class StateMachine : MonoBehaviour
         if (CurrentState == null)
             return true;
 
+        if (CurrentState is IdleState)
+            return true;
+
         // Add universally allowed transitions
         List<Type> allowedTransitions = CurrentState.AllowedTransitions;
         allowedTransitions.Add(typeof(IdleState));

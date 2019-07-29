@@ -31,7 +31,7 @@ public class UnitPlacementState : BattleState
 
         mover = character.MovementAbility;
         moveRange = mover.GetNodesInRange();
-        //grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange", "empty");
+        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.04f), "moverange", "inner");
         grid.OutlineNodes(moveRange, CustomColors.MovementRange);
         InTransition = false;
     }
@@ -39,9 +39,9 @@ public class UnitPlacementState : BattleState
     public override void Exit()
     {
         base.Exit();
-        //grid.DeSelectNodes("moverange");
-        grid.RemoveOutline(moveRange);
+        grid.DeSelectNodes("moverange");
         grid.DeSelectNodes("movepath");
+        grid.RemoveOutline(moveRange);
         moveRange = null;
         battleUI.SetApCost();
     }
@@ -92,11 +92,11 @@ public class UnitPlacementState : BattleState
             List<Node> path = mover.GetPath(tile.node);
             if (mover.isPath)
             {
-                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "filled");
+                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "inner");
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "filled");
+                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "inner");
             }
         }
     }

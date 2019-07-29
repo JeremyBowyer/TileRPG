@@ -8,7 +8,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(0f, 0.5f, 1f, 0.5f);
+            return new Color(0f, 0.5f, 1f, 1f);
         }
     }
 
@@ -16,7 +16,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(0f, 1f, 1f, 0.4f);
+            return new Color(0f, 1f, 1f, 1f);
         }
     }
     
@@ -32,7 +32,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(1f, 0f, 0f, 0.2f);
+            return new Color(1f, 0f, 0f, 1f);
         }
     }
 
@@ -82,6 +82,11 @@ public class CustomColors
         {
             return new Color(0.8f, 0.4f, 0.4f, 0.5f);
         }
+    }
+
+    public static Color ChangeAlpha(Color _color, float _alpha)
+    {
+        return new Color(_color.r, _color.g, _color.b, _alpha);
     }
 
 }

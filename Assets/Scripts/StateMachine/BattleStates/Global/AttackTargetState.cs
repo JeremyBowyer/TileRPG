@@ -30,21 +30,21 @@ public class AttackTargetState : BattleState
         character = bc.CurrentCharacter;
         attackAbility = args.attackAbility;
         attackRange = attackAbility.GetRange();
-        //grid.SelectNodes(attackRange, CustomColors.AttackRange, "attackrange", "empty");
+        grid.SelectNodes(attackRange, CustomColors.ChangeAlpha(CustomColors.AttackRange, 0.04f), "attackrange", "inner");
         grid.OutlineNodes(attackRange, CustomColors.AttackRange);
     }
 
     public override void Exit()
     {
         base.Exit();
-        //grid.DeSelectNodes("attackrange");
+        grid.DeSelectNodes("attackrange");
         grid.RemoveOutline(attackRange);
 
-        foreach(GameObject enemy in outlinedEnemies)
+        foreach(GameObject go in outlinedEnemies)
         {
-            if (enemy == null)
+            if (go == null)
                 return;
-            Destroy(enemy.GetComponent<Outline>());
+            Destroy(go.GetComponent<Highlight>());
         }
         outlinedEnemies = new List<GameObject>();
         attackRange = null;
@@ -66,13 +66,9 @@ public class AttackTargetState : BattleState
         if (attackRange.Contains(enemy.tile.node) && attackAbility.ValidateTarget(enemy))
         {
             GameObject go = enemy.gameObject;
-            go.AddComponent<Outline>();
-            Outline outline = go.GetComponent<Outline>();
-            outline.OutlineMode = Outline.Mode.OutlineAll;
-            outline.OutlineColor = Color.red;
-            outline.OutlineWidth = 3f;
-            
-            outlinedEnemies.Add(enemy.gameObject);
+            Highlight hl = go.AddComponent<Highlight>();
+            hl.HighlightObject(CustomColors.Hostile);
+            outlinedEnemies.Add(go);
         }
     }
 
@@ -83,12 +79,12 @@ public class AttackTargetState : BattleState
         if (enemy == null)
             return;
 
-        Outline ol = enemy.gameObject.GetComponent<Outline>();
+        Highlight hl = enemy.gameObject.GetComponent<Highlight>();
 
-        if (ol == null)
+        if (hl == null)
             return;
 
-        Destroy(ol);
+        Destroy(hl);
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)

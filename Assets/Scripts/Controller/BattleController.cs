@@ -15,7 +15,7 @@ public class BattleController : GameController
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public LineRenderer lineRenderer;
-    public GameObject selectedCharacterAura;
+    public GameObject selectionCircle;
     public LevelController lc;
     public BSPBattleRoom battleRoom;
 
@@ -118,17 +118,17 @@ public class BattleController : GameController
         CurrentCharacter = character;
         lc.cameraTarget = character.transform;
 
-        selectedCharacterAura.gameObject.transform.SetParent(CurrentCharacter.gameObject.transform);
-        selectedCharacterAura.transform.localPosition = new Vector3(0, 0, 0);
-        selectedCharacterAura.SetActive(true);
-        Projector projector = selectedCharacterAura.GetComponent<Projector>();
+        selectionCircle.gameObject.transform.SetParent(CurrentCharacter.gameObject.transform);
+        selectionCircle.transform.localPosition = new Vector3(0, 0, 0);
+        selectionCircle.SetActive(true);
+        Projector projector = selectionCircle.GetComponent<Projector>();
         projector.material = new Material(projector.material);
 
         if (character is EnemyController)
-            projector.material.SetColor("_RampColorTint", CustomColors.Hostile);
+            projector.material.SetColor("_Color", CustomColors.Hostile);
 
         if (character is PlayerController)
-            projector.material.SetColor("_RampColorTint", CustomColors.PlayerUI);
+            projector.material.SetColor("_Color", CustomColors.PlayerUI);
 
 
 
@@ -164,7 +164,8 @@ public class BattleController : GameController
         lc.bspController.ShowAllRooms();
         grid.ClearGrid();
         characters.Clear();
-        selectedCharacterAura.SetActive(false);
+        selectionCircle.gameObject.transform.parent = null;
+        selectionCircle.SetActive(false);
         turnQueue.EndBattle();
         // Set protag as camera target
         lc.cameraTarget = protag.transform;

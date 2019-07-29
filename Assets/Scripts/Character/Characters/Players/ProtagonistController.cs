@@ -52,14 +52,6 @@ public class ProtagonistController : PlayerController
 
         if(PersistentObjects.partyMembers == null)
         {
-            Wizard member3 = new Wizard()
-            {
-                cName = "Son of Kong",
-                cClass = "Wizard",
-                model = "Wizard"
-            };
-            partyMembers.Add(member3);
-
             Rogue member1 = new Rogue()
             {
                 cName = "Wingus",
@@ -67,6 +59,14 @@ public class ProtagonistController : PlayerController
                 model = "Rogue"
             };
             partyMembers.Add(member1);
+
+            Wizard member3 = new Wizard()
+            {
+                cName = "Son of Kong",
+                cClass = "Wizard",
+                model = "Wizard"
+            };
+            partyMembers.Add(member3);
 
             Rogue member2 = new Rogue()
             {
@@ -146,6 +146,9 @@ public class ProtagonistController : PlayerController
     {
         foreach (PartyMember member in partyMembers)
         {
+
+            if (member.controller != null)
+                continue;
             GameObject goMember = Instantiate(Resources.Load("Prefabs/Characters/" + member.model)) as GameObject;
             PartyMemberController controller = goMember.AddComponent<PartyMemberController>();
             member.controller = controller;

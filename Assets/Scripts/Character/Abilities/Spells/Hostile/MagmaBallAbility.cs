@@ -27,6 +27,11 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
 
     public override List<Node> GetRange()
     {
+        //
+        // Summary:
+        //     Returns a list of the nodes in range of the ability.
+        //
+
         List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
         return range;
     }

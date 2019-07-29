@@ -85,9 +85,9 @@ public class BSPController : MonoBehaviour
         ConnectRooms(rootNode);
         connections.BuildAllCorridors();
 
-        AddProps();
+        //AddProps();
         SetStartingPlace();
-        AddEnemies();
+        //AddEnemies();
 
         lc = GetComponent<LevelController>();
         navMesh = GetComponent<NavMeshSurface>();

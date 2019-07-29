@@ -33,8 +33,9 @@ public class SpellEnvironmentPathTargetState : BattleState
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
 
-        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
-        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
+        Color color = AbilityTypes.GetIntentColor(spellAbility.abilityIntent);
+        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.04f), "spellrange", "inner");
+        grid.OutlineNodes(spellRange, color);
         base.Enter();
         InTransition = false;
     }
@@ -42,7 +43,7 @@ public class SpellEnvironmentPathTargetState : BattleState
     public override void Exit()
     {
         base.Exit();
-        //grid.DeSelectNodes("spellrange");
+        grid.DeSelectNodes("spellrange");
         grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("startnode");
         grid.DeSelectNodes("abilitypath");
@@ -66,21 +67,21 @@ public class SpellEnvironmentPathTargetState : BattleState
         {
             if(startNode == null)
             {
-                grid.SelectNodes(tile.node, CustomColors.Support, "startnode", "filled");
+                grid.SelectNodes(tile.node, CustomColors.Support, "startnode", "inner");
             }
             else
             {
                 if (tile.node == startNode)
                 {
                     abilityPath = new List<Node>() { tile.node };
-                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "filled");
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "inner");
                 }
                 else
                 {
                     abilityPath = spellAbility.GetPath(startNode.tile, tile);
                     if (abilityPath.Count == 0)
                         return;
-                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "filled");
+                    grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "inner");
                 }
             }
         }

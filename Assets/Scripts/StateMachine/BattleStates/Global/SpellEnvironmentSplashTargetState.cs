@@ -31,8 +31,9 @@ public class SpellEnvironmentSplashTargetState : BattleState
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
 
-        //grid.SelectNodes(spellRange, CustomColors.SpellRange, "spellrange", "empty");
-        grid.OutlineNodes(spellRange, AbilityTypes.GetIntentColor(spellAbility.abilityIntent));
+        Color color = AbilityTypes.GetIntentColor(spellAbility.abilityIntent);
+        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.04f), "spellrange", "inner");
+        grid.OutlineNodes(spellRange, color);
         base.Enter();
         InTransition = false;
     }
@@ -41,7 +42,7 @@ public class SpellEnvironmentSplashTargetState : BattleState
     {
         base.Exit();
         bc.lineRenderer.positionCount = 0;
-        //grid.DeSelectNodes("spellrange");
+        grid.DeSelectNodes("spellrange");
         grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("splashzone");
         spellRange = null;
@@ -66,7 +67,7 @@ public class SpellEnvironmentSplashTargetState : BattleState
             if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, true))
             {
                 splashZone = spellAbility.GetSplashZone(tile);
-                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "filled");
+                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "inner");
             }
         }
     }

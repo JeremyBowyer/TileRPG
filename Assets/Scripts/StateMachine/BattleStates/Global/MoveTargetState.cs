@@ -30,7 +30,7 @@ public class MoveTargetState : BattleState
         mover = bc.CurrentCharacter.MovementAbility;
         player = bc.CurrentCharacter as PlayerController;
         moveRange = mover.GetNodesInRange();
-        //grid.SelectNodes(moveRange, CustomColors.MovementRange, "moverange", "empty");
+        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.04f), "moverange", "inner");
         grid.OutlineNodes(moveRange, CustomColors.MovementRange);
         InTransition = false;
     }
@@ -40,7 +40,7 @@ public class MoveTargetState : BattleState
         base.Exit();
         bc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes("movepath");
-        //grid.DeSelectNodes("moverange");
+        grid.DeSelectNodes("moverange");
         grid.RemoveOutline(moveRange);
         battleUI.SetApCost();
         moveRange = null;
@@ -93,11 +93,11 @@ public class MoveTargetState : BattleState
 
             if (mover.isPath)
             {
-                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "filled");
+                grid.SelectNodes(path, CustomColors.MovementPath, "movepath", "inner");
             }
             else
             {
-                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "filled");
+                grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "inner");
             }
         }
     }

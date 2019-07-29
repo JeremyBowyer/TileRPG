@@ -39,6 +39,7 @@ public class EnemyTurnState : AIBattleState
 
     public IEnumerator DelayAction(float secs, Action callback)
     {
+        Debug.Log("starting");
         yield return new WaitForSeconds(secs);
         if (callback != null)
             callback();
@@ -47,7 +48,9 @@ public class EnemyTurnState : AIBattleState
 
     public void DecideAction()
     {
+        Debug.Log("considering");
         enemyAI.ConsiderOptions();
+        Debug.Log("considered");
         Exit();
     }
 

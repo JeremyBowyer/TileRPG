@@ -135,7 +135,6 @@ public class CameraController : MonoBehaviour {
 
     public void ScreenEdgeMovement(float x, float y)
     {
-        return;
         if (Input.GetMouseButton(2))
             return;
 

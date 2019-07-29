@@ -29,7 +29,7 @@ public class LevelController : GameController
         cameraTarget = protag.transform;
 
         bspController = GetComponent<BSPController>();
-
+        
         ChangeState<InitLevelState>();
     }
 

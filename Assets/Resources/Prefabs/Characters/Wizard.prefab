@@ -1022,6 +1022,7 @@ GameObject:
   - component: {fileID: 95024718898846286}
   - component: {fileID: 65053693381656800}
   - component: {fileID: 114681572288333012}
+  - component: {fileID: 180249205506525223}
   m_Layer: 9
   m_Name: Wizard
   m_TagString: Untagged
@@ -1100,6 +1101,18 @@ MonoBehaviour:
   - jump
   - die
   - attack
+--- !u!114 &180249205506525223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1390983897077294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55d546bc04feab947ad2513a04cefa45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1392940640450890
 GameObject:
   m_ObjectHideFlags: 0
@@ -3024,7 +3037,7 @@ PrefabInstance:
     - target: {fileID: 198402116184471508, guid: a97488243f758e84e8d38a7a432bd9e2,
         type: 3}
       propertyPath: m_Name
-      value: SelectionCirclePrefab
+      value: UnitCircle
       objectReference: {fileID: 0}
     - target: {fileID: 6843722231524619337, guid: a97488243f758e84e8d38a7a432bd9e2,
         type: 3}
