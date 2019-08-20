@@ -17,11 +17,11 @@ public class Node : IHeapItem<Node> {
     {
         get
         {
-            return _gCost;
+            return _gCost * movementCostModifier;
         }
         set
         {
-            _gCost = value * movementCostModifier;
+            _gCost = value;
         }
     }
 	public float hCost;

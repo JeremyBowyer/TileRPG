@@ -117,10 +117,6 @@ public class MoveTargetState : BattleState
         }
     }
 
-    protected override void OnFire(object sender, InfoEventArgs<int> e)
-    {
-    }
-
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
         bc.ChangeState<CommandSelectionState>();

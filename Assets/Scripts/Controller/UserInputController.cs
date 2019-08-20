@@ -11,32 +11,52 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<GameObject>> hoverExitEvent;
     public static event EventHandler<InfoEventArgs<Point>> moveEvent;
     public static event EventHandler<InfoEventArgs<Vector3>> moveMouseEvent;
-    public static event EventHandler<InfoEventArgs<int>> fireEvent;
     public static event EventHandler<InfoEventArgs<int>> cancelEvent;
+    public static event EventHandler<InfoEventArgs<KeyCode>> keyDownEvent;
     public static LayerMask mouseLayer;
+    private static List<LayerMask> mouseLayers;
+    private static int layers;
     private RaycastHit hit;
     private GameObject lastHit;
     private GameObject currentHit;
     private Camera _camera;
     public PauseMenu pauseMenu;
-    string[] _buttons = new string[] { "Fire1", "Fire2", "Fire3" };
 
     private void Awake()
     {
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
+        mouseLayers = new List<LayerMask>();
     }
-    void Update() {
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            SceneManager.LoadScene("Battle");
-        }
+    public static void ResetEvents()
+    {
+        clickEvent = null;
+        hoverEnterEvent = null;
+        hoverExitEvent = null;
+        moveEvent = null;
+        moveMouseEvent = null;
+        cancelEvent = null;
+        keyDownEvent = null;
+    }
+
+    public static void ResetLayers()
+    {
+        mouseLayers.Clear();
+        CalculateLayer();
+    }
+
+    void Update() {
 
         // Escape (cancel)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(cancelEvent != null)
-                cancelEvent(this, new InfoEventArgs<int>(1));
+            cancelEvent?.Invoke(this, new InfoEventArgs<int>(1));
+        }
+        
+        // Key Down Event
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            keyDownEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.M));
         }
 
         // Move Event
@@ -45,25 +65,13 @@ public class UserInputController : MonoBehaviour {
 
         if (x != 0 || y != 0)
         {
-            if (moveEvent != null)
-                moveEvent(this, new InfoEventArgs<Point>(new Point(x, y)));
-        }
-
-        // Fire Event
-        for (int i = 0; i < 3; ++i)
-        {
-            if (Input.GetButtonUp(_buttons[i]))
-            {
-                if (fireEvent != null)
-                    fireEvent(this, new InfoEventArgs<int>(i));
-            }
+            moveEvent?.Invoke(this, new InfoEventArgs<Point>(new Point(x, y)));
         }
 
         /* ---------------- */
         /* - Mouse Events - */
         /* - MUST BE LAST - */
         /* ---------------- */
-
         if (moveMouseEvent != null)
             moveMouseEvent(this, new InfoEventArgs<Vector3>(Input.mousePosition));
 
@@ -72,7 +80,8 @@ public class UserInputController : MonoBehaviour {
         return;
 
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        int layer = 1 << mouseLayer;
+        int layer = (1 << mouseLayer) | layers;
+
         bool wasHit = Physics.Raycast(ray, out hit, 100f, layer);
 
         if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null || clickEvent != null))
@@ -100,4 +109,29 @@ public class UserInputController : MonoBehaviour {
         }
 
     }
+
+    public static void AddLayer(LayerMask layermask)
+    {
+        mouseLayers.Add(layermask);
+        CalculateLayer();
+    }
+
+    public static void RemoveLayer(LayerMask layermask)
+    {
+        mouseLayers.Remove(layermask);
+        CalculateLayer();
+    }
+
+    public static void CalculateLayer()
+    {
+        layers = 0;
+        if (mouseLayers.Count > 0)
+        {
+            foreach (LayerMask lm in mouseLayers)
+            {
+                layers |= (1 << lm);
+            }
+        }
+    }
+
 }

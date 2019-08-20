@@ -27,7 +27,7 @@ public class UnitPlacementState : BattleState
         base.Enter();
         character = args.character;
 
-        bc.lc.cameraTarget = character.transform;
+        bc.FollowTarget(character.transform);
 
         mover = character.MovementAbility;
         moveRange = mover.GetNodesInRange();
@@ -118,10 +118,6 @@ public class UnitPlacementState : BattleState
     protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
     {
         cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
-    }
-
-    protected override void OnFire(object sender, InfoEventArgs<int> e)
-    {
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)

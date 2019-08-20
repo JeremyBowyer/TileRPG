@@ -136,7 +136,7 @@ public class Pathfinding : MonoBehaviour {
     {
 
         // ignoreOccupant and ignoreUnwalkable should be FALSE only if the movement/ability 
-        // shouldn't be able to move THROUGH these tiles. If they can move through these nodes,
+        // shouldn't be able to move THROUGH these nodes. If they can move through these nodes,
         // just not end on them, then keep those bools TRUE, and feed the resulting nodes to CullNodes()
 
         ResetCosts();

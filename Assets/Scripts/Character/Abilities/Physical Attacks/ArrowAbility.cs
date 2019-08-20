@@ -11,7 +11,7 @@ public class ArrowAbility : AttackAbility {
     {
         AbilityName = "Arrow attack";
         AbilityDescription = "Attack at range with an arrow.";
-        AbilityPower = 25;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 10) };
         ApCost = 75;
         AbilityRange = 3;
         diag = true;
@@ -28,7 +28,7 @@ public class ArrowAbility : AttackAbility {
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Damage(AbilityPower);
+        character.Damage(AbilityDamage);
     }
 
     public override List<Node> GetRange()

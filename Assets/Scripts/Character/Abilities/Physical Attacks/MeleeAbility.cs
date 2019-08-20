@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class MeleeAbility : AttackAbility
 {
-
     public MeleeAbility(CharController _character)
     {
         AbilityName = "Melee attack";
         AbilityDescription = "Attack at melee range.";
-        AbilityPower = 30;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 30) };
         ApCost = 75;
         AbilityRange = 1.5f;
         diag = true;
@@ -32,16 +31,16 @@ public class MeleeAbility : AttackAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Damage(AbilityPower);
+        character.Damage(AbilityDamage);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
+        if(character is EnemyController)
+            yield return new WaitForSeconds(2f);
         character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        character.animParamController.SetTrigger("attack");
+        character.animParamController.SetTrigger("attack", callback);
         character.animParamController.SetBool("idle");
-        yield return null;
-        callback();
         yield break;
     }
 }

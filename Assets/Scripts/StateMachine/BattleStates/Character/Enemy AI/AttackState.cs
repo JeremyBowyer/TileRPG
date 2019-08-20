@@ -22,6 +22,7 @@ public class AttackState : AIBattleState
         InTransition = true;
         base.Enter();
         aiAction.text = "Attacking...";
+        superUI.ShowMessage(args.attackAbility.AbilityName, 1.5f);
         args.callback = InitiateTurn;
         character.ChangeState<AttackSequenceState>(args);
         InTransition = false;

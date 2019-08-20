@@ -73,7 +73,7 @@ public class StateMachine : MonoBehaviour
     {
         get
         {
-            bool currentMaster = _currentState == null ? false : _currentState.isMaster;
+            bool currentMaster = _currentState == null ? false : _currentState.IsMaster;
             return (currentMaster);
         }
         set { }
@@ -86,7 +86,7 @@ public class StateMachine : MonoBehaviour
             bool queuedMaster = false;
             foreach (QueuedTransition qt in stateQueue)
             {
-                if (qt.state.isMaster)
+                if (qt.state.IsMaster)
                 {
                     queuedMaster = true;
                     break;
@@ -213,9 +213,6 @@ public class StateMachine : MonoBehaviour
     protected virtual bool ValidateTransition(Type targetType)
     {
         if (CurrentState == null)
-            return true;
-
-        if (CurrentState is IdleState)
             return true;
 
         // Add universally allowed transitions

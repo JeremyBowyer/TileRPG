@@ -13,13 +13,14 @@ public class ProjectileValidationController
         bc = _bc;
     }
 
-    public bool ValidateProjectile(Vector3[] path, GameObject target, bool display = true)
+    public bool ValidateProjectile(Vector3[] path, GameObject target, Color color, bool display = true)
     {
         List<Vector3> validPath = new List<Vector3>();
         int layerMask = 1 << LayerMask.NameToLayer("Character");
         layerMask |= (1 << LayerMask.NameToLayer("Ignore Raycast"));
+        layerMask |= (1 << LayerMask.NameToLayer("MovementBlocker"));
+        layerMask |= (1 << LayerMask.NameToLayer("BSPNode"));
         layerMask = ~layerMask;
-
 
         foreach (Vector3 point in path)
         {
@@ -34,6 +35,7 @@ public class ProjectileValidationController
             {
                 if (col.gameObject != target)
                 {
+                    Debug.Log(col.gameObject.name);
                     if(display)
                         DisplayTrajectory(validPath, Color.gray);
                     return false;
@@ -42,7 +44,7 @@ public class ProjectileValidationController
         }
 
         if (display)
-            DisplayTrajectory(validPath, CustomColors.Hostile);
+            DisplayTrajectory(validPath, color);
         return true;
     }
 

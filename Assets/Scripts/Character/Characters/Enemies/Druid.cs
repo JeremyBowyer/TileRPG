@@ -6,10 +6,12 @@ public class Druid : Enemy
 {
     public override void Init()
     {
-        stats.maxHealth = 100;
+        stats.maxHP = 100;
         stats.maxAP = 100;
         stats.agility = 40;
         stats.Init();
+        resists.Init();
+        buildUps.Init();
 
         experience = 0;
         level = 1;

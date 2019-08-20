@@ -10,7 +10,7 @@ public class FireboltAbility : TargetSpellAbility
     {
         AbilityName = "Firebolt";
         AbilityDescription = "Attack at range with a firebolt.";
-        AbilityPower = 17;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Fire, 30, MaladyTypes.MaladyType.Burn, 20) };
         ApCost = 25;
         MpCost = 10;
         AbilityRange = 5f;
@@ -33,7 +33,7 @@ public class FireboltAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Damage(AbilityPower);
+        character.Damage(AbilityDamage);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
@@ -41,13 +41,13 @@ public class FireboltAbility : TargetSpellAbility
         character.animParamController.SetTrigger("cast_start");
         character.animParamController.SetBool("cast_loop");
         character.transform.LookAt(new Vector3(_target.transform.position.x, character.transform.position.y, _target.transform.position.z));
-        Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 1f, character.transform.position.z);
+        Vector3 spawnLocation = character.transform.position + Vector3.up * character.height / 2 + character.direction * 0.2f;
         GameObject fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/FireboltPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
         fbPrefabClone.gameObject.tag = "SpellTargetGO";
         Vector3 startingPos = fbPrefabClone.transform.position;
-        Vector3 endingPos = _target.transform.position + Vector3.up * 1f;
+        Vector3 endingPos = _target.transform.position + Vector3.up * _target.height / 2;
         float currentTime = 0f;
-        float speed = 1.5f;
+        float speed = 2f;
 
         Vector3 deltaPos = endingPos - startingPos;
 

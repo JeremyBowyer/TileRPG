@@ -7,21 +7,15 @@ public class BurnTileEffect : TileEffect
     private const int MaxIterations = 2;
     private int countdown;
     private GameObject go;
+    private GameObject prefab;
+    private Damage dmg = new Damage(DamageTypes.DamageType.Fire, 20, MaladyTypes.MaladyType.Burn, 50);
 
     public override void ApplyEffect(CharController _target)
     {
         if (_target == null)
             return;
 
-        BurnPlayerEffect existingEffect = _target.gameObject.GetComponent<BurnPlayerEffect>();
-        if (existingEffect != null)
-        {
-            existingEffect.RefreshEffect();
-        } else
-        {
-            BurnPlayerEffect pe = _target.gameObject.AddComponent<BurnPlayerEffect>();
-            pe.Init(_target);
-        }
+        _target.Damage(dmg);
     }
 
     public override void TurnTick(CharController _currentCharacter)
@@ -40,13 +34,11 @@ public class BurnTileEffect : TileEffect
     {
         base.Init(_tile, _sourceDirection, _grid);
 
-        GameObject highlightedGO = Resources.Load("Prefabs/Grid/SelectedTile") as GameObject;
-        go = Instantiate(highlightedGO, tile.WorldPosition + Vector3.up * 0.1f, Quaternion.identity);
-        go.transform.rotation = Quaternion.LookRotation(bc.grid.forwardDirection, Vector3.up);
-        go.transform.parent = bc.battleRoom.transform;
-        MeshRenderer mesh = go.GetComponent<MeshRenderer>();
-        mesh.material = new Material(mesh.material);
-        mesh.material.SetColor("_Color", CustomColors.Fire);
+        go = Instantiate(Resources.Load("Prefabs/Tile Effects/BurningEffectTile")) as GameObject;
+        PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();
+        go.transform.position = _tile.anchorPoint;
+        go.transform.parent = _tile.gameObject.transform;
+        psUpdater.UpdateMeshEffect(_tile.gameObject);
 
         countdown = MaxIterations;
     }

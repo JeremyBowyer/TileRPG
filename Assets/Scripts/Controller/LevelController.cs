@@ -16,6 +16,12 @@ public class LevelController : GameController
     public Vector3 startingPos;
     public BSPController bspController;
 
+    // Directions
+    public Vector3 rightDirection { get { return Vector3.right; } }
+    public Vector3 leftDirection { get { return Vector3.left; } }
+    public Vector3 forwardDirection { get { return Vector3.forward; } }
+    public Vector3 backwardDirection { get { return Vector3.back; } }
+
     public void InitializeLevel()
     {
         // Assign references
@@ -24,9 +30,7 @@ public class LevelController : GameController
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
 
         protag.transform.position = GameObject.FindGameObjectWithTag("StartingTilePlayer").transform.position;
-
-        cameraRig.FollowTarget = protag.transform;
-        cameraTarget = protag.transform;
+        FollowTarget(protag.transform);
 
         bspController = GetComponent<BSPController>();
         

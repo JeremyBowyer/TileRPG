@@ -5,80 +5,208 @@ using UnityEngine.UI;
 
 public class StatusIndicator : MonoBehaviour {
 
-	[SerializeField]
-    private RectTransform healthBarRect;
     [SerializeField]
-    private RectTransform apBarRect;
+    protected RectTransform hpBarRect;
     [SerializeField]
-    private RectTransform mpBarRect;
+    protected RectTransform apBarRect;
+    [SerializeField]
+    protected RectTransform mpBarRect;
 
-    private GameObject popupText;
+    [SerializeField]
+    protected RectTransform hpMaxBarRect;
+    [SerializeField]
+    protected RectTransform apMaxBarRect;
+    [SerializeField]
+    protected RectTransform mpMaxBarRect;
 
-    void Start()
-	{
-		if (healthBarRect == null) {
-			Debug.LogError ("STATUS INDICATOR: No health bar object assigned to " + gameObject.name);
-		}
+    [SerializeField]
+    protected Canvas canvas;
 
-        popupText = Resources.Load("Prefabs/UI/PopupText") as GameObject;
+    private IEnumerator hpCoroutine;
+    private IEnumerator apCoroutine;
+    private IEnumerator mpCoroutine;
 
-    }
+    private IEnumerator hpMaxCoroutine;
+    private IEnumerator apMaxCoroutine;
+    private IEnumerator mpMaxCoroutine;
 
-    public void FloatText(string text, Color color, float duration = 1.5f)
+    Vector3[] hpInnerCorners = new Vector3[4];
+    Vector3[] apInnerCorners = new Vector3[4];
+    Vector3[] mpInnerCorners = new Vector3[4];
+
+    Vector3[] hpMaxCorners = new Vector3[4];
+    Vector3[] apMaxCorners = new Vector3[4];
+    Vector3[] mpMaxCorners = new Vector3[4];
+
+    float hpInnerWidth;
+    float apInnerWidth;
+    float mpInnerWidth;
+
+    float hpMaxWidth;
+    float apMaxWidth;
+    float mpMaxWidth;
+
+    public void SetCurrentHP(int _cur, int _tempMax, int _max, bool animate = true)
     {
-        if (gameObject == null)
+        if (!gameObject.activeSelf)
             return;
-        GameObject popUpGO = Instantiate(popupText, gameObject.transform);
-        PopupText popUp = popUpGO.GetComponent<PopupText>();
-        popUp.duration = duration;
-        popUp.speed = 1f;
 
-        Text popUpText = popUpGO.GetComponent<Text>();
-        popUpText.text = text;
-        popUpText.color = color;
-
-        popUpGO.SetActive(true);
-    }
-
-
-    public void SetHealth(int _cur, int _max)
-    {
-        
-        if(healthBarRect != null && gameObject.activeSelf)
+        if(hpBarRect != null)
         {
-            StartCoroutine(DepleteHealth(_cur, _max));
+            if (hpCoroutine != null)
+                StopCoroutine(hpCoroutine);
+
+            hpCoroutine = ScaleStatBar(hpBarRect, _cur, _max, animate);
+            StartCoroutine(hpCoroutine);
+        }
+
+        if(hpMaxBarRect != null)
+        {
+            if (hpMaxCoroutine != null)
+                StopCoroutine(hpMaxCoroutine);
+
+            hpMaxCoroutine = ScaleMaxStatBar(hpMaxBarRect, _tempMax, _max, animate);
+            StartCoroutine(hpMaxCoroutine);
         }
     }
 
-    public IEnumerator DepleteHealth(int _cur, int _max)
+    public void SetCurrentAP(int _cur, int _tempMax, int _max, bool animate = true)
+    {
+        if (!gameObject.activeSelf)
+            return;
+
+        if (apBarRect != null)
+        {
+            if (apCoroutine != null)
+                StopCoroutine(apCoroutine);
+
+            apCoroutine = ScaleStatBar(apBarRect, _cur, _max, animate);
+            StartCoroutine(apCoroutine);
+        }
+
+        if (apMaxBarRect != null)
+        {
+            if (apMaxCoroutine != null)
+                StopCoroutine(apMaxCoroutine);
+
+            apMaxCoroutine = ScaleMaxStatBar(apMaxBarRect, _tempMax, _max, animate);
+            StartCoroutine(apMaxCoroutine);
+        }
+    }
+
+    public void SetCurrentMP(int _cur, int _tempMax, int _max, bool animate = true)
+    {
+        if (!gameObject.activeSelf)
+            return;
+
+        if (mpBarRect != null)
+        {
+            if (mpCoroutine != null)
+                StopCoroutine(mpCoroutine);
+
+            mpCoroutine = ScaleStatBar(mpBarRect, _cur, _max, animate);
+            StartCoroutine(mpCoroutine);
+        }
+
+        if (mpMaxBarRect != null)
+        {
+            if (mpMaxCoroutine != null)
+                StopCoroutine(mpMaxCoroutine);
+
+            mpMaxCoroutine = ScaleMaxStatBar(mpMaxBarRect, _tempMax, _max, animate);
+            StartCoroutine(mpMaxCoroutine);
+        }
+    }
+
+    public IEnumerator ScaleStatBar(RectTransform bar, int _cur, int _max, bool animate = true)
     {
         float currentTime = 0f;
-        float speed = 5f;
-        float startingScale = healthBarRect.localScale.x;
+        float speed = 1f;
+        float startingScale = bar.localScale.x;
         float endingScale = (float)_cur / _max;
+
+        if (!animate)
+        {
+            bar.localScale = new Vector3(endingScale, bar.localScale.y, bar.localScale.z);
+            yield break;
+        }
+
         while (!Mathf.Approximately(currentTime, 1.0f))
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * speed));
-            float frameValue = startingScale - ((startingScale - endingScale) * EasingEquations.EaseOutCubic(0.0f, 1.0f, currentTime));
-            healthBarRect.localScale = new Vector3(frameValue, healthBarRect.localScale.y, healthBarRect.localScale.z);
+            float frameValue = startingScale + ((endingScale - startingScale) * EasingEquations.EaseOutCubic(0.0f, 1.0f, currentTime));
+            bar.localScale = new Vector3(frameValue, bar.localScale.y, bar.localScale.z);
             yield return new WaitForEndOfFrame();
         }
     }
 
-    public void SetAP(int _cur, int _max)
+    public virtual IEnumerator ScaleMaxStatBar(RectTransform bar, int _cur, int _max, bool animate = true)
     {
-        float _value = (float)_cur / _max;
+        yield return new WaitForEndOfFrame();
+        float currentTime = 0f;
+        float speed = 1f;
 
-        if (apBarRect != null)
-            apBarRect.localScale = new Vector3(_value, apBarRect.localScale.y, healthBarRect.localScale.z);
+        Transform innerBoundsT, outerBoundsT;
+
+        innerBoundsT = bar.transform.Find("InnerBounds");
+        outerBoundsT = bar.transform.Find("OuterBounds");
+
+        if (innerBoundsT == null || outerBoundsT == null)
+            goto EndCoroutine;
+
+        RectTransform innerBoundsRect, outerBoundsRect;
+
+        innerBoundsRect = innerBoundsT.GetComponent<RectTransform>();
+        outerBoundsRect = outerBoundsT.GetComponent<RectTransform>();
+
+        if (innerBoundsRect == null || outerBoundsRect == null)
+            goto EndCoroutine;
+
+
+        float startingWidth = 0f, innerBounds = 0f, outerBounds = 0f, baseWidth = 0f, endingWidth = 0f;
+        float scale = canvas.scaleFactor;
+        if(this is GlobalStatusIndicator)
+        {
+            startingWidth = GetWidth(bar) / bar.localScale.x / scale;
+
+            innerBounds = GetWidth(innerBoundsRect) / innerBoundsRect.localScale.x;
+            outerBounds = GetWidth(outerBoundsRect) / outerBoundsRect.localScale.x;
+            baseWidth = outerBounds - innerBounds;
+            endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) * 2f / scale;
+        } else if (this is CharacterStatusIndicator)
+        {
+            startingWidth = bar.rect.width / scale;
+
+            innerBounds = innerBoundsRect.rect.width / innerBoundsRect.localScale.x;
+            outerBounds = outerBoundsRect.rect.width / outerBoundsRect.localScale.x;
+            baseWidth = outerBounds - innerBounds;
+            endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) / scale;
+        }
+
+        if (!animate)
+        {
+            bar.sizeDelta = new Vector2(endingWidth, bar.sizeDelta.y);
+            goto EndCoroutine;
+        }
+
+        while (!Mathf.Approximately(currentTime, 1.0f))
+        {
+            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * speed));
+            float frameValue = startingWidth + ((endingWidth - startingWidth) * EasingEquations.EaseOutCubic(0.0f, 1.0f, currentTime));
+            bar.sizeDelta = new Vector2(frameValue, bar.sizeDelta.y);
+            yield return new WaitForEndOfFrame();
+        }
+
+        EndCoroutine:
+        yield break;
     }
 
-    public void SetMP(int _cur, int _max)
+    protected float GetWidth(RectTransform bar)
     {
-        float _value = (float)_cur / _max;
-
-        if (mpBarRect != null)
-            mpBarRect.localScale = new Vector3(_value, mpBarRect.localScale.y, healthBarRect.localScale.z);
+        Vector3[] corners = new Vector3[4];
+        bar.GetWorldCorners(corners);
+        float width = corners[3].x - corners[0].x;
+        return width;
     }
 
 }

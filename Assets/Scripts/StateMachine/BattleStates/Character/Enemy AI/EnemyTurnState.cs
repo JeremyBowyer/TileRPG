@@ -31,26 +31,20 @@ public class EnemyTurnState : AIBattleState
     {
         InTransition = true;
         base.Enter();
-        if (aiAction == null)
-            Debug.Log("hi");
         aiAction.text = "Thinking...";
-        StartCoroutine(DelayAction(3f, DecideAction));
+        StartCoroutine(DelayAction(2f, DecideAction));
     }
 
     public IEnumerator DelayAction(float secs, Action callback)
     {
-        Debug.Log("starting");
         yield return new WaitForSeconds(secs);
-        if (callback != null)
-            callback();
+        callback?.Invoke();
         yield break;
     }
 
     public void DecideAction()
     {
-        Debug.Log("considering");
         enemyAI.ConsiderOptions();
-        Debug.Log("considered");
         Exit();
     }
 
@@ -58,5 +52,4 @@ public class EnemyTurnState : AIBattleState
     {
         base.Exit();
     }
-
 }

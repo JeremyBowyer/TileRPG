@@ -6,9 +6,8 @@ using UnityEngine.EventSystems;
 
 public class Tile : MonoBehaviour {
 
-    [SerializeField]
-    public List<Grid.Position> moveBlocks;
 
+    public List<Grid.Position> moveBlocks;
     public Grid grid;
     public Node node;
     public Vector3 WorldPosition { get { return node.worldPosition;  } }
@@ -20,6 +19,7 @@ public class Tile : MonoBehaviour {
     public Texture emptyTex;
     public Texture innerTex;
     public Texture filledTex;
+    public Vector3 anchorPoint;
 
     public Dictionary<string, Color> colorDict;
     public Dictionary<string, Texture> textureDict;
@@ -46,40 +46,11 @@ public class Tile : MonoBehaviour {
         get { return GetComponent<TileEffect>(); }
     }
 
-    private void OnDrawGizmos()
-    {
-        if (node == null)
-            return;
-        Gizmos.color = CustomColors.Hostile;
-        foreach(Grid.Position pos in moveBlocks)
-        {
-            Vector3 frontLeft, frontRight, backLeft, backRight;
-            frontLeft = WorldPosition + (grid.forwardDirection * grid.nodeRadius) + (grid.leftDirection * grid.nodeRadius) + (Vector3.up * 0.5f);
-            frontRight = WorldPosition + (grid.forwardDirection * grid.nodeRadius) + (grid.rightDirection * grid.nodeRadius) + (Vector3.up * 0.5f);
-            backLeft = WorldPosition + (grid.backwardDirection * grid.nodeRadius) + (grid.leftDirection * grid.nodeRadius) + (Vector3.up * 0.5f);
-            backRight = WorldPosition + (grid.backwardDirection * grid.nodeRadius) + (grid.rightDirection * grid.nodeRadius) + (Vector3.up * 0.5f);
-
-            if(pos == Grid.Position.Front)
-            {
-                Gizmos.DrawLine(frontLeft, frontRight);
-            } else if(pos == Grid.Position.Left)
-            {
-                Gizmos.DrawLine(frontLeft, backLeft);
-            } else if(pos == Grid.Position.Back)
-            {
-                Gizmos.DrawLine(backLeft, backRight);
-            } else if(pos == Grid.Position.Right)
-            {
-                Gizmos.DrawLine(backRight, frontRight);
-            }
-        }
-
-    }
-
     void Awake() {
         if (projector == null)
             projector = transform.Find("AnchorPoint").transform.Find("Projector").GetComponent<Projector>();
 
+        anchorPoint = transform.Find("AnchorPoint").transform.position;
         moveBlocks = new List<Grid.Position>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         originalMat = projector.material;
@@ -90,6 +61,33 @@ public class Tile : MonoBehaviour {
         emptyTex = (Texture) Resources.Load("Sprites/ThickSquare");
         innerTex = (Texture) Resources.Load("Sprites/SquareFilledSmall");
         filledTex = (Texture) Resources.Load("Sprites/SquareFilledFull");
+    }
+
+    public void FindMovementBlocks()
+    {
+        Vector3 anchorPoint = transform.Find("AnchorPoint").transform.position;
+        foreach (Vector3 direction in new Vector3[] { grid.forwardDirection, grid.rightDirection, grid.backwardDirection, grid.leftDirection })
+        {
+            int layerMask = (1 << LayerMask.NameToLayer("MovementBlocker"));
+
+            if (Physics.Raycast(anchorPoint, direction, 1f, layerMask))
+            {
+
+                if (direction == grid.forwardDirection)
+                {
+                    moveBlocks.Add(Grid.Position.Front);
+                } else if (direction == grid.rightDirection)
+                {
+                    moveBlocks.Add(Grid.Position.Right);
+                } else if (direction == grid.backwardDirection)
+                {
+                    moveBlocks.Add(Grid.Position.Back);
+                } else if (direction == grid.leftDirection)
+                {
+                    moveBlocks.Add(Grid.Position.Left);
+                }
+            }
+        }
     }
 
     public void AddColor(string set, Color color, string type)

@@ -30,7 +30,8 @@ public class WorldExploreState : WorldState
             return new List<Type>
             {
             typeof(InitBattleState),
-            typeof(WorldMenuState)
+            typeof(WorldMenuState),
+            typeof(WorldMapState)
             };
         }
         set { }
@@ -39,6 +40,7 @@ public class WorldExploreState : WorldState
     public override void Enter()
     {
         InTransition = true;
+        UserInputController.ResetEvents();
         base.Enter();
 
         movementCursor = lc.movementCursor;
@@ -84,6 +86,12 @@ public class WorldExploreState : WorldState
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
         lc.ChangeState<WorldMenuState>();
+    }
+
+    protected override void OnKeyDown(object sender, InfoEventArgs<KeyCode> e)
+    {
+        if (e.info == KeyCode.M)
+            lc.ChangeState<WorldMapState>();
     }
 
     public override void Exit()

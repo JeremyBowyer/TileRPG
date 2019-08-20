@@ -9,7 +9,10 @@ public class DeathSequence : BattleState
     private List<Node> path;
     private CharController character;
     private State stateToNotify;
-
+    //public override bool IsMaster
+    //{
+    //    get { return true; }
+    //}
     private IEnumerator traverseCoroutine;
 
     public override List<Type> AllowedTransitions

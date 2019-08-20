@@ -30,6 +30,6 @@ public abstract class TileEffect : MonoBehaviour
         tile = _tile;
         bc.onUnitChange += TurnTick;
         bc.onRoundChange += RoundTick;
-        ApplyToOccupant();
+        //ApplyToOccupant();
     }
 }

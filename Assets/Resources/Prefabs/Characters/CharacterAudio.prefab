@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6969900136421738850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5017049016082195487}
+  - component: {fileID: 2556561502788290814}
+  - component: {fileID: 4501141025205447517}
+  - component: {fileID: 8619637201953005253}
+  - component: {fileID: 8928662256814386632}
+  - component: {fileID: 4967989813408088694}
+  m_Layer: 9
+  m_Name: CharacterAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5017049016082195487
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2556561502788290814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f629463923905b6459ffdce9a883ca36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds: []
+--- !u!114 &4501141025205447517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Malady
+  soundGroup: 0
+  clip: {fileID: 8300000, guid: 74a1348463bfd4c8491417ce496ef3b9, type: 3}
+  volume: 0.5
+  pitch: 1.5
+  loop: 0
+  playOnAwake: 0
+  source: {fileID: 0}
+--- !u!114 &8619637201953005253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Run_01
+  soundGroup: 1
+  clip: {fileID: 8300000, guid: 03b9f3c6dfda041a3848fed9ead95b8b, type: 3}
+  volume: 0.5
+  pitch: 1.5
+  loop: 0
+  playOnAwake: 0
+  source: {fileID: 0}
+--- !u!114 &8928662256814386632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Run_02
+  soundGroup: 1
+  clip: {fileID: 8300000, guid: b96913c1cddd5463f8ece564361ff4e7, type: 3}
+  volume: 0.5
+  pitch: 1.5
+  loop: 0
+  playOnAwake: 0
+  source: {fileID: 0}
+--- !u!114 &4967989813408088694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Run_03
+  soundGroup: 1
+  clip: {fileID: 8300000, guid: 0949c01424dd8446abda2f813285e617, type: 3}
+  volume: 0.5
+  pitch: 1.5
+  loop: 0
+  playOnAwake: 0
+  source: {fileID: 0}

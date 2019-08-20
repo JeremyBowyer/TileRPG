@@ -4,6 +4,62 @@ using UnityEngine;
 
 public class CustomColors
 {
+    public static Color Shock
+    {
+        get
+        {
+            return SpellRange;
+        }
+    }
+
+    public static Color Frost
+    {
+        get
+        {
+            return new Color(0.5f, 0.85f, 0.8f);
+        }
+    }
+
+    public static Color Pierce
+    {
+        get
+        {
+            return new Color(0.6f, 0.1f, 0.1f);
+        }
+    }
+
+    public static Color Bludgeon
+    {
+        get
+        {
+            return new Color(0.75f, 0.75f, 0.75f);
+        }
+    }
+
+    public static Color Corruption
+    {
+        get
+        {
+            return new Color(0.3f, 0f, 0.6f);
+        }
+    }
+
+    public static Color White
+    {
+        get
+        {
+            return new Color(1f, 1f, 1f);
+        }
+    }
+
+    public static Color Blank
+    {
+        get
+        {
+            return new Color(0f, 0f, 0f, 0f);
+        }
+    }
+
     public static Color MovementPath
     {
         get
@@ -64,7 +120,7 @@ public class CustomColors
     {
         get
         {
-            return new Color(1f, 0.25f, 0f, 0.5f);
+            return new Color(1f, 0.5f, 0f, 0.5f);
         }
     }
 

@@ -13,7 +13,7 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
     {
         AbilityName = "Magma Ball";
         AbilityDescription = "Attack at range with a magma ball.";
-        AbilityPower = 12;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Fire, 12, MaladyTypes.MaladyType.Burn, 50) };
         ApCost = 25;
         MpCost = 50;
         AbilityRange = 4;
@@ -49,7 +49,7 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Damage(AbilityPower);
+        character.Damage(AbilityDamage);
     }
 
     public override void ApplyTileEffect(Tile _tile, Vector3 _sourceDirection, Grid _grid)
@@ -70,9 +70,9 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
 
     public override Vector3[] GetPath(Vector3 _target)
     {
-        Vector3 startingPos = character.transform.position + Vector3.up * 1f;
+        Vector3 startingPos = character.transform.position + Vector3.up * character.height;
         Vector3 deltaPos = _target - startingPos;
-        float fbHeight = Vector3.Distance(startingPos, _target);
+        float fbHeight = Vector3.Distance(startingPos, _target) / 2;
         Vector3 cp1 = startingPos + deltaPos * 0.5f + new Vector3(0, fbHeight, 0);
 
         Vector3[] linePoints = new Vector3[100];
@@ -92,14 +92,14 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         character.animParamController.SetTrigger("cast_start");
         character.animParamController.SetBool("cast_loop");
         character.transform.LookAt(new Vector3(tile.transform.position.x, character.transform.position.y, tile.transform.position.z));
-        Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + 2f, character.transform.position.z);
+        Vector3 spawnLocation = new Vector3(character.transform.position.x, character.transform.position.y + character.height, character.transform.position.z);
         mbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/MagmaBallPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
         mbPrefabClone.gameObject.tag = "SpellEnvironmentGO";
         //inProgress = true;
         Vector3 startingPos = mbPrefabClone.transform.position;
         Vector3 endingPos = tile.WorldPosition;
         float currentTime = 0f;
-        float speed = 0.8f;
+        float speed = 0.5f;
         float fbHeight = Vector3.Distance(startingPos, endingPos);
         float fbSpeed = speed + speed / fbHeight;
 
@@ -109,7 +109,7 @@ public class MagmaBallAbility : EnvironmentSplashSpellAbility
         while (!Mathf.Approximately(currentTime, 1.0f))
         {
             currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * fbSpeed));
-            float frameValue = (1f - 0f) * EasingEquations.EaseInExpo(0.0f, 1.0f, currentTime) + 0f;
+            float frameValue = (1f - 0f) * EasingEquations.EaseInCubic(0.0f, 1.0f, currentTime) + 0f;
             Vector3 framePos = MathCurves.Bezier(startingPos, endingPos, cp1, frameValue);
             mbPrefabClone.transform.position = framePos;
             yield return new WaitForEndOfFrame();

@@ -64,7 +64,7 @@ public class SpellEnvironmentSplashTargetState : BattleState
         if (spellRange.Contains(tile.node))
         {
             // If spell isn't a projectile, or the projectile is validated, highlight splashzone because spell is valid
-            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, true))
+            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, CustomColors.Hostile, true))
             {
                 splashZone = spellAbility.GetSplashZone(tile);
                 grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "inner");
@@ -92,7 +92,7 @@ public class SpellEnvironmentSplashTargetState : BattleState
         if (spellRange.Contains(tile.node))
         {
             // If spell is a projectile and path isn't valid, return
-            if (spellAbility.isProjectile && !bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, false))
+            if (spellAbility.isProjectile && !bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, CustomColors.Hostile, false))
             {
                 return;
             }

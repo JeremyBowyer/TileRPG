@@ -10,7 +10,7 @@ public class ExecuteAbility : TargetSpellAbility
     {
         AbilityName = "Execute";
         AbilityDescription = "Execute an enemy, if their HP is below 50%.";
-        AbilityPower = 50;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 500) };
         ApCost = 25;
         MpCost = 50;
         AbilityRange = 1f;
@@ -33,12 +33,12 @@ public class ExecuteAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Damage(character.character.stats.curHealth);
+        character.Damage(new Damage[] { new Damage(DamageTypes.DamageType.Physical, character.character.stats.curHP) });
     }
 
     public override bool ValidateTarget(CharController character)
     {
-        return (((float)character.character.stats.curHealth / character.character.stats.maxHealth) < 0.5);
+        return (((float)character.character.stats.curHP / character.character.stats.maxHP) < 0.5);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)

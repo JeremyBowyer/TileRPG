@@ -6,13 +6,17 @@ public class Goblin : Enemy
 {
     public override void Init()
     {
-        stats.maxHealth = 200;
+        stats.maxHP = 200;
         stats.maxAP = 125;
         stats.agility = 25;
         stats.Init();
+        resists.Init();
+        buildUps.Init();
 
         experience = 0;
         level = 1;
+
+        isInitialized = true;
 
         cName = "Rob";
         cClass = "Goblin";

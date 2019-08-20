@@ -15,8 +15,6 @@ public class GameController : StateMachine
     public List<GameObject> enemies; // Enemies in battle
     public List<GameObject> characters; // All enemies and players on map
 
-    public Transform cameraTarget;
-
     void Start()
     {
         // Assign references
@@ -63,6 +61,12 @@ public class GameController : StateMachine
             }
 
         }
+    }
+
+    public void FollowTarget(Transform _target)
+    {
+        cameraRig.FollowTarget = _target;
+        cameraRig.isFollowing = true;
     }
 
     public void InstantiateProtagonist()

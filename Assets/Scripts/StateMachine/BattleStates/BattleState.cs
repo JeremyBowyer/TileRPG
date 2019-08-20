@@ -14,8 +14,9 @@ public abstract class BattleState : State
     public List<GameObject> characters { get { return bc.characters; } }
 
     // Methods
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
@@ -51,10 +52,6 @@ public abstract class BattleState : State
     }
 
     protected override void OnMouseMove(object sender, InfoEventArgs<Vector3> e)
-    {
-    }
-
-    protected override void OnFire(object sender, InfoEventArgs<int> e)
     {
     }
 

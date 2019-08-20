@@ -15,7 +15,7 @@ public class WalkMovement : Movement
 
     public WalkMovement(CharController controller) : base(controller)
     {
-        speed = 4f;
+        Speed = 4f;
         mName = "Walk";
     }
 
@@ -48,8 +48,8 @@ public class WalkMovement : Movement
                 controller.transform.position = new Vector3(newX, newY, newZ);
                 yield return new WaitForEndOfFrame();
             }
-
-            controller.OccupyTile(node.tile);
+            if(node != path[path.Count-1])
+                controller.PassThrough(node.tile);
         }
 
         // Clean up

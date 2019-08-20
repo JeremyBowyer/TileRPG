@@ -188,7 +188,7 @@ public class WorldMenuPanelController : MonoBehaviour
         entry.Reset();
         entry.mName.text = member.cName;
         entry.mClass.text = member.cClass;
-        entry.mHp.text = member.stats.curHealth.ToString();
+        entry.mHp.text = member.stats.curHP.ToString();
         entry.mMana.text = member.stats.curMP.ToString();
         entry.mStamina.text = member.stats.curAP.ToString();
         entry.mLevel.text = member.level.ToString();
@@ -208,7 +208,7 @@ public class WorldMenuPanelController : MonoBehaviour
             entry.Reset();
             entry.mName.text = member.cName;
             entry.mClass.text = member.cClass;
-            entry.mHp.text = member.stats.curHealth.ToString();
+            entry.mHp.text = member.stats.curHP.ToString();
             entry.mMana.text = member.stats.curMP.ToString();
             entry.mStamina.text = member.stats.curAP.ToString();
             entry.mLevel.text = member.level.ToString();
@@ -238,7 +238,7 @@ public class WorldMenuPanelController : MonoBehaviour
         entry.Reset();
         entry.mName.text = member.cName;
         entry.mClass.text = member.cClass;
-        entry.mHp.text = member.stats.curHealth.ToString();
+        entry.mHp.text = member.stats.curHP.ToString();
         entry.mMana.text = member.stats.curMP.ToString();
         entry.mStamina.text = member.stats.curAP.ToString();
         entry.mLevel.text = member.level.ToString();
@@ -269,7 +269,7 @@ public class WorldMenuPanelController : MonoBehaviour
             entry.Reset();
             entry.mName.text = member.cName;
             entry.mClass.text = member.cClass;
-            entry.mHp.text = member.stats.curHealth.ToString();
+            entry.mHp.text = member.stats.curHP.ToString();
             entry.mMana.text = member.stats.curMP.ToString();
             entry.mStamina.text = member.stats.curAP.ToString();
             entry.mLevel.text = member.level.ToString();

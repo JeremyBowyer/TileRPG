@@ -19,6 +19,12 @@ public class BattleController : GameController
     public LevelController lc;
     public BSPBattleRoom battleRoom;
 
+    // Directions
+    public Vector3 rightDirection { get { return lc.rightDirection; } }
+    public Vector3 leftDirection { get { return lc.leftDirection; } }
+    public Vector3 forwardDirection { get { return lc.forwardDirection; } }
+    public Vector3 backwardDirection { get { return lc.backwardDirection; } }
+
     // Variables
     private CharController currentCharacter;
     public CharController CurrentCharacter
@@ -31,11 +37,33 @@ public class BattleController : GameController
         {
             currentCharacter = value;
             if (battleUI != null)
-                battleUI.UpdateStats();
+                battleUI.UpdateCurrentStats(animate: false);
         }
     }
+
+    private CharController targetCharacter;
+    public CharController TargetCharacter
+    {
+        get
+        {
+            return targetCharacter;
+        }
+        set
+        {
+            targetCharacter = value;
+            if (battleUI != null)
+            {
+                if (targetCharacter == null)
+                    battleUI.UnloadTargetStats();
+                else
+                    battleUI.LoadTargetStats(targetCharacter);
+            }
+        }
+    }
+
     public Tile currentTile;
     public Queue<GameObject> unitsToPlace; // Queue of party members to be placed on the grid
+    public Queue<KeyValuePair<CharController, Damage[]>> damageQueue;
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
     private bool inBattle;
     public bool InBattle
@@ -51,7 +79,7 @@ public class BattleController : GameController
     public delegate void OnRoundChange();
     public OnRoundChange onRoundChange;
 
-    void Start()
+    private void Awake()
     {
         // Assign references
         rc = new RoundController(this);
@@ -64,7 +92,11 @@ public class BattleController : GameController
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         lc = GameObject.Find("LevelController").GetComponent<LevelController>();
         unitsToPlace = new Queue<GameObject>();
+        damageQueue = new Queue<KeyValuePair<CharController, Damage[]>>();
+    }
 
+    void Start()
+    {
         //cameraRig.FollowTarget = protag.transform;
         //cameraTarget = protag.transform;
         ChangeState<IdleState>();
@@ -73,6 +105,7 @@ public class BattleController : GameController
     public void Init(BSPBattleRoom _room)
     {
         battleRoom = _room;
+        battleRoom.GetComponent<BoxCollider>().enabled = false;
         StateArgs args = new StateArgs()
         {
             room = _room
@@ -100,23 +133,12 @@ public class BattleController : GameController
         // Determine turn order, to find next character
         rc.DetermineTurnOrder();
         ChangePlayer(rc.roundChars[0]);
-
-        /*
-        if (CurrentCharacter == null)
-        {
-            ChangePlayer(characters[0].GetComponent<CharController>());
-            return;
-        }
-        int index = characters.IndexOf(CurrentCharacter.gameObject);
-        index = (index + 2 > characters.Count) ? 0 : index + 1;
-        ChangePlayer(characters[index].GetComponent<CharController>());
-        */
     }
 
     public void ChangePlayer(CharController character)
     {
         CurrentCharacter = character;
-        lc.cameraTarget = character.transform;
+        FollowTarget(character.transform);
 
         selectionCircle.gameObject.transform.SetParent(CurrentCharacter.gameObject.transform);
         selectionCircle.transform.localPosition = new Vector3(0, 0, 0);
@@ -130,10 +152,7 @@ public class BattleController : GameController
         if (character is PlayerController)
             projector.material.SetColor("_Color", CustomColors.PlayerUI);
 
-
-
-        if (onUnitChange != null)
-            onUnitChange(character);
+        onUnitChange?.Invoke(character);
     }
 
     public void OnUnitDeath(CharController character)
@@ -167,12 +186,11 @@ public class BattleController : GameController
         selectionCircle.gameObject.transform.parent = null;
         selectionCircle.SetActive(false);
         turnQueue.EndBattle();
-        // Set protag as camera target
-        lc.cameraTarget = protag.transform;
+        battleRoom.GetComponent<BoxCollider>().enabled = true;
 
-        // Place protag on starting spot
+        // Set protag as camera target
+        FollowTarget(protag.transform);
         NavMeshAgent protagAgent = protag.GetComponent<NavMeshAgent>();
-        //protagAgent.Warp(lc.startingPos);
         protagAgent.Warp(protagAgent.transform.position);
         battleRoom.completed = true;
         battleRoom = null;

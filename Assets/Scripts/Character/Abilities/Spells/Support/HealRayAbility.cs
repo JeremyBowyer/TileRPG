@@ -10,7 +10,7 @@ public class HealRayAbility : TargetSpellAbility
     {
         AbilityName = "Heal Ray Ability";
         AbilityDescription = "Heal an ally for a moderate amount from range.";
-        AbilityPower = 50;
+        AbilityDamage = null;
         ApCost = 25;
         MpCost = 40;
         AbilityRange = 60;
@@ -33,7 +33,7 @@ public class HealRayAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Heal(AbilityPower);
+        character.Heal(50);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)

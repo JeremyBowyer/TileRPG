@@ -24,6 +24,7 @@ public class InitLevelState : WorldState
     {
         InTransition = true;
         base.Enter();
+        Shader.WarmupAllShaders();
         protag = lc.protag.GetComponent<ProtagonistController>();
 
         // Set protag as camera target

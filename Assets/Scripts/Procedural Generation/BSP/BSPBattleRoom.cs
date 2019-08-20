@@ -13,8 +13,7 @@ public class BSPBattleRoom : BSPRoom
     public override void Init(int _id, Vector2 _bufferBounds)
     {
         base.Init(_id, _bufferBounds);
-        //enemyPrefabs = new string[] { "Druid", "Goblin_Shaman", "Goblin_Warchief" };
-        enemyPrefabs = new string[] { "Goblin_Warchief", "Goblin_Warchief", "Goblin_Warchief" };
+        enemyPrefabs = new string[] { "Skeleton_Knight", "Skeleton_Lesser" };
         completed = false;
 
         float area = xSize * zSize / 60;
@@ -36,7 +35,7 @@ public class BSPBattleRoom : BSPRoom
 
         for (int i = 0; i<Math.Min(enemyCnt, floors.Count); i++)
         {
-            int enemyIdx = rnd.Next(0, 3);
+            int enemyIdx = rnd.Next(0, enemyPrefabs.Length);
             int floorIdx = rnd.Next(0, eligibleFloors.Count);
 
             GameObject enemyGO = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Characters/Enemies/" + enemyPrefabs[enemyIdx]));
@@ -51,28 +50,30 @@ public class BSPBattleRoom : BSPRoom
         }
     }
 
-    private void OnDrawGizmos()
+    //private void OnDrawGizmos()
+    //{
+    //    if (lc.bc.grid.grid != null)
+    //    {
+    //        Gizmos.color = CustomColors.Hostile;
+    //        Gizmos.DrawLine(transform.position + Vector3.up * 2f, transform.position + lc.bc.grid.forwardDirection * 8f + Vector3.up * 2f);
+
+    //        Gizmos.color = CustomColors.Support;
+    //        Gizmos.DrawLine(transform.position + Vector3.up * 2f, transform.position + lc.bc.grid.rightDirection * 8f + Vector3.up * 2f);
+    //    }
+
+    //    if(gameObject.activeSelf && !completed)
+    //    {
+    //        Gizmos.color = CustomColors.Fire;
+    //        Gizmos.DrawCube(transform.position, new Vector3(xSize, ySize, zSize));
+    //    }
+    //}
+
+    protected override void OnTriggerEnter(Collider other)
     {
-        if (lc.bc.grid.grid != null)
-        {
-            Gizmos.color = CustomColors.Hostile;
-            Gizmos.DrawLine(transform.position + Vector3.up * 2f, transform.position + lc.bc.grid.forwardDirection * 8f + Vector3.up * 2f);
-
-            Gizmos.color = CustomColors.Support;
-            Gizmos.DrawLine(transform.position + Vector3.up * 2f, transform.position + lc.bc.grid.rightDirection * 8f + Vector3.up * 2f);
-        }
-
-        if(gameObject.activeSelf && !completed)
-        {
-            Gizmos.color = CustomColors.Fire;
-            Gizmos.DrawCube(transform.position, new Vector3(xSize, ySize, zSize));
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
+        base.OnTriggerEnter(other);
         if(other.tag == "Protag" && !completed)
         {
+            GetComponent<BoxCollider>().enabled = false;
             lc.StartBattle(this);
         }
     }

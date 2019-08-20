@@ -55,8 +55,7 @@ public class Inventory
             }
         }
 
-        // This should never run
-        return new BlankItem();
+        return null;
     }
 
 }

@@ -29,6 +29,9 @@ public class AIBattleState : BattleState
 
     public void InitiateTurn()
     {
-        character.ChangeState<EnemyTurnState>();
+        if(character.Stats.curHP <= 0)
+            bc.ChangeState<SelectUnitState>();
+        else
+            character.ChangeState<EnemyTurnState>();
     }
 }

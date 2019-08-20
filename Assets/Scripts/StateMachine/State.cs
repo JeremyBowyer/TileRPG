@@ -5,6 +5,9 @@ using System;
 
 public abstract class State : MonoBehaviour
 {
+    // References
+    public InputEventHandler events;
+
     // Fields
     private bool _inTransition;
     public bool InTransition
@@ -44,7 +47,7 @@ public abstract class State : MonoBehaviour
     {
         get { return false; }
     }
-    public virtual bool isMaster
+    public virtual bool IsMaster
     {
         get { return false; }
     }
@@ -53,6 +56,11 @@ public abstract class State : MonoBehaviour
     {
         get { return new List<Type>(); }
         set { }
+    }
+
+    protected virtual void Awake()
+    {
+        events = GameObject.FindGameObjectWithTag("InputEventHandler").GetComponent<InputEventHandler>();
     }
 
     public virtual void Enter()
@@ -84,6 +92,7 @@ public abstract class State : MonoBehaviour
         UserInputController.hoverExitEvent += OnHoverExit;
         UserInputController.moveEvent += OnMove;
         UserInputController.moveMouseEvent += OnMouseMove;
+        UserInputController.keyDownEvent += OnKeyDown;
     }
 
     protected virtual void RemoveListeners()
@@ -94,6 +103,7 @@ public abstract class State : MonoBehaviour
         UserInputController.hoverExitEvent -= OnHoverExit;
         UserInputController.moveEvent -= OnMove;
         UserInputController.moveMouseEvent -= OnMouseMove;
+        UserInputController.keyDownEvent -= OnKeyDown;
     }
 
     protected virtual void OnClick(object sender, InfoEventArgs<RaycastHit> e)
@@ -116,11 +126,11 @@ public abstract class State : MonoBehaviour
     {
     }
 
-    protected virtual void OnFire(object sender, InfoEventArgs<int> e)
+    protected virtual void OnCancel(object sender, InfoEventArgs<int> e)
     {
     }
 
-    protected virtual void OnCancel(object sender, InfoEventArgs<int> e)
+    protected virtual void OnKeyDown(object sender, InfoEventArgs<KeyCode> e)
     {
     }
 

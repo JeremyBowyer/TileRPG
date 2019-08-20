@@ -32,6 +32,7 @@ public class InitBattleState : BattleState
         InTransition = true;
         base.Enter();
         bc.protag.animParamController.SetBool("idle");
+        UserInputController.AddLayer(LayerMask.NameToLayer("Character"));
 
         // Get args
         room = args.room;
@@ -40,10 +41,9 @@ public class InitBattleState : BattleState
 
         // Start Coroutines
         StartCoroutine(grid.GenerateGrid(room, OnCreateGrid));
-        StartCoroutine(bc.cameraRig.ZoomCamera(5f, 2f, 5f));
-
+        bc.cameraRig.Zoom(5f, 2f, 5f);
     }
-      
+
     public void OnCreateGrid()
     {
         bc.EnableRBs(false);
@@ -115,6 +115,30 @@ public class InitBattleState : BattleState
 
         InTransition = false;
         bc.ChangeState<PlaceUnitsState>();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        AddListeners();
+    }
+
+    protected override void OnDestroy()
+    {
+        //RemoveListeners();
+    }
+
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        CharController target = e.info.gameObject.GetComponent<CharController>();
+
+        if (target != null)
+            events.LoadTargetCharacter(target);
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        events.UnloadTargetCharacter();
     }
 
 }

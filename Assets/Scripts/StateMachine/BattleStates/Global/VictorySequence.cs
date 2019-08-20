@@ -11,7 +11,7 @@ public class VictorySequence : BattleState
     {
         get { return false; }
     }
-    public override bool isMaster
+    public override bool IsMaster
     {
         get { return true; }
     }

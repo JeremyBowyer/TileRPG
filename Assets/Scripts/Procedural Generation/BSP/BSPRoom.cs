@@ -6,15 +6,18 @@ using System;
 public class BSPRoom : BSPArea
 {
     public BSPNode Node { get; set; }
+    public MapRoom mapRoom;
     public GameObject[,] floorGrid;
     protected string[] floorPropPrefabs;
     protected System.Random rnd;
+    protected enum RoomType { Terrain, Obstacles, Open };
+    protected RoomType roomType;
 
 	// Use this for initialization
 	public override void Init (int _id, Vector2 _bufferBounds) {
 
         base.Init(_id, _bufferBounds);
-        floorPropPrefabs = new string[] { "Containers_01", "Keg" };
+        floorPropPrefabs = new string[] { "Containers_01", "Keg", "VaseGroup", "BrokenTable" };
         Destroy(GetComponent<MeshRenderer>());
         floorGrid = new GameObject[Mathf.RoundToInt(xSize), Mathf.RoundToInt(zSize)];
 
@@ -136,7 +139,35 @@ public class BSPRoom : BSPArea
         }
     }
 
-    public BSPFloor FindFloorFromWorldPoint(Vector3 point)
+    public void UpdateFloors()
+    {
+        for(int i=0; i < floors.Count; i++)
+        {
+            GameObject oldFloor = floors[i];
+            GameObject newFloor = FindFloorFromWorldPoint(oldFloor.transform.Find("AnchorPoint").transform.position);
+
+            if (oldFloor == newFloor)
+                continue;
+
+            BSPFloor oldFloorObj = oldFloor.GetComponent<BSPFloor>();
+            BSPFloor newFloorObj = newFloor.GetComponent<BSPFloor>() ?? newFloor.AddComponent<BSPFloor>();
+
+            newFloorObj.x = oldFloorObj.x;
+            newFloorObj.y = oldFloorObj.y;
+            newFloorObj.isCorner = oldFloorObj.isCorner;
+            newFloorObj.isDoorway = oldFloorObj.isDoorway;
+            floors[i] = newFloor;
+            newFloor.AddComponent<Tile>();
+            SignObject(newFloor);
+            if (newFloorObj.isCorner)
+            {
+                cornerFloors[cornerFloors.IndexOf(oldFloor)] = newFloor; 
+            }
+            Destroy(oldFloor);
+        }
+    }
+
+    public GameObject FindFloorFromWorldPoint(Vector3 point)
     {
         int layerMask = (1 << LayerMask.NameToLayer("Terrain"));
 
@@ -145,7 +176,8 @@ public class BSPRoom : BSPArea
         {
             if (hit.collider.tag == "Ground")
             {
-                BSPFloor floor = hit.collider.gameObject.GetComponent<BSPFloor>();
+                GameObject floor = hit.collider.gameObject;
+
                 if (floor != null)
                     return floor;
             }
@@ -181,17 +213,62 @@ public class BSPRoom : BSPArea
 
     public override void AddProps()
     {
-        if(xSize >= 7 && zSize >= 7)
-        {
-            AddChandelier();
-        }
+        DetermineRoomType();
 
+        switch (roomType)
+        {
+            case RoomType.Terrain:
+                AddTerrainProps();
+                break;
+            case RoomType.Obstacles:
+                AddObstaclesProps();
+                break;
+            case RoomType.Open:
+                AddOpenProps();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void AddTerrainProps()
+    {
+        AddChandelier();
+        AddPlatform();
+        AddCornerFloorProps();
+    }
+
+    public void AddObstaclesProps()
+    {
+        AddChandelier();
         AddRug();
         AddCornerFloorProps();
         AddEdgeFloorProps();
         AddFloorProps();
     }
-    
+
+    public void AddOpenProps()
+    {
+        AddCornerFloorProps();
+        AddEdgeFloorProps();
+    }
+
+    public void DetermineRoomType()
+    {
+        if (xSize > 10 && zSize > 10)
+        {
+            roomType = RoomType.Terrain;
+        }
+        else if (xSize > 4 || zSize > 4)
+        {
+            roomType = RoomType.Obstacles;
+        }
+        else
+        {
+            roomType = RoomType.Open;
+        }
+    }
+
     public void AddFloorProps()
     {
         int cnt = Mathf.RoundToInt(floors.Count / 15f);
@@ -217,7 +294,7 @@ public class BSPRoom : BSPArea
     public void AddChandelier()
     {
         GameObject chandelier = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Props/Chandelier"));
-        chandelier.transform.position = transform.position + Vector3.up * 5f;
+        chandelier.transform.position = transform.position + Vector3.up * 7f;
         chandelier.transform.parent = transform;
         AddProp(chandelier);
     }
@@ -284,7 +361,7 @@ public class BSPRoom : BSPArea
         // Load random bookcase
         string[] bookcasePrefabs = new string[] { "Bookcase_01", "Bookcase_02" };
         int bookCaseIdx = rnd.Next(0, bookcasePrefabs.Length);
-        GameObject bookcase = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Props/"+bookcasePrefabs[bookCaseIdx]));
+        GameObject bookcase = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Props/" + bookcasePrefabs[bookCaseIdx]));
 
         // Place bookcase
         bookcase.transform.position = floor.transform.Find("AnchorPoint").transform.position;
@@ -361,7 +438,23 @@ public class BSPRoom : BSPArea
             }
         }
 
+    }
 
+    public void AddPlatform()
+    {
+        if ((xSize > 8 && zSize > 8))
+        {
+            GameObject platform = (GameObject)GameObject.Instantiate(Resources.Load("Prefabs/Map/Floors/Platform_01"));
+            if (zSize > xSize)
+                platform.transform.Rotate(new Vector3(0f, 90f, 0f));
+
+            platform.transform.position = GetMiddleCorner();
+            platform.transform.parent = transform;
+
+            AddProp(platform);
+        }
+
+        UpdateFloors();
     }
 
     public void AddRug()
@@ -415,6 +508,34 @@ public class BSPRoom : BSPArea
         return new Vector3(roundX, transform.position.y, roundZ);
     }
 
+    public Vector3 GetMiddleCorner()
+    {
+        // This function returns the corner of a tile as close to the middle as possible
+        float roundX;
+
+        if (xSize % 2 == 0)
+        {
+            roundX = transform.position.x;
+        }
+        else
+        {
+            roundX = transform.position.x + 0.5f;
+        }
+
+        float roundZ;
+        if (zSize % 2 == 0)
+        {
+            roundZ = transform.position.z;
+        }
+        else
+        {
+            roundZ = transform.position.z + 0.5f;
+        }
+
+        return new Vector3(roundX, transform.position.y, roundZ);
+
+    }
+
     public GameObject GetMiddleFloor()
     {
         Collider[] cols = Physics.OverlapSphere(GetRoundedCenter(), 0.4f);
@@ -464,5 +585,13 @@ public class BSPRoom : BSPArea
     public GameObject GetData()
     {
         return gameObject;
-    }		
+    }
+
+    protected virtual void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Protag")
+        {
+            other.GetComponent<CharController>().room = this;
+        }
+    }
 }

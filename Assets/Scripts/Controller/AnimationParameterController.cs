@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -58,13 +59,13 @@ public class AnimationParameterController : MonoBehaviour {
         _animator.SetTrigger(_trigger);
     }
 
-    public void SetTrigger(string _trigger, UnityAction _callback)
+    public void SetTrigger(string _trigger, Action _callback)
     {
         _animator.SetTrigger(_trigger);
         StartCoroutine(OnCompleteAnimation(_trigger, _callback));
     }
 
-    IEnumerator OnCompleteAnimation(string param, UnityAction _callback)
+    IEnumerator OnCompleteAnimation(string param, Action _callback)
     {
         // **************************************************** //
         // PARAMETER STRING MUST BE IDENTICAL TO ANIMATION NAME //

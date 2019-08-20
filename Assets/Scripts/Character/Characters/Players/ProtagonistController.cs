@@ -42,6 +42,7 @@ public class ProtagonistController : PlayerController
                 controller = this
             };
             character.Init();
+            Stats.curHP = 10;
             character.InitAbilities();
             character.cName = "Protagonist";
         }
@@ -52,14 +53,6 @@ public class ProtagonistController : PlayerController
 
         if(PersistentObjects.partyMembers == null)
         {
-            Rogue member1 = new Rogue()
-            {
-                cName = "Wingus",
-                cClass = "Rogue",
-                model = "Rogue"
-            };
-            partyMembers.Add(member1);
-
             Wizard member3 = new Wizard()
             {
                 cName = "Son of Kong",
@@ -67,15 +60,6 @@ public class ProtagonistController : PlayerController
                 model = "Wizard"
             };
             partyMembers.Add(member3);
-
-            Rogue member2 = new Rogue()
-            {
-                cName = "Dingus",
-                cClass = "Rogue",
-                model = "Rogue"
-            };
-            partyMembers.Add(member2);
-
         }
         else
         {

@@ -67,7 +67,7 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-
+        Debug.Log("spell target");
         CharController target = null;
         Color color = Color.cyan;
 
@@ -94,6 +94,7 @@ public class SpellCharacterTargetState : BattleState
             Highlight hl = go.AddComponent<Highlight>();
             hl.HighlightObject(color);
             outlinedEnemies.Add(target.gameObject);
+            bc.TargetCharacter = target;
         }
     }
 
@@ -120,6 +121,7 @@ public class SpellCharacterTargetState : BattleState
 
         if (spellRange.Contains(target.tile.node) && spellAbility.ValidateTarget(target))
         {
+            bc.battleUI.UnloadTargetStats();
             StateArgs spellArgs = new StateArgs
             {
                 targetCharacter = target,
@@ -133,6 +135,7 @@ public class SpellCharacterTargetState : BattleState
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
+        bc.battleUI.UnloadTargetStats();
         bc.ChangeState<CommandSelectionState>();
     }
 

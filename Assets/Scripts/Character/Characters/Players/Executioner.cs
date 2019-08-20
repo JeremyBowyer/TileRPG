@@ -6,10 +6,12 @@ public class Executioner : PartyMember
 {
     public override void Init()
     {
-        stats.maxHealth = 175;
+        stats.maxHP = 175;
         stats.maxAP = 200;
         stats.agility = 75;
         stats.Init();
+        resists.Init();
+        buildUps.Init();
 
         experience = 0;
         level = 1;

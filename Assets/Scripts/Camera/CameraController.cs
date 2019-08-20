@@ -13,9 +13,6 @@ public class CameraController : MonoBehaviour {
             if (followTarget != null)
                 return followTarget;
 
-            if (gc.cameraTarget != null)
-                return gc.cameraTarget;
-
             return gameObject.transform;
         }
 
@@ -38,6 +35,7 @@ public class CameraController : MonoBehaviour {
     private float mouseEdgeHeight;
     private float aspectRatio;
     private float boundary = 50f;
+    private IEnumerator zoomCoroutine;
 
     // Camera Zoom parameters
     public float minSize;
@@ -75,11 +73,6 @@ public class CameraController : MonoBehaviour {
         CameraSize = minSize;
     }
 
-    public void AcquireTarget()
-    {
-        FollowTarget = gc.cameraTarget;
-    }
-
     public void LateUpdate()
     {
         /*
@@ -89,12 +82,12 @@ public class CameraController : MonoBehaviour {
         // Zoom Camera
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
-            CameraSize += 1;
+            Zoom(CameraSize + 1, minSize, maxSize);
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
-            CameraSize -= 1;
+            Zoom(CameraSize - 1, minSize, maxSize);
         }
 
         // Rotate Camera
@@ -107,15 +100,11 @@ public class CameraController : MonoBehaviour {
         // Follow Target
         if (isFollowing)
         {
-            if (gc.cameraTarget == null)
+            if (FollowTarget == null)
                 FollowTarget = gc.protag.transform;
-            else
-                FollowTarget = gc.cameraTarget.transform;
 
             if (FollowTarget != null)
             {
-                //_target = gc.currentCharacter.transform;
-
                 var x = transform.position.x;
                 var y = transform.position.y;
                 var z = transform.position.z;
@@ -217,27 +206,30 @@ public class CameraController : MonoBehaviour {
         return normDelta;
     }
 
-    public IEnumerator ZoomCamera(float targetSize, float _minSize, float _maxSize)
+    public void Zoom(float targetSize, float _minSize, float _maxSize)
     {
-        float currentSize = _camera.orthographicSize;
-        float speed = 2f;
+        if (zoomCoroutine != null)
+            StopCoroutine(zoomCoroutine);
+        zoomCoroutine = ZoomCamera(targetSize, _minSize, _maxSize);
+        StartCoroutine(zoomCoroutine);
+    }
+
+    private IEnumerator ZoomCamera(float targetSize, float _minSize, float _maxSize, float _speed = 5f)
+    {
+        targetSize = Mathf.Clamp(targetSize, _minSize, _maxSize);
+
+        float deltaSize = targetSize - CameraSize;
+        float startSize = CameraSize;
         minSize = _minSize;
         maxSize = _maxSize;
 
-        float min = Mathf.Min(new float[] { currentSize, targetSize });
-        float max = Mathf.Max(new float[] { currentSize, targetSize });
-
-        while (!Mathf.Approximately(_camera.orthographicSize, targetSize))
+        float currentTime = 0f;
+        while (!Mathf.Approximately(currentTime, 1.0f))
         {
-            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize + (targetSize - currentSize) * Time.deltaTime * speed, min, max);
+            currentTime = Mathf.Clamp01(currentTime + (Time.deltaTime * _speed));
+            CameraSize = startSize + deltaSize * EasingEquations.EaseInOutExpo(0.0f, 1.0f, currentTime);
             yield return new WaitForEndOfFrame();
         }
-        yield break;
-    }
-
-    public IEnumerator FocusOnTarget(Transform _target)
-    {
-
         yield break;
     }
 

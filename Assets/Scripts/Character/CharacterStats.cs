@@ -4,66 +4,115 @@ using UnityEngine;
 
 public class CharacterStats
 {
-    public int maxHealth = 100;
+    // Hard Max
+    public int maxHP = 100;
     public int maxAP = 100;
     public int maxMP = 100;
-    public float movementModifier = 0.5f;
     
-    public int agility = 100;
-    public float initiativeModifier = 1f;
-
-    public float initiative
+    // Temp Max
+    private int _maxHPTemp;
+    public int maxHPTemp
     {
-        get { return agility * initiativeModifier; }
+        get { return _maxHPTemp; }
+        set { _maxHPTemp = Mathf.Clamp(value, 1, maxHP); }
     }
 
-    private int _curHealth;
-    public int curHealth
+    private int _maxAPTemp;
+    public int maxAPTemp
     {
-        get { return _curHealth; }
-        set { _curHealth = Mathf.Clamp(value, 0, maxHealth); }
+        get { return _maxAPTemp; }
+        set { _maxAPTemp = Mathf.Clamp(value, 1, maxAP); }
+    }
+
+    private int _maxMPTemp;
+    public int maxMPTemp
+    {
+        get { return _maxMPTemp; }
+        set { _maxMPTemp = Mathf.Clamp(value, 1, maxMP); }
+    }
+
+    // Current Stats
+    private int _curHP;
+    public int curHP
+    {
+        get { return _curHP; }
+        set { _curHP = Mathf.Clamp(value, 0, maxHPTemp); }
     }
 
     private int _curAP;
     public int curAP
     {
         get { return _curAP; }
-        set { _curAP = Mathf.Clamp(value, 0, maxAP); }
+        set { _curAP = Mathf.Clamp(value, 0, maxAPTemp); }
     }
 
     private int _curMP;
     public int curMP
     {
         get { return _curMP; }
-        set { _curMP = Mathf.Clamp(value, 0, maxMP); }
+        set { _curMP = Mathf.Clamp(value, 0, maxMPTemp); }
+    }
+
+    public int agility = 100;
+    public float initiativeModifier = 1f;
+    public float initiative
+    {
+        get { return agility * initiativeModifier; }
     }
 
     public int moveRange
     {
-        get { return _curAP / 10; }
+        get { return _curAP / 20; }
     }
 
     public bool IsDamaged
     {
-        get { return curHealth < maxHealth; }
+        get { return curHP < maxHPTemp; }
     }
 
     public void Init()
     {
-        _curHealth = maxHealth;
+        _curHP = maxHP;
         _curAP = maxAP;
         _curMP = maxMP;
-        initiativeModifier = 1f;
+
+        maxHPTemp = maxHP;
+        maxAPTemp = maxAP;
+        maxMPTemp = maxMP;
+    }
+
+    public void Refresh()
+    {
+        _curAP = maxAPTemp;
     }
 
     public void Damage(int amt)
     {
-        curHealth -= amt;
+        curHP -= amt;
     }
 
     public void Heal(int amt)
     {
-        curHealth += amt;
+        curHP += amt;
+    }
+
+    public void ChangeMaxHP(int amt)
+    {
+        maxHPTemp = Mathf.Clamp(maxHPTemp + amt, 1, maxHP);
+        int newAmt = Mathf.Min(new int[] { curHP, maxHPTemp });
+        curHP = newAmt;
+    }
+
+    public void ChangeMaxAP(int amt)
+    {
+        maxAPTemp = Mathf.Clamp(maxAPTemp + amt, 1, maxAP);
+        curAP = Mathf.Min(new int[] { curAP, maxAPTemp });
+    }
+
+    public void ChangeMaxMP(int amt)
+    {
+        maxMPTemp = Mathf.Clamp(maxMPTemp + amt, 1, maxMP);
+        curMP = Mathf.Min(new int[] { curMP, maxMPTemp });
     }
 
     public void FillAP(int amt)
@@ -73,7 +122,7 @@ public class CharacterStats
 
     public void FillAP()
     {
-        curAP = maxAP;
+        curAP = maxAPTemp;
     }
 }
 

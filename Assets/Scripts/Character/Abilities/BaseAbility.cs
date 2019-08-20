@@ -7,7 +7,7 @@ public abstract class BaseAbility {
 
     private string abilityName;
     private string abilityDescription;
-    private int abilityPower;
+    private Damage[] abilityDamage;
     private int apCost;
     private int mpCost;
     private float abilityRange;
@@ -31,10 +31,10 @@ public abstract class BaseAbility {
         set { abilityDescription = value; }
     }
 
-    public int AbilityPower
+    public Damage[] AbilityDamage
     {
-        get { return abilityPower; }
-        set { abilityPower = value; }
+        get { return abilityDamage; }
+        set { abilityDamage = value; }
     }
 
     public int ApCost
@@ -57,8 +57,8 @@ public abstract class BaseAbility {
 
     public virtual void ApplyCost(CharController _owner)
     {
-        _owner.Stats.curAP = Mathf.Clamp(_owner.Stats.curAP - ApCost, 0, _owner.Stats.maxAP);
-        _owner.Stats.curMP = Mathf.Clamp(_owner.Stats.curMP - MpCost, 0, _owner.Stats.maxMP);
+        _owner.Stats.curAP = Mathf.Clamp(_owner.Stats.curAP - ApCost, 0, _owner.Stats.maxAPTemp);
+        _owner.Stats.curMP = Mathf.Clamp(_owner.Stats.curMP - MpCost, 0, _owner.Stats.maxMPTemp);
     }
 
     public abstract void ApplyCharacterEffect(CharController _target);
@@ -97,6 +97,7 @@ public abstract class BaseAbility {
 
         return shortPath;
     }
+
     public virtual Vector3[] GetPath(Vector3 _target)
     {
         return new Vector3[1]{ Vector3.zero };

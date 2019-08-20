@@ -9,7 +9,7 @@ public abstract class Movement
     public float speed = 1f;
     public float startValue = 0f;
     public float endValue = 1f;
-    public float costModifier = 1f;
+    public float costModifier = 2f;
     public string mName;
     protected CharController controller;
     protected BattleController bc

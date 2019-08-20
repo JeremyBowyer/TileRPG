@@ -26,13 +26,6 @@ public abstract class BaseAbilityMenuState : BattleState
 
     }
 
-    protected override void OnFire(object sender, InfoEventArgs<int> e)
-    {
-        if (e.info == 0)
-            Confirm();
-        else
-            OnCancel(sender, e);
-    }
     protected override void OnMove(object sender, InfoEventArgs<Point> e)
     {
         if (e.info.x > 0 || e.info.y < 0)

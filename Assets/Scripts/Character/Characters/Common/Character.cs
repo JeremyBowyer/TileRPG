@@ -14,6 +14,8 @@ public class Character
 
     // Stats
     public CharacterStats stats = new CharacterStats();
+    public CharacterResistances resists = new CharacterResistances();
+    public CharacterMaladyBuildUps buildUps = new CharacterMaladyBuildUps();
 
     // Spells, Attack and Movement
     public AttackAbility attackAbility;
@@ -33,6 +35,8 @@ public class Character
         if (!isInitialized)
         {
             stats.Init();
+            resists.Init();
+            buildUps.Init();
             experience = 0;
             level = 1;
             isInitialized = true;

@@ -9,11 +9,11 @@ public static class AbilityTypes {
     public static Color GetIntentColor(Intent intent)
     {
         Color intentColor;
-        if (intent == AbilityTypes.Intent.Hostile)
+        if (intent == Intent.Hostile)
         {
             intentColor = CustomColors.AttackRange;
         }
-        else if (intent == AbilityTypes.Intent.Heal)
+        else if (intent == Intent.Heal)
         {
             intentColor = CustomColors.Heal;
         }

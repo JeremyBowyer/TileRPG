@@ -11,7 +11,7 @@ public class WorldState : State
     public List<GameObject> characters { get { return lc.characters; } }
 
     // Methods
-    protected virtual void Awake()
+    protected override void Awake()
     {
         lc = GameObject.Find("LevelController").GetComponent<LevelController>();
     }

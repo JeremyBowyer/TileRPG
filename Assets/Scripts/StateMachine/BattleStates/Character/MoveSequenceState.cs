@@ -37,6 +37,7 @@ public class MoveSequenceState : BattleState
         InTransition = true;
         base.Enter();
         character = GetComponent<CharController>();
+        bc.FollowTarget(character.transform);
         path = args.path;
         callback = args.callback;
         if(path.Count == 0)
@@ -46,15 +47,14 @@ public class MoveSequenceState : BattleState
         }
         targetTile = path[path.Count - 1].tile;
         traverseCoroutine = character.MovementAbility.Traverse(path, OnCoroutineFinish);
-        character.Move(targetTile);
         StartCoroutine(traverseCoroutine);
     }
 
     public void OnCoroutineFinish()
     {
         InTransition = false;
-        if (callback != null)
-            callback();
+        character.Move(targetTile);
+        callback?.Invoke();
         character.ChangeState<IdleState>();
     }
 

@@ -110,7 +110,9 @@ MonoBehaviour:
   isWalkable: 1
   projector: {fileID: 1709148002683274451}
   emptyTex: {fileID: 2800000, guid: f3d9b00e6e2c47e4da95a999a610511a, type: 3}
+  innerTex: {fileID: 0}
   filledTex: {fileID: 2800000, guid: 27b352c22ec11cf4aa5d67967bde33f0, type: 3}
+  anchorPoint: {x: 0, y: 0, z: 0}
   colorHierarchy: []
   occupant: {fileID: 0}
 --- !u!1001 &4709238184319288555

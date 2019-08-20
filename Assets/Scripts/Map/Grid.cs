@@ -28,10 +28,10 @@ public class Grid : MonoBehaviour {
     public Vector3 centerPoint;
 
     // Directions
-    public Vector3 rightDirection;
-    public Vector3 leftDirection { get { return -rightDirection; } }
-    public Vector3 forwardDirection;
-    public Vector3 backwardDirection { get { return -forwardDirection; } }
+    public Vector3 rightDirection { get { return bc.rightDirection; } }
+    public Vector3 leftDirection { get { return bc.leftDirection; } }
+    public Vector3 forwardDirection { get { return bc.forwardDirection; } }
+    public Vector3 backwardDirection { get { return bc.backwardDirection; } }
 
     public enum Position { Front, Back, Left, Right, Diagonal};
 
@@ -81,12 +81,11 @@ public class Grid : MonoBehaviour {
         nodeDiameter = room.floors[0].GetComponent<BoxCollider>().bounds.size.x;
 
         int cnt = 0;
-        foreach (GameObject baseFloorGO in room.floors)
+        foreach (GameObject floorGO in room.floors)
         {
             cnt++;
-            BSPFloor floor = room.FindFloorFromWorldPoint(baseFloorGO.transform.position);
-            GameObject floorGO = floor.gameObject;
-            Tile tile = floorGO.AddComponent<Tile>();
+            Tile tile = floorGO.GetComponent<Tile>();
+            BSPFloor floor = floorGO.GetComponent<BSPFloor>();
             floorGO.layer = LayerMask.NameToLayer("GridClick");
             tiles.Add(floorGO);
             int x = floor.x;
@@ -116,35 +115,15 @@ public class Grid : MonoBehaviour {
                     tile.isWalkable = false;
                 }
 
+                // Find Movement Blocks
+                tile.FindMovementBlocks();
+
                 // Assign to grid
                 grid[x, y] = node;
             }
             if(cnt % 4 == 0)
                 yield return null;
         }
-
-
-        // Establish directions
-        Vector3 fromPos;
-        Vector3 toPos;
-
-        // Forward direction;
-        fromPos = grid[0, 0].worldPosition;
-        toPos = grid[0, 1].worldPosition;
-        fromPos.y = 0;
-        toPos.y = 0;
-        Vector3 forwardHeading = toPos - fromPos;
-        float forwardDistance = forwardHeading.magnitude;
-        forwardDirection = forwardHeading / forwardDistance;
-
-        // Right Direction
-        fromPos = grid[0, 0].worldPosition;
-        toPos = grid[1, 0].worldPosition;
-        fromPos.y = 0;
-        toPos.y = 0;
-        Vector3 rightHeading = toPos - fromPos;
-        float rightDistance = rightHeading.magnitude;
-        rightDirection = rightHeading / rightDistance;
 
         if (callback != null)
             callback();

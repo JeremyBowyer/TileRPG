@@ -10,7 +10,7 @@ public class BackstabAbility : TargetSpellAbility
     {
         AbilityName = "Backstab";
         AbilityDescription = "Attack an enemy from behind, dealing high damage";
-        AbilityPower = 25;
+        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 40) };
         ApCost = 25;
         MpCost = 40;
         AbilityRange = 1f;
@@ -33,7 +33,7 @@ public class BackstabAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController _target)
     {
-        _target.Damage(AbilityPower);
+        _target.Damage(AbilityDamage);
     }
 
     public override bool ValidateTarget(CharController _target)

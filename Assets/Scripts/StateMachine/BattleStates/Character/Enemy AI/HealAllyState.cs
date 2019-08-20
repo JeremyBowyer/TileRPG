@@ -23,6 +23,7 @@ public class HealAllyState : AIBattleState
         base.Enter();
         args.callback = InitiateTurn;
         aiAction.text = "Healing Ally...";
+        superUI.ShowMessage(args.spell.AbilityName, 1.5f);
         character.ChangeState<SpellTargetSequenceState>(args);
         InTransition = false;
     }

@@ -39,6 +39,12 @@ public class BSPConnectionHandler : MonoBehaviour
 
     public void ConnectRooms(BSPRoom _roomA, BSPRoom _roomB)
     {
+        if (_roomA == null)
+            Debug.Log("roomA");
+
+        if (_roomB == null)
+            Debug.Log("roomB");
+
         BSPConnection connection = new BSPConnection(_roomA, _roomB);
         AddConnection(connection);
     }
@@ -71,6 +77,7 @@ public class BSPConnectionHandler : MonoBehaviour
                 }
             }
         }
+
         BSPConnection connection = new BSPConnection(closestA, closestB);
         AddConnection(connection);
     }

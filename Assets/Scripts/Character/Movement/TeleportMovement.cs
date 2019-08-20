@@ -22,8 +22,14 @@ public class TeleportMovement : Movement
     {
         Tile targetTile = path[path.Count - 1].tile;
         Vector3 _targetPos = targetTile.WorldPosition;
+        controller.HideCharacter();
+
+        yield return new WaitForSeconds(0.5f);
         controller.transform.LookAt(new Vector3(targetTile.transform.position.x, controller.transform.position.y, targetTile.transform.position.z));
         controller.transform.position = _targetPos;
+
+        yield return new WaitForSeconds(0.25f);
+        controller.ShowCharacter();
         callback();
         yield break;
     }

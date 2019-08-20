@@ -11,10 +11,12 @@ public class Protagonist : PartyMember
     {
         if (isInitialized) return;
 
-        stats.maxHealth = 1000;
+        stats.maxHP = 1000;
         stats.maxAP = 10000;
         stats.agility = 75;
         stats.Init();
+        resists.Init();
+        buildUps.Init();
 
         experience = 0;
         level = 1;

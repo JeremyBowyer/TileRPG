@@ -8,10 +8,12 @@ public class Wizard : PartyMember
     {
         if (isInitialized) return;
 
-        stats.maxHealth = 100;
+        stats.maxHP = 100;
         stats.maxAP = 10000;
         stats.agility = 200;
         stats.Init();
+        resists.Init();
+        buildUps.Init();
 
         experience = 0;
         level = 1;

@@ -20,15 +20,18 @@ public class BSPController : MonoBehaviour
     private LevelController lc;
     private NavMeshSurface navMesh;
 
+    public MapController uiMapController;
+
 	//top node of the BSP tree
-	private BSPNode rootNode;
-	
-	private ArrayList roomList = new ArrayList();
+	public BSPNode rootNode;
+	public ArrayList roomList = new ArrayList();
 	private ArrayList corridorList = new ArrayList();
 
     private void Start()
     {
         GenerateMap();
+        uiMapController.Init();
+        uiMapController.GenerateMapUI();
     }
 
     public void ClearMap()
@@ -69,7 +72,6 @@ public class BSPController : MonoBehaviour
         theSection.name = "Root Node";
         theSection.transform.parent = partitionFolder.transform;
         rootNode = new BSPNode(theSection, null);
-		
 		for (int i = 0; i < numberOfSplits; i++){
 			SplitLeafs(rootNode);
 		}
@@ -85,16 +87,15 @@ public class BSPController : MonoBehaviour
         ConnectRooms(rootNode);
         connections.BuildAllCorridors();
 
-        //AddProps();
+        AddProps();
         SetStartingPlace();
-        //AddEnemies();
+        AddEnemies();
 
         lc = GetComponent<LevelController>();
         navMesh = GetComponent<NavMeshSurface>();
         navMesh.BuildNavMesh();
 
         lc.InitializeLevel();
-        //connections.DisplayConnections();
 	}
 	
     public void ShowRoom(BSPRoom _room)
@@ -139,22 +140,24 @@ public class BSPController : MonoBehaviour
     }
 
 	//sub divide the leafs of the BSP tree
-	private void SplitLeafs(BSPNode _aNode){
-		if (_aNode.GetLeftChild() == null){
-			Split (_aNode);
+	private void SplitLeafs(BSPNode _node){
+		if (_node.IsLeaf){
+			Split (_node);
 		}else{
-			SplitLeafs(_aNode.GetLeftChild());
-			SplitLeafs(_aNode.GetRightChild());
-		}
+            SplitLeafs(_node.GetRightChild());
+            //if (Random.value > 0.3f)
+            //    SplitLeafs(_node.GetLeftChild());
+            SplitLeafs(_node.GetLeftChild());
+        }
 	}
 	
 	//find and add rooms to the leafs of the BSP tree
-	private void AddRoomToLeafs(BSPNode _aNode){
-		if (_aNode.IsLeaf){
-			CreateRoom(_aNode);
+	private void AddRoomToLeafs(BSPNode _node){
+		if (_node.IsLeaf){
+			CreateRoom(_node);
 		} else {
-			AddRoomToLeafs(_aNode.GetLeftChild());
-			AddRoomToLeafs(_aNode.GetRightChild());
+			AddRoomToLeafs(_node.GetLeftChild());
+			AddRoomToLeafs(_node.GetRightChild());
 		}
 	}
 	
@@ -162,17 +165,21 @@ public class BSPController : MonoBehaviour
 	private void ConnectRooms(BSPNode _node){
 
         // If the node is a leaf, connect it with its sibling
-        if (_node.IsLeaf)
+        if (_node.IsLeaf && _node.SiblingIsLeaf)
         {
             BSPRoom leftRoom = _node.GetParent().GetLeftChild().GetRoom();
             BSPRoom rightRoom = _node.GetParent().GetRightChild().GetRoom();
+
             connections.ConnectRooms(leftRoom, rightRoom);
         }
         // If the node is not a leaf, restart process with its children
         else
         {
-            ConnectRooms(_node.GetLeftChild());
-            ConnectRooms(_node.GetRightChild());
+            if(_node.GetLeftChild() != null)
+                ConnectRooms(_node.GetLeftChild());
+
+            if(_node.GetRightChild() != null)
+                ConnectRooms(_node.GetRightChild());
 
             // If the node is not a leaf and not root, connect it with its sibling node
             if (!_node.IsRoot)

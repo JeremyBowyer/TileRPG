@@ -57,7 +57,6 @@ public class BaseAI : MonoBehaviour {
 
     protected virtual void DecideAction()
     {
-
         if (CheckForEnd())
         {
             character.ChangeState<IdleState>();
@@ -74,6 +73,12 @@ public class BaseAI : MonoBehaviour {
         if (maxHealSpell != null && DamagedAllyInRange())
         {
             HealAlly();
+            return;
+        }
+
+        if (hostileSpellRange.Contains(enemyTarget.tile.node))
+        {
+            HostileTargetSpell();
             return;
         }
 
@@ -97,12 +102,6 @@ public class BaseAI : MonoBehaviour {
             return;
         }
 
-        if (hostileSpellRange.Contains(enemyTarget.tile.node))
-        {
-            HostileTargetSpell();
-            return;
-        }
-
         Chase();
     }
 
@@ -110,6 +109,7 @@ public class BaseAI : MonoBehaviour {
     {
         hostileSpells = new List<SpellAbility>();
         healSpells = new List<SpellAbility>();
+
         foreach (SpellAbility spell in character.Spells)
         {
             if (spell.abilityIntent == AbilityTypes.Intent.Hostile && spell.ValidateCost(character))
@@ -178,11 +178,11 @@ public class BaseAI : MonoBehaviour {
     {
         // Further spell range
         // TODO: flesh this out so you're not simply using the spell with farthest range
-        float maxSpellRange = 0;
+        float maxSpellRange = 0f;
         maxHostileSpell = null;
         foreach (SpellAbility spell in hostileSpells)
         {
-            if (spell.AbilityRange >= maxSpellRange & spell is TargetSpellAbility)
+            if (spell.AbilityRange >= maxSpellRange && spell is TargetSpellAbility)
             {
                 maxSpellRange = spell.AbilityRange;
                 maxHostileSpell = spell as TargetSpellAbility;
@@ -190,14 +190,7 @@ public class BaseAI : MonoBehaviour {
         }
         if (maxHostileSpell != null)
         {
-            hostileSpellRange = bc.pathfinder.FindRange(
-                bc.CurrentCharacter.tile.node,
-                maxHostileSpell.AbilityRange,
-                maxHostileSpell.diag,
-                true,
-                true,
-                false,
-                true);
+            hostileSpellRange = maxHostileSpell.GetRange();
         }
         else
         {
@@ -241,7 +234,7 @@ public class BaseAI : MonoBehaviour {
             if (lowestAllyInRange == null)
             {
                 lowestAllyInRange = ally;
-            } else if(ally.Stats.curHealth < lowestAllyInRange.Stats.curHealth)
+            } else if(ally.Stats.curHP < lowestAllyInRange.Stats.curHP)
             {
                 lowestAllyInRange = ally;
             }
@@ -345,10 +338,10 @@ public class BaseAI : MonoBehaviour {
         foreach (GameObject ally in bc.enemies)
         {
             EnemyController allyController = ally.GetComponent<EnemyController>();
-            if (allyController.Stats.curHealth < allyController.Stats.maxHealth && allyController.Stats.curHealth < allyHp)
+            if (allyController.Stats.IsDamaged && allyController.Stats.curHP < allyHp)
             {
                 allyTarget = allyController;
-                allyHp = allyController.Stats.curHealth;
+                allyHp = allyController.Stats.curHP;
             }
         }
 
