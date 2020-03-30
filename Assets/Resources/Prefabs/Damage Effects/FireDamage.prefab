@@ -45905,7 +45905,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_RenderMode: 3
+  m_RenderMode: 1
   m_SortMode: 0
   m_MinParticleSize: 0
   m_MaxParticleSize: 8
@@ -46031,6 +46031,7 @@ GameObject:
   - component: {fileID: 4482785863565716247}
   - component: {fileID: 4391856631346231185}
   - component: {fileID: 4362144889354253255}
+  - component: {fileID: -6516529073466608442}
   m_Layer: 0
   m_Name: FireDamage
   m_TagString: Untagged
@@ -50784,6 +50785,27 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &-6516529073466608442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4482785863566081847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Fire
+  soundGroup: 0
+  soundType: 0
+  clip: {fileID: 8300000, guid: dcc9ba7d164c9ec41812100a4bffc554, type: 3}
+  volume: 0.5
+  pitch: 1
+  loop: 0
+  playOnAwake: 1
+  source: {fileID: 0}
 --- !u!1 &4482785863566081849
 GameObject:
   m_ObjectHideFlags: 0

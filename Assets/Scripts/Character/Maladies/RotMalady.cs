@@ -6,13 +6,14 @@ public class RotMalady : Malady
 {
     private int countdown;
     private const int MaxIterations = 2;
-    private Damage Damage = new Damage(DamageTypes.DamageType.Corruption, 20);
+
     public override MaladyTypes.MaladyType Type
     {
         get { return MaladyTypes.MaladyType.Rot; }
     }
 
-    public override void ApplyMalady(CharController _target)
+
+    public override void ApplyMalady(CharController _target, bool queue = false)
     {
         if (_target == null)
             return;
@@ -28,7 +29,7 @@ public class RotMalady : Malady
         countdown = MaxIterations;
     }
 
-    public override void TurnTick(CharController currentCharacter)
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
@@ -40,10 +41,11 @@ public class RotMalady : Malady
         ApplyMalady(target);
     }
 
-    public override void Init(CharController _target)
+    public override void Init(Character _source, CharController _target)
     {
-        base.Init(_target);
+        base.Init(_source, _target);
         countdown = MaxIterations;
+        mName = "a rot";
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/RotEffectPlayer")) as GameObject;
         PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();
         go.transform.parent = _target.gameObject.transform;

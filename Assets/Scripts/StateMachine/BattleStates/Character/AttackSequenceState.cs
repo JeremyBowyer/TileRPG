@@ -33,14 +33,15 @@ public class AttackSequenceState : BattleState
         attackAbility = args.attackAbility;
         callback = args.callback;
         character.Attack(targetCharacter, attackAbility);
-        StartCoroutine(attackAbility.Initiate(targetCharacter, OnAttackEnd));
+        character.onAttackLand += OnAttackEnd;
+        StartCoroutine(attackAbility.Initiate(targetCharacter));
     }
 
-    public void OnAttackEnd()
+    public void OnAttackEnd(string _clipName)
     {
         attackAbility.ApplyCharacterEffect(targetCharacter);
-        if (callback != null)
-            callback();
+        callback?.Invoke();
+        character.onAttackLand -= OnAttackEnd;
         InTransition = false;
         character.ChangeState<IdleState>();
     }

@@ -3,7 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartyMember : Player
+public class PartyMember : Character
 {
-    public string model;
+
+    public PartyMember() : base()
+    {
+        Init();
+    }
 }

@@ -42,27 +42,33 @@ public class MoveSequenceState : BattleState
         callback = args.callback;
         if(path.Count == 0)
         {
-            OnCoroutineFinish();
+            OnCoroutineFinish(true);
             return;
         }
         targetTile = path[path.Count - 1].tile;
-        traverseCoroutine = character.MovementAbility.Traverse(path, OnCoroutineFinish);
+        traverseCoroutine = character.MovementAbility.Traverse(path, () => OnCoroutineFinish(true));
+        character.audioController.Play("move");
         StartCoroutine(traverseCoroutine);
     }
 
-    public void OnCoroutineFinish()
+    public void OnCoroutineFinish(bool finish)
     {
         InTransition = false;
-        character.Move(targetTile);
+
+        if (finish)
+        {
+            character.Move(targetTile);
+            character.Place(targetTile, false);
+        }
+
+        character.animParamController.SetBool("idle", true);
         callback?.Invoke();
         character.ChangeState<IdleState>();
     }
 
-    public override void InterruptTransition()
+    public override void InterruptTransition(bool finish)
     {
         StopCoroutine(traverseCoroutine);
-        character.Place(targetTile);
-        character.animParamController.SetBool("idle", true);
-        OnCoroutineFinish();
+        OnCoroutineFinish(finish);
     }
 }

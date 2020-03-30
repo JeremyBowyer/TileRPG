@@ -8,8 +8,8 @@ public class BSPNode {
 	private BSPNode leftChild;
 	private BSPNode rightChild;
 	private BSPNode parent;
-    private BSPRoom room;
-    private List<BSPRoom> allRooms;
+    private List<KeepRoom> allRooms;
+    private List<BSPNode> allLeafNodes;
 
     public bool IsLeaf
     {
@@ -79,6 +79,11 @@ public class BSPNode {
 	}
 	
 	public void SetLeftChild(GameObject _partition){
+        if(_partition == null)
+        {
+            leftChild = null;
+            return;
+        }
 		leftChild = new BSPNode(_partition, this);	
 	}
 	
@@ -87,14 +92,16 @@ public class BSPNode {
 	}
 	
 	public void SetRightChild(GameObject _partition){
+        if (_partition == null)
+        {
+            rightChild = null;
+            return;
+        }
         rightChild = new BSPNode(_partition, this);
 	}
 	
 	public GameObject GetData(){
-        if (room == null)
-            return data;
-        else
-            return room.GetData();
+        return data;
 	}
 	
 	public BSPNode GetParent(){
@@ -109,36 +116,26 @@ public class BSPNode {
             return parent.GetRoot();
     }
 
-    public void SetRoom(BSPRoom _room)
+    public List<BSPNode> GetAllLeafNodes()
     {
-        room = _room;
+        allLeafNodes = new List<BSPNode>();
+        AddLeafNodes(this);
+        return allLeafNodes;
     }
 
-    public BSPRoom GetRoom()
-    {
-        return room;
-    }
-
-    public List<BSPRoom> GetAllRooms()
-    {
-        allRooms = new List<BSPRoom>();
-        AddRooms(this);
-        return allRooms;
-    }
-
-    public void AddRooms(BSPNode _node)
+    public void AddLeafNodes(BSPNode _node)
     {
         if (_node == null)
             return;
 
-        if(_node.GetRoom() != null)
+        if (_node.IsLeaf)
         {
-            allRooms.Add(_node.GetRoom());
+            allLeafNodes.Add(_node);
             return;
         }
 
-        AddRooms(_node.GetLeftChild());
-        AddRooms(_node.GetRightChild());
+        AddLeafNodes(_node.GetLeftChild());
+        AddLeafNodes(_node.GetRightChild());
     }
 
     public BSPNode GetSibling()
@@ -159,27 +156,27 @@ public class BSPNode {
 
     }
 
-    public BSPRoom FindLeftRoom()
+    public BSPNode GetLeftLeafNode()
     {
         if (GetLeftChild() == null)
         {
-            return room;
+            return this;
         }
         else
         {
-            return GetLeftChild().FindLeftRoom();
+            return GetLeftChild().GetLeftLeafNode();
         }
     }
 
-    public BSPRoom FindRightRoom()
+    public BSPNode GetRightLeafNode()
     {
         if (GetRightChild() == null)
         {
-            return room;
+            return this;
         }
         else
         {
-            return GetRightChild().FindRightRoom();
+            return GetRightChild().GetRightLeafNode();
         }
     }
 

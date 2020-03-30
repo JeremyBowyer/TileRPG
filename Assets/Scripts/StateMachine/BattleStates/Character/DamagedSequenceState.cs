@@ -47,7 +47,7 @@ public class DamagedSequenceState : BattleState
         character.ChangeState<IdleState>();
     }
 
-    public override void InterruptTransition()
+    public override void InterruptTransition(bool finish)
     {
         StopCoroutine(damagedCoroutine);
 

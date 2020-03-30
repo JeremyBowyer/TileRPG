@@ -6,7 +6,10 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LayoutAnchor))]
 public class UIPanel : MonoBehaviour
 {
-
+    [SerializeField]
+    private float duration = 0.25f;
+    [SerializeField]
+    private Sound clip;
     public Position CurrentPosition { get; private set; }
     public Tweener Transition { get; private set; }
     public bool InTransition { get { return Transition != null; } }
@@ -14,7 +17,7 @@ public class UIPanel : MonoBehaviour
     {
         get
         {
-            if (positionMap.ContainsKey(name))
+            if (positionMap != null && positionMap.ContainsKey(name))
                 return positionMap[name];
             return null;
         }
@@ -79,15 +82,23 @@ public class UIPanel : MonoBehaviour
     }
     public Tweener SetPosition(Position p, bool animated)
     {
+        if (CurrentPosition == p)
+            return null;
+
         CurrentPosition = p;
         if (CurrentPosition == null)
             return null;
+
         if (InTransition)
             Transition.easingControl.Stop();
         if (animated)
         {
+            if (clip != null)
+                clip.Play();
+
             Transition = anchor.MoveToAnchorPosition(p.myAnchor, p.parentAnchor, p.offset);
-            Transition.easingControl.duration = GetComponent<EasingControl>().duration;
+            //Transition.easingControl.duration = GetComponent<EasingControl>().duration;
+            Transition.easingControl.duration = duration;
             return Transition;
         }
         else

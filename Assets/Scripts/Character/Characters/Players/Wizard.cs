@@ -4,6 +4,21 @@ using UnityEngine;
 
 public class Wizard : PartyMember
 {
+    public Wizard() : base()
+    {
+        avatar = null;
+
+        abilities = new List<SpellAbility>();
+        abilities.Add(new MagmaBallAbility(this));
+        abilities.Add(new FireboltAbility(this));
+        abilities.Add(new HealRayAbility(this));
+        abilities.Add(new WallOfStoneAbility(this));
+
+        attackAbility = new PunchAttackAbility(this);
+        movementAbility = new TeleportMovement(this);
+        movementAbility.costModifier = 3f;
+    }
+
     public override void Init()
     {
         if (isInitialized) return;
@@ -13,26 +28,11 @@ public class Wizard : PartyMember
         stats.agility = 200;
         stats.Init();
         resists.Init();
+        damageBonuses.Init();
         buildUps.Init();
-
-        experience = 0;
-        level = 1;
 
         cName = "Wizard";
         cClass = "Wizard";
         isInitialized = true;
-    }
-
-    public override void InitAbilities()
-    {
-        spells = new List<SpellAbility>();
-        spells.Add(new MagmaBallAbility(controller));
-        spells.Add(new FireboltAbility(controller));
-        spells.Add(new HealRayAbility(controller));
-        spells.Add(new WallOfStoneAbility(controller));
-
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new TeleportMovement(controller);
-        movementAbility.costModifier = 3f;
     }
 }

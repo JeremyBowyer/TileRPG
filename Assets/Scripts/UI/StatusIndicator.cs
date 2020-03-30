@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,13 @@ public class StatusIndicator : MonoBehaviour {
     protected RectTransform apMaxBarRect;
     [SerializeField]
     protected RectTransform mpMaxBarRect;
+
+    [SerializeField]
+    protected TextMeshProUGUI hpAmount;
+    [SerializeField]
+    protected TextMeshProUGUI apAmount;
+    [SerializeField]
+    protected TextMeshProUGUI mpAmount;
 
     [SerializeField]
     protected Canvas canvas;
@@ -46,10 +54,16 @@ public class StatusIndicator : MonoBehaviour {
     float apMaxWidth;
     float mpMaxWidth;
 
+    [HideInInspector]
+    public bool Displaying = false;
+
     public void SetCurrentHP(int _cur, int _tempMax, int _max, bool animate = true)
     {
-        if (!gameObject.activeSelf)
+        if (!gameObject.activeInHierarchy)
             return;
+
+        if (hpAmount != null)
+            hpAmount.text = _cur.ToString();
 
         if(hpBarRect != null)
         {
@@ -72,8 +86,11 @@ public class StatusIndicator : MonoBehaviour {
 
     public void SetCurrentAP(int _cur, int _tempMax, int _max, bool animate = true)
     {
-        if (!gameObject.activeSelf)
+        if (!gameObject.activeInHierarchy)
             return;
+
+        if (apAmount != null)
+            apAmount.text = _cur.ToString();
 
         if (apBarRect != null)
         {
@@ -96,8 +113,11 @@ public class StatusIndicator : MonoBehaviour {
 
     public void SetCurrentMP(int _cur, int _tempMax, int _max, bool animate = true)
     {
-        if (!gameObject.activeSelf)
+        if (!gameObject.activeInHierarchy)
             return;
+
+        if (mpAmount != null)
+            mpAmount.text = _cur.ToString();
 
         if (mpBarRect != null)
         {
@@ -120,10 +140,11 @@ public class StatusIndicator : MonoBehaviour {
 
     public IEnumerator ScaleStatBar(RectTransform bar, int _cur, int _max, bool animate = true)
     {
+        Displaying = true;
         float currentTime = 0f;
         float speed = 1f;
         float startingScale = bar.localScale.x;
-        float endingScale = (float)_cur / _max;
+        float endingScale = (float)_cur / 100f;
 
         if (!animate)
         {
@@ -138,10 +159,14 @@ public class StatusIndicator : MonoBehaviour {
             bar.localScale = new Vector3(frameValue, bar.localScale.y, bar.localScale.z);
             yield return new WaitForEndOfFrame();
         }
+
+        Displaying = false;
     }
 
     public virtual IEnumerator ScaleMaxStatBar(RectTransform bar, int _cur, int _max, bool animate = true)
     {
+        Displaying = true;
+
         yield return new WaitForEndOfFrame();
         float currentTime = 0f;
         float speed = 1f;
@@ -167,12 +192,13 @@ public class StatusIndicator : MonoBehaviour {
         float scale = canvas.scaleFactor;
         if(this is GlobalStatusIndicator)
         {
-            startingWidth = GetWidth(bar) / bar.localScale.x / scale;
+            startingWidth = CustomUtils.GetWidth(bar) / bar.localScale.x / scale;
 
-            innerBounds = GetWidth(innerBoundsRect) / innerBoundsRect.localScale.x;
-            outerBounds = GetWidth(outerBoundsRect) / outerBoundsRect.localScale.x;
+            innerBounds = CustomUtils.GetWidth(innerBoundsRect) / innerBoundsRect.localScale.x;
+            outerBounds = CustomUtils.GetWidth(outerBoundsRect) / outerBoundsRect.localScale.x;
             baseWidth = outerBounds - innerBounds;
-            endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) * 2f / scale;
+            //endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) * 2f / scale;
+            endingWidth = (baseWidth + innerBounds * ((float)_cur / 100f)) / scale;
         } else if (this is CharacterStatusIndicator)
         {
             startingWidth = bar.rect.width / scale;
@@ -180,7 +206,8 @@ public class StatusIndicator : MonoBehaviour {
             innerBounds = innerBoundsRect.rect.width / innerBoundsRect.localScale.x;
             outerBounds = outerBoundsRect.rect.width / outerBoundsRect.localScale.x;
             baseWidth = outerBounds - innerBounds;
-            endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) / scale;
+            //endingWidth = (baseWidth + innerBounds * ((float)_cur / _max)) / scale;
+            endingWidth = (baseWidth + innerBounds * ((float)_cur / 100f)) / scale;
         }
 
         if (!animate)
@@ -198,15 +225,8 @@ public class StatusIndicator : MonoBehaviour {
         }
 
         EndCoroutine:
+        Displaying = false;
         yield break;
-    }
-
-    protected float GetWidth(RectTransform bar)
-    {
-        Vector3[] corners = new Vector3[4];
-        bar.GetWorldCorners(corners);
-        float width = corners[3].x - corners[0].x;
-        return width;
     }
 
 }

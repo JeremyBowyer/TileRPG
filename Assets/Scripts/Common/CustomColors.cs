@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CustomColors
 {
+    public enum ColorType { None, Physical, Shock, Frost, Fire, Pierce, Bludgeon, Corruption, HP, AP, MP, PlayerUI, EnemyUI };
+
     public static Color Shock
     {
         get
@@ -43,6 +45,23 @@ public class CustomColors
             return new Color(0.3f, 0f, 0.6f);
         }
     }
+
+    public static Color Fire
+    {
+        get
+        {
+            return new Color(1f, 0.5f, 0f, 0.5f);
+        }
+    }
+
+    public static Color Physical
+    {
+        get
+        {
+            return new Color(1f, 1f, 1f);
+        }
+    }
+
 
     public static Color White
     {
@@ -116,14 +135,6 @@ public class CustomColors
         }
     }
 
-    public static Color Fire
-    {
-        get
-        {
-            return new Color(1f, 0.5f, 0f, 0.5f);
-        }
-    }
-
     public static Color PlayerUI
     {
         get
@@ -137,6 +148,30 @@ public class CustomColors
         get
         {
             return new Color(0.8f, 0.4f, 0.4f, 0.5f);
+        }
+    }
+
+    public static Color HP
+    {
+        get
+        {
+            return new Color(0.35f, 0f, 0f);
+        }
+    }
+
+    public static Color AP
+    {
+        get
+        {
+            return new Color(0.39f, 0.44f, 0.165f);
+        }
+    }
+
+    public static Color MP
+    {
+        get
+        {
+            return new Color(0f, 0.2f, 0.7f);
         }
     }
 

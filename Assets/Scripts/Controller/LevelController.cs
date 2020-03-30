@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEditor;
 
 public class LevelController : GameController
 {
@@ -14,35 +16,60 @@ public class LevelController : GameController
     public EnemyController battleInitiator;
     public BattleController bc;
     public Vector3 startingPos;
+    [HideInInspector]
     public BSPController bspController;
+    public Level level;
+    public Roster globalEnemyGroup;
+    public Camera miniMapCamera;
+    public GameObject miniMapPlayer;
+    public GameObject mapHolder;
+
+    public static LevelController instance;
 
     // Directions
-    public Vector3 rightDirection { get { return Vector3.right; } }
-    public Vector3 leftDirection { get { return Vector3.left; } }
-    public Vector3 forwardDirection { get { return Vector3.forward; } }
-    public Vector3 backwardDirection { get { return Vector3.back; } }
+    public static Vector3 rightDirection { get { return Vector3.right; } }
+    public static Vector3 leftDirection { get { return Vector3.left; } }
+    public static Vector3 forwardDirection { get { return Vector3.forward; } }
+    public static Vector3 backwardDirection { get { return Vector3.back; } }
+    public static Vector3 forwardLeftDirection { get { return new Vector3(-0.5f, 0f, 0.5f); } }
+    public static Vector3 forwardRightDirection { get { return new Vector3(0.5f, 0f, 0.5f); } }
+    public static Vector3 backwardLeftDirection { get { return new Vector3(-0.5f, 0f, -0.5f); } }
+    public static Vector3 backwardRightDirection { get { return new Vector3(0.5f, 0f, -0.5f); } }
+
+    public void Awake()
+    {
+        instance = this;
+    }
 
     public void InitializeLevel()
     {
-        // Assign references
-        protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
-        cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
-        _camera = GameObject.Find("Camera").GetComponent<Camera>();
+        AssignReferences();
 
-        protag.transform.position = GameObject.FindGameObjectWithTag("StartingTilePlayer").transform.position;
-        FollowTarget(protag.transform);
+        float mapSize = Mathf.Max(new float[] { bspController.gridSize.x, bspController.gridSize.y });
+        if (miniMapCamera != null)
+            miniMapCamera.orthographicSize = mapSize / 2f + 5f;
 
-        bspController = GetComponent<BSPController>();
-        
+        if (miniMapPlayer != null)
+        {
+            Instantiate(miniMapPlayer, protag.transform);
+        }
+
         ChangeState<InitLevelState>();
     }
 
-    public void StartBattle(BSPBattleRoom _room)
+    public override void AssignReferences()
     {
-        bspController.ShowRoom(_room);
+        base.AssignReferences();
+        level = new KeepLevel();
+        InstantiateProtagonist();
+        bspController = GetComponent<BSPController>();
+    }
+
+    public void StartBattle(KeepBattleRoom _room)
+    {
+        //bspController.ShowRoom(_room);
         startingPos = protag.transform.position;
         ChangeState<IdleState>();
-        uiController.SwitchTo("battle");
-        bc.Init(_room);
+        bc.InitBattle(_room);
     }
 }

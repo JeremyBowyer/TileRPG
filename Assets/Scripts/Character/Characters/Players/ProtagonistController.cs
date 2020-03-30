@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,12 +8,16 @@ public class ProtagonistController : PlayerController
 {
     public NavMeshAgent protagAgent;
 
-    public List<PartyMember> partyMembers = new List<PartyMember>();
     public Inventory inventory;
 
-    public override void Awake()
+    private HubController hc;
+
+    public override void InitController()
     {
-        base.Awake();
+        base.InitController();
+        GameObject hcGO = GameObject.Find("HubController");
+        if (hcGO != null)
+            hc = hcGO.GetComponent<HubController>();
         protagAgent = GetComponent<NavMeshAgent>();
     }
 
@@ -20,12 +25,6 @@ public class ProtagonistController : PlayerController
     {
         character = _character;
         character.controller = this;
-        character.InitAbilities();
-    }
-
-    public void LoadPartyMembers(List<PartyMember> _partyMembers)
-    {
-        partyMembers = _partyMembers;
     }
 
     public void LoadInventory(Inventory _inventory)
@@ -39,52 +38,32 @@ public class ProtagonistController : PlayerController
         {
             character = new Executioner
             {
-                controller = this
+                controller = this,
+                cName = "Protagonist"
             };
             character.Init();
-            Stats.curHP = 10;
-            character.InitAbilities();
-            character.cName = "Protagonist";
         }
         else
         {
             LoadCharacter(PersistentObjects.protagonist);
         }
 
-        if(PersistentObjects.partyMembers == null)
-        {
-            Wizard member3 = new Wizard()
-            {
-                cName = "Son of Kong",
-                cClass = "Wizard",
-                model = "Wizard"
-            };
-            partyMembers.Add(member3);
-        }
-        else
-        {
-            LoadPartyMembers(PersistentObjects.partyMembers);
-        }
-
-        if(PersistentObjects.inventory == null)
-        {
-            inventory = new Inventory();
-            inventory.Add(new Potion());
-            inventory.Add(new Potion());
-            inventory.Add(new Potion());
-        } else
-        {
-            LoadInventory(PersistentObjects.inventory);
-        }
-
+        if (PersistentObjects.bag != null)
+            LoadInventory(PersistentObjects.bag);
     }
 
     private void LateUpdate()
     {
-        if (bc.InBattle)
+        if (protagAgent == null)
             return;
 
-        if (lc.CurrentState == null || lc.CurrentState.GetType().Name != "WorldExploreState")
+        if (bc != null && bc.InBattle)
+            return;
+
+        if (lc != null && (lc.CurrentState == null || lc.CurrentState.GetType().Name != "WorldExploreState"))
+            return;
+
+        if (!protagAgent.isOnNavMesh)
             return;
 
         float x = Input.GetAxis("Horizontal");
@@ -113,31 +92,24 @@ public class ProtagonistController : PlayerController
         protagAgent.isStopped = false;
     }
 
-    public override void AfterDeath()
+    public override void AfterDeath(Damage _damage)
     {
         Application.Quit();
     }
 
-    public void InitPartyMembers()
-    {
-        foreach(PartyMember member in partyMembers)
-        {
-            member.Init();
-        }
-    }
-
     public void InstantiatePartyMembers()
     {
-        foreach (PartyMember member in partyMembers)
+        foreach (PartyMember member in PersistentObjects.party.GetMembers())
         {
+            if (member.controller == this)
+                continue;
 
             if (member.controller != null)
                 continue;
-            GameObject goMember = Instantiate(Resources.Load("Prefabs/Characters/" + member.model)) as GameObject;
+            GameObject goMember = Instantiate(Resources.Load("Prefabs/Characters/Players/" + member.model)) as GameObject;
             PartyMemberController controller = goMember.AddComponent<PartyMemberController>();
             member.controller = controller;
             controller.character = member;
-            member.InitAbilities();
             member.Init();
 
             goMember.name = member.cName;

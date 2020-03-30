@@ -31,15 +31,7 @@ public class EnemyTurnState : AIBattleState
     {
         InTransition = true;
         base.Enter();
-        aiAction.text = "Thinking...";
-        StartCoroutine(DelayAction(2f, DecideAction));
-    }
-
-    public IEnumerator DelayAction(float secs, Action callback)
-    {
-        yield return new WaitForSeconds(secs);
-        callback?.Invoke();
-        yield break;
+        StartCoroutine(CustomUtils.DelayAction(2f, DecideAction));
     }
 
     public void DecideAction()

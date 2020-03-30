@@ -6,23 +6,24 @@ using UnityEngine;
 public class ExecuteAbility : TargetSpellAbility
 {
 
-    public ExecuteAbility(CharController _character)
+    public ExecuteAbility(Character _character)
     {
         AbilityName = "Execute";
         AbilityDescription = "Execute an enemy, if their HP is below 50%.";
-        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 500) };
+        AbilityDamage = new Damage[] { new Damage(_character, DamageTypes.DamageType.Physical, int.MaxValue) };
         ApCost = 25;
         MpCost = 50;
         AbilityRange = 1f;
         diag = false;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Hostile;
+        abilityIntent = IntentTypes.Intent.Hostile;
+        icon = Resources.Load<Sprite>("Sprites/Ability Icons/ExecuteAbility");
     }
 
     public override List<Node> GetRange()
     {
-        List<Node> range = character.bc.pathfinder.FindRange(character.tile.node, AbilityRange, diag, true, false, false, false);
+        List<Node> range = controller.bc.pathfinder.FindRange(controller.tile.node, AbilityRange, diag, true, false, false, false);
         return range;
     }
 
@@ -31,9 +32,14 @@ public class ExecuteAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyCharacterEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController _target)
     {
-        character.Damage(new Damage[] { new Damage(DamageTypes.DamageType.Physical, character.character.stats.curHP) });
+        foreach (Damage dmg in AbilityDamage)
+        {
+            dmg.ability = this;
+            dmg.damageAmount = _target.Stats.curHP;
+        }
+        character.controller.DealDamage(AbilityDamage, _target);
     }
 
     public override bool ValidateTarget(CharController character)
@@ -43,10 +49,9 @@ public class ExecuteAbility : TargetSpellAbility
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
-        character.animParamController.SetTrigger("execute");
-        character.animParamController.SetBool("idle");
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        callback();
+        controller.animParamController.SetTrigger("overhead_attack", callback);
+        controller.animParamController.SetBool("idle");
+        controller.transform.rotation = Quaternion.LookRotation(controller.bc.grid.GetDirection(controller.tile.node, _target.tile.node), Vector3.up);
         yield break;
     }
 }

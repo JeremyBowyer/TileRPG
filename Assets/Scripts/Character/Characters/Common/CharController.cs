@@ -5,9 +5,23 @@ using UnityEngine;
 
 public abstract class CharController : StateMachine {
 
+    private bool delegatesAssigned;
+
     public Tile tile;
-    public float height;
-    public List<Malady> maladies;
+    public float height
+    {
+        get
+        {
+            BoxCollider box = GetComponent<BoxCollider>();
+            if (box != null)
+                return box.bounds.extents.y;
+            else
+                return 0f;
+        }
+        set { }
+    }
+
+    public bool outline = false;
     public Vector3 direction
     {
         get { return transform.forward; }
@@ -21,12 +35,14 @@ public abstract class CharController : StateMachine {
     public AnimationParameterController animParamController;
     public CharacterAudioController audioController;
     public TurnEntry turnEntry;
-    public BSPRoom room;
-    public SkinnedMeshRenderer mesh;
+    public KeepRoom room;
+    public SkinnedMeshRenderer[] meshes;
+    public Highlight highlight;
+
+    public delegate void OnAttackLand(string _clipName);
+    public OnAttackLand onAttackLand;
 
     // Properties
-
-    // Check for maladies
     public bool NextTurn
     {
         get { return character.stats.curAP <= 0; }
@@ -38,9 +54,39 @@ public abstract class CharController : StateMachine {
         get { return character.cName; }
     }
 
+    public List<PartyPassive> PartyPassives
+    {
+        get { return character.partyPassives; }
+    }
+
+    public List<PersonalPassive> PersonalPassives
+    {
+        get { return character.personalPassives; }
+    }
+
+    public List<Party> Parties
+    {
+        get { return character.parties; }
+    }
+
+    public List<Roster> Rosters
+    {
+        get { return character.rosters; }
+    }
+
+    public List<Malady> Maladies
+    {
+        get { return character.maladies; }
+    }
+
+    public List<Boon> Boons
+    {
+        get { return character.boons; }
+    }
+
     public List<SpellAbility> Spells
     {
-        get { return character.spells; }
+        get { return character.abilities; }
     }
 
     public AttackAbility AttackAbility
@@ -63,16 +109,32 @@ public abstract class CharController : StateMachine {
         get { return character.resists; }
     }
 
+    public CharacterDamageBonuses DamageBonuses
+    {
+        get { return character.damageBonuses; }
+    }
+
     public CharacterMaladyBuildUps BuildUps
     {
         get { return character.buildUps; }
     }
 
-    public virtual void Awake()
+    public bool IsDead
     {
-        statusIndicator = transform.Find("CameraAngleTarget/CharacterStatusIndicator").gameObject.GetComponent<CharacterStatusIndicator>();
+        get { return Stats.curHP <= 0; }
+    }
+
+    public virtual void InitController()
+    {
+        AssignReferences();
         SetAnimatorParameters();
         CreateCharacter();
+        LoadAudioProfile();
+        AssignDelegates();
+    }
+
+    public void AssignReferences()
+    {
         GameObject bcGO = GameObject.Find("BattleController");
         if (bcGO != null)
             bc = bcGO.GetComponent<BattleController>();
@@ -81,12 +143,90 @@ public abstract class CharController : StateMachine {
         if (lcGO != null)
             lc = lcGO.GetComponent<LevelController>();
 
-        mesh = gameObject.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
+        highlight = GetComponentInChildren<Highlight>();
 
-        height = GetComponent<BoxCollider>().bounds.extents.y;
-        maladies = new List<Malady>();
         audioController = GetComponentInChildren<CharacterAudioController>();
-        ScaleCharacter();
+
+        statusIndicator = transform.Find("CameraAngleTarget/CharacterStatusIndicator").gameObject.GetComponent<CharacterStatusIndicator>();
+        
+        Transform modelGO = gameObject.transform.Find("Model");
+        if(modelGO != null)
+        {
+            meshes = new SkinnedMeshRenderer[] { modelGO.GetComponent<SkinnedMeshRenderer>() };
+
+        }
+        else
+        {
+            meshes = GetComponentsInChildren<SkinnedMeshRenderer>(false);
+        }
+
+    }
+
+    public void AssignDelegates()
+    {
+        if (delegatesAssigned)
+            return;
+
+        BuildUps.onChargeActive += (type) => statusIndicator.AddMaladyCharge(type, true);
+        BuildUps.onChargeActive += ChargeMalady;
+        BuildUps.onChargeDeactive += statusIndicator.RemoveMaladyCharge;
+        delegatesAssigned = true;
+    }
+
+    public bool HasPartyPassive(Type _passive)
+    {
+        foreach (PartyPassive passive in PartyPassives)
+        {
+            if (passive.GetType() == _passive)
+                return true;
+        }
+        return false;
+    }
+
+    public bool HasPersonalPassive(Type _passive)
+    {
+        foreach (PersonalPassive passive in PersonalPassives)
+        {
+            if (passive.GetType() == _passive)
+                return true;
+        }
+        return false;
+    }
+
+    public bool HasBoon(Boon _boon)
+    {
+        foreach (Boon boon in Boons)
+        {
+            if (boon == _boon)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool HasBoonType(Type _boonType)
+    {
+        foreach(Boon boon in Boons)
+        {
+            if(boon.GetType() == _boonType)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void AddBoon(Boon _boon)
+    {
+        Boons.Add(_boon);
+    }
+
+    public void RemoveBoon(Boon _boon)
+    {
+        Boons.Remove(_boon);
     }
 
     public bool HasMalady(MaladyTypes.MaladyType _malady)
@@ -96,24 +236,22 @@ public abstract class CharController : StateMachine {
 
     public void AddMalady(Malady _malady)
     {
-        maladies.Add(_malady);
+        Maladies.Add(_malady);
     }
 
     public void RemoveMalady(Malady _malady)
     {
-        maladies.Remove(_malady);
+        Maladies.Remove(_malady);
+        statusIndicator.RemoveMalady(MaladyTypes.GetType(_malady));
     }
-
-    public void ScaleCharacter()
-    {
-        transform.localScale = transform.localScale / height;
-        height = GetComponent<BoxCollider>().bounds.extents.y;
-    }
-
+    
     public virtual void HideCharacter()
     {
-        mesh.enabled = false;
-        foreach (Malady malady in maladies)
+        foreach(SkinnedMeshRenderer mesh in meshes)
+        {
+            mesh.enabled = false;
+        }
+        foreach (Malady malady in Maladies)
         {
             malady.HideMalady();
         }
@@ -121,8 +259,11 @@ public abstract class CharController : StateMachine {
 
     public virtual void ShowCharacter()
     {
-        mesh.enabled = true;
-        foreach(Malady malady in maladies)
+        foreach (SkinnedMeshRenderer mesh in meshes)
+        {
+            mesh.enabled = true;
+        }
+        foreach (Malady malady in Maladies)
         {
             malady.ShowMalady();
         }
@@ -133,7 +274,12 @@ public abstract class CharController : StateMachine {
         character = new Character();
         character.controller = this;
         character.Init();
-        maladies = new List<Malady>();
+    }
+
+    public void LoadAudioProfile()
+    {
+        audioController.charController = this;
+        audioController.LoadProfile();
     }
 
     public virtual void LoadCharacter(Character _character)
@@ -170,7 +316,9 @@ public abstract class CharController : StateMachine {
 
         circleGO.SetActive(false);
         Stats.Refresh();
+        //BuildUps.ResetBUs();
         RemoveAllMaladies();
+        RemoveAllBoons();
     }
 
     public void OnTurnEnd()
@@ -181,10 +329,6 @@ public abstract class CharController : StateMachine {
     public virtual void SetAnimatorParameters()
     {
         animParamController = GetComponent<AnimationParameterController>();
-        /*
-        animParamController._bools = new List<string> { "idle", "falling", "running" };
-        animParamController._triggers = new List<string> { "jump", "die", "attack" };
-        */
     }
 
     public virtual void Pause()
@@ -197,10 +341,11 @@ public abstract class CharController : StateMachine {
         animParamController.Resume();
     }
 
-    public void Place(Tile _tile)
+    public void Place(Tile _tile, bool occupy = true)
     {
         transform.position = _tile.WorldPosition;
-        OccupyTile(_tile);
+        if(occupy)
+            OccupyTile(_tile);
     }
 
     public void PassThrough(Tile _tile)
@@ -210,7 +355,7 @@ public abstract class CharController : StateMachine {
 
     public void Move(Tile _tile)
     {
-        Stats.curAP -= (int)_tile.node.gCost*20;
+        Stats.curAP -= (int)_tile.node.gCost*10;
         bc.battleUI.UpdateCurrentStats(true);
 
         OccupyTile(_tile);
@@ -235,94 +380,169 @@ public abstract class CharController : StateMachine {
 
     public void Attack(CharController _target, AttackAbility _ability)
     {
-        Stats.curAP -= _ability.ApCost;
-        bc.battleUI.UpdateCurrentStats(true);
+        FillAP(-_ability.ApCost);
     }
 
     public void CastSpell(SpellAbility spell)
     {
-        Stats.curMP -= spell.MpCost;
-        Stats.curAP -= spell.ApCost;
+        spell.ApplyCost(this);
         bc.battleUI.UpdateCurrentStats(true);
     }
 
     public void ChangeMaxHP(int amt)
     {
         Stats.ChangeMaxHP(amt);
-        statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
+        if (statusIndicator != null)
+            statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
+        UpdateStatusIndicators();
     }
 
     public void ChangeMaxAP(int amt)
     {
         Stats.ChangeMaxAP(amt);
-        statusIndicator.SetCurrentAP(Stats.curAP, Stats.maxAPTemp, Stats.maxAP);
+        if (statusIndicator != null)
+            statusIndicator.SetCurrentAP(Stats.curAP, Stats.maxAPTemp, Stats.maxAP);
+        UpdateStatusIndicators();
     }
 
     public void ChangeMaxMP(int amt)
     {
         Stats.ChangeMaxMP(amt);
-        statusIndicator.SetCurrentMP(Stats.curMP, Stats.maxMPTemp, Stats.maxMP);
+        if (statusIndicator != null)
+            statusIndicator.SetCurrentMP(Stats.curMP, Stats.maxMPTemp, Stats.maxMP);
+        UpdateStatusIndicators();
     }
 
-    public void Damage(Damage[] dmgPackage)
+    /// <summary>Apply damage to a target character. All damage done by a player to other players should be run through this, to account for any damage modifiers the character may have.</summary>
+    public void DealDamage(Damage _dmg, CharController _target)
+    {
+        ShowUITemp();
+
+        Damage adjDmg = (Damage)_dmg.Clone();
+
+        // Calculate and apply damage
+        adjDmg.damageAmount = character.damageBonuses.CalculateDamage(adjDmg);
+
+        if(adjDmg.maladyType != null)
+        {
+            MaladyTypes.MaladyType type = (MaladyTypes.MaladyType)adjDmg.maladyType;
+            if (BuildUps.IsCharged(type))
+            {
+                _target.ApplyMalady(type, character);
+                BuildUps.SetBU(type, 0f);
+            }
+            else
+            {
+                ApplyBuildUp(adjDmg);
+            }
+        }
+
+        _target.TakeDamage(adjDmg);
+    }
+
+    /// <summary>Apply damage package to a target character. All damage done by a player to other players should be run through this, to account for any damage modifiers the character may have.</summary>
+    public void DealDamage(Damage[] _dmgPackage, CharController _target)
     {
         if (gameObject == null)
             return;
 
-        foreach(Damage dmg in dmgPackage)
+        foreach (Damage dmg in _dmgPackage)
         {
-            Damage(dmg);
+            DealDamage(dmg, _target);
         }
     }
 
-    public void Damage(Damage dmg)
+    /// <summary>Apply damage package to this character.</summary>
+    public void TakeDamage(Damage[] _dmgPackage)
     {
         if (gameObject == null)
             return;
-        animParamController.SetTrigger("get_hit");
 
-        // Calculate and apply damage
-        int dmgAmt = Resists.CalculateDamage(dmg);
-        Stats.Damage(dmgAmt);
-        DisplayEffect((DamageTypes.DamageType)dmg.damageType);
-        statusIndicator.FloatText(dmgAmt, DamageTypes.GetColor((DamageTypes.DamageType)dmg.damageType));
+        foreach(Damage dmg in _dmgPackage)
+        {
+            TakeDamage(dmg);
+        }
+    }
 
-        // Apply malady build-up
-        if (dmg.maladyType != null && dmg.maladyAmount != null && !HasMalady((MaladyTypes.MaladyType)dmg.maladyType))
+    /// <summary>Apply damage to this character.</summary>
+    public void TakeDamage(Damage _dmg)
+    {
+        ShowUITemp();
+
+        if (gameObject == null)
+            return;
+
+        // Create copy of damage, so damage adjustments don't taint the ability's damage object
+        Damage adjDmg = (Damage)_dmg.Clone();
+
+        // Adjust damage by resists, then apply
+        adjDmg.damageAmount = Resists.CalculateDamage(adjDmg);
+        Stats.Damage((int)adjDmg.damageAmount);
+
+        DisplayEffect((DamageTypes.DamageType)adjDmg.damageType);
+        statusIndicator.FloatText((int)adjDmg.damageAmount, DamageTypes.GetColor((DamageTypes.DamageType)adjDmg.damageType));
+        CameraController.instance.Shake();
+        FlashHighlight(CustomColors.White);
+
+        // Update status indicator
+        statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
+        UpdateStatusIndicators();
+
+        // Check for death
+        if (Stats.curHP <= 0)
+        {
+            Die(adjDmg);
+            CombatLogController.instance.AddEntry(adjDmg, character, true);
+        }
+        else
+        {
+            animParamController.SetTrigger("get_hit");
+            audioController.Play("get_hit");
+            CombatLogController.instance.AddEntry(adjDmg, character, false);
+        }
+    }
+
+    /// <summary> Apply malady build-up from a given damage source.</summary>
+    public void ApplyBuildUp(Damage dmg)
+    {
+        if (dmg.maladyType != null && dmg.maladyAmount != null)
         {
             MaladyTypes.MaladyType type = (MaladyTypes.MaladyType)dmg.maladyType;
             float curBU = BuildUps.GetBU(type);
             float addBU = (float)dmg.maladyAmount;
             BuildUps.AddBU(type, addBU);
-            statusIndicator.DisplayBuildUp(type, curBU, BuildUps.GetBU(type), () => ApplyMalady(type));
-        }
-
-        // Update status indicator
-        statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
-        bc.battleUI.UpdateCurrentStats(bc.CurrentCharacter == this);
-
-        // Check for death
-        if (Stats.curHP <= 0)
-        {
-            Die();
+            statusIndicator.DisplayBuildUp(type, curBU, BuildUps.GetBU(type));
         }
     }
 
-    public float SetResistance(DamageTypes.DamageType type, float amt)
+    public void AddResistance(DamageTypes.DamageType type, float amt)
     {
-        float realAmt = Resists.SetResistance(type, amt);
-        return realAmt;
+        Resists.AddResistance(type, amt);
     }
 
-    public float AddResistance(DamageTypes.DamageType type, float amt)
+    public void RemoveResistance(DamageTypes.DamageType type, float amt)
     {
-        float realAmt = Resists.AddResistance(type, amt);
-        return realAmt;
+        Resists.RemoveResistance(type, amt);
     }
 
     public float GetResistance(DamageTypes.DamageType type)
     {
         return Resists.GetResistance(type);
+    }
+
+    public void AddDamageBoost(DamageTypes.DamageType type, float amt)
+    {
+        DamageBonuses.AddBonus(type, amt);
+    }
+
+    public void RemoveDamageBoost(DamageTypes.DamageType type, float amt)
+    {
+        DamageBonuses.RemoveBonus(type, amt);
+    }
+
+    public float GetDamageBoost(DamageTypes.DamageType type)
+    {
+        return DamageBonuses.GetBonus(type);
     }
 
     public void DisplayEffect(DamageTypes.DamageType type)
@@ -333,21 +553,78 @@ public abstract class CharController : StateMachine {
         GameObject effectGO = Instantiate(prefab, gameObject.transform);
     }
 
-    public void ApplyMalady(MaladyTypes.MaladyType type)
+    public void ChargeMalady(MaladyTypes.MaladyType type)
     {
-        audioController.Play("Malady");
-        MaladyTypes.ApplyMalady(type, this);
-        BuildUps.SetBU(type, 0f);
+        audioController.Play("ChargeMalady");
     }
 
-    public void Heal(int amt)
+    public void ApplyMalady(MaladyTypes.MaladyType type, Character _source)
+    {
+        audioController.Play("Malady");
+        MaladyTypes.ApplyMalady(type, _source, this);
+        statusIndicator.AddMalady(type, true);
+    }
+
+    public void Heal(int amt, bool show = false)
     {
         if (gameObject == null)
             return;
 
         Stats.Heal(amt);
-        statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
-        statusIndicator.FloatText(amt, Color.green);
+        if(show && statusIndicator != null)
+        {
+            statusIndicator.FloatText(amt, CustomColors.HP);
+            statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP);
+        }
+        UpdateStatusIndicators();
+    }
+
+    public void FillAP(int amt, bool show = false)
+    {
+        Stats.FillAP(amt);
+        if(show && statusIndicator != null)
+        {
+            statusIndicator.FloatText(amt, CustomColors.AP);
+        }
+        UpdateStatusIndicators();
+    }
+
+    public void FillAP(bool show = false)
+    {
+        if(show && statusIndicator != null)
+        {
+            statusIndicator.FloatText(Stats.maxAPTemp - Stats.curAP, CustomColors.AP);
+        }
+        Stats.FillAP();
+        UpdateStatusIndicators();
+    }
+
+    public void FillMP(int amt, bool show = false)
+    {
+        Stats.FillMP(amt);
+        if(show && statusIndicator != null)
+        {
+            statusIndicator.FloatText(amt, CustomColors.MP);
+        }
+        UpdateStatusIndicators();
+    }
+
+    public void FillMP(bool show = false)
+    {
+        Stats.FillMP();
+        if(show && statusIndicator != null)
+        {
+            statusIndicator.FloatText(Stats.maxMPTemp - Stats.curMP, Color.blue);
+        }
+        UpdateStatusIndicators();
+    }
+
+    public void UpdateStatusIndicators()
+    {
+        if (BattleUIController.instance == null)
+            return;
+        BattleUIController.instance.UpdateCurrentStats(bc.CurrentCharacter == this);
+        BattleUIController.instance.UpdateTargetStats(bc.TargetCharacter == this);
     }
 
     public void TurnToward()
@@ -355,46 +632,96 @@ public abstract class CharController : StateMachine {
 
     }
 
-    public void OnTurnEnd(CharController character)
+    public void ShowUITemp(float delay = 3f)
+    {
+        if(statusIndicator != null)
+            statusIndicator.ShowTemp(delay);
+    }
+
+    public void ShowUI(bool show)
+    {
+        if (statusIndicator == null)
+            return;
+
+        statusIndicator.Show();
+        if(show)
+            statusIndicator.SetCurrentHP(Stats.curHP, Stats.maxHPTemp, Stats.maxHP, animate: false);
+    }
+
+    public void HideUI(bool wait = true)
+    {
+        if (statusIndicator != null)
+            statusIndicator.Hide(wait);
+    }
+    
+    public void OnUnitChange(CharController previousCharacter, CharController currentCharacter)
     {
         Stats.FillAP();
     }
 
-    public virtual void Die()
+    public void OnRoundChange()
+    {
+        BuildUps.DecreaseAll(5f);
+    }
+
+    public virtual void Die(Damage _damage)
     {
         if (gameObject == null)
             return;
 
-        // Leave current tile
-        if (tile != null)
-            tile.Occupant = null;
-
-        //statusIndicator.gameObject.SetActive(false);
-        bc.onUnitChange -= OnTurnEnd;
-
+        Stats.curHP = 0;
         StateArgs deathArgs = new StateArgs()
         {
-            waitingStateMachines = new List<StateMachine> { bc }
+            damage = _damage,
+            waitingStateMachines = new List<StateMachine> { bc },
+            finishInterruptedState = false
         };
         ChangeState<DeathSequence>(deathArgs);
     }
 
-    public virtual void AfterDeath()
+    public virtual void AfterDeath(Damage damage)
     {
-        bc.OnUnitDeath(this);
-        gameObject.SetActive(false);
+        Party[] partiesCopy = new Party[Parties.Count];
+        Parties.CopyTo(partiesCopy);
+        foreach (Party party in partiesCopy)
+        {
+            party.RemoveMember(character);
+        }
+
+        Roster[] rostersCopy = new Roster[Rosters.Count];
+        Rosters.CopyTo(rostersCopy);
+        foreach (Roster roster in rostersCopy)
+        {
+            roster.RemoveMember(character);
+        }
+
         RemoveAllMaladies();
         OccupyTile(null);
-        //Destroy(this.gameObject);
+
+        bc.onUnitChange -= OnUnitChange;
+        bc.OnUnitDeath(this, damage);
+
+        //statusIndicator.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     public void RemoveAllMaladies()
     {
-        Malady[] MaladiesCopy = new Malady[maladies.Count];
-        maladies.CopyTo(MaladiesCopy);
+        Malady[] MaladiesCopy = new Malady[Maladies.Count];
+        Maladies.CopyTo(MaladiesCopy);
         foreach (Malady malady in MaladiesCopy)
         {
             malady.RemoveMalady();
+        }
+    }
+
+    public void RemoveAllBoons()
+    {
+        Boon[] BoonsCopy = new Boon[Boons.Count];
+        Boons.CopyTo(BoonsCopy);
+        foreach(Boon boon in BoonsCopy)
+        {
+            boon.RemoveBoon();
         }
     }
 
@@ -402,11 +729,50 @@ public abstract class CharController : StateMachine {
     {
         audioController.PlayRandomFromGroup(Sound.SoundGroup.Run);
     }
+    
+    public void PlayClip(string _clipName)
+    {
+    }
+
+    public void AttackLand(string _clipName)
+    {
+        audioController.Play("attack");
+        onAttackLand?.Invoke(_clipName);
+    }
+
+    public void Highlight(Color _color)
+    {
+        if (highlight == null)
+            return;
+
+        highlight.HighlightObject(_color);
+    }
+
+    public void RemoveHighlight()
+    {
+        if (highlight == null)
+            return;
+
+        highlight.RemoveHighlight();
+    }
+
+    public void FlashHighlight(Color _color)
+    {
+        if (highlight == null)
+            return;
+
+        highlight.FlashObject(_color);
+    }
 
     private void OnDrawGizmos()
     {
+        Vector3 forwardleft = new Vector3(-0.5f, 0f, 0.5f);
+
         Gizmos.color = CustomColors.Hostile;
-        Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + direction * 1f + Vector3.up * 0.5f);
+        //Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + direction * 1f + Vector3.up * 0.5f);
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + Vector3.forward * 1f + Vector3.up * 0.5f);
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + Vector3.left * 1f + Vector3.up * 0.5f);
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.5f, transform.position + forwardleft * 1f + Vector3.up * 0.5f);
     }
 
 }

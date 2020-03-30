@@ -8,34 +8,39 @@ public class GlobalStatusIndicator : StatusIndicator
     [SerializeField]
     protected GameObject statusEffects;
 
-    private GameObject effectPrefab;
+    protected List<GameObject> maladies;
+    private GameObject maladyPrefab;
 
     public void Start()
     {
-        effectPrefab = Resources.Load("Prefabs/UI/Malady") as GameObject;
+        maladyPrefab = Resources.Load("Prefabs/UI/Malady") as GameObject;
+        maladies = new List<GameObject>();
     }
 
-    public void AddEffects(List<Malady> effects)
+    public void AddMaladies(List<Malady> maladies)
     {
-        RemoveEffects();
-        foreach (Malady effect in effects)
+        RemoveMaladies();
+        foreach (Malady malady in maladies)
         {
-            AddEffect(effect);
+            AddMalady(malady);
         }
     }
 
-    public void AddEffect(Malady effect)
+    public void AddMalady(Malady malady)
     {
-        GameObject effectGO = Instantiate(effectPrefab, statusEffects.transform);
-        Image icon = effectGO.GetComponent<Image>();
-        icon.sprite = effect.icon;
+        GameObject maladyGO = Instantiate(maladyPrefab, statusEffects.transform);
+        maladies.Add(maladyGO);
+        Image icon = maladyGO.GetComponent<Image>();
+        icon.sprite = malady.icon;
     }
 
-    public void RemoveEffects()
+    public void RemoveMaladies()
     {
-        foreach (GameObject child in GameObject.FindGameObjectsWithTag("EffectIcon"))
+        if (maladies == null)
+            return;
+        foreach (GameObject maladyGO in maladies)
         {
-            Destroy(child);
+            Destroy(maladyGO);
         }
     }
 

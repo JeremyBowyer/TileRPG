@@ -6,23 +6,24 @@ using UnityEngine;
 public class BackstabAbility : TargetSpellAbility
 {
 
-    public BackstabAbility(CharController _character)
+    public BackstabAbility(Character _character)
     {
         AbilityName = "Backstab";
         AbilityDescription = "Attack an enemy from behind, dealing high damage";
-        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Physical, 40) };
+        AbilityDamage = new Damage[] { new Damage(_character, DamageTypes.DamageType.Physical, 40) };
         ApCost = 25;
         MpCost = 40;
         AbilityRange = 1f;
         diag = false;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Hostile;
+        abilityIntent = IntentTypes.Intent.Hostile;
+        icon = Resources.Load<Sprite>("Sprites/Ability Icons/BackstabAbility");
     }
 
     public override List<Node> GetRange()
     {
-        List<Node> range = character.bc.pathfinder.FindRange(character.tile.node, AbilityRange, diag, true, false, false, false);
+        List<Node> range = controller.bc.pathfinder.FindRange(controller.tile.node, AbilityRange, diag, true, false, false, false);
         return range;
     }
 
@@ -33,21 +34,25 @@ public class BackstabAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController _target)
     {
-        _target.Damage(AbilityDamage);
+        foreach (Damage dmg in AbilityDamage)
+        {
+            dmg.ability = this;
+        }
+        character.controller.DealDamage(AbilityDamage, _target);
     }
 
     public override bool ValidateTarget(CharController _target)
     {
-        Grid.Position pos = character.bc.grid.CompareDirection(character.tile.node, _target.tile.node, _target.direction);
+        Grid.Position pos = controller.bc.grid.CompareDirection(controller.tile.node, _target.tile.node, _target.direction);
 
         return pos == Grid.Position.Back;
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
-        character.animParamController.SetTrigger("backstab");
-        character.animParamController.SetBool("idle");
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        controller.animParamController.SetTrigger("stab_attack");
+        controller.animParamController.SetBool("idle");
+        controller.transform.rotation = Quaternion.LookRotation(controller.bc.grid.GetDirection(controller.tile.node, _target.tile.node), Vector3.up);
         callback();
         yield break;
     }

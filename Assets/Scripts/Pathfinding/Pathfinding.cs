@@ -94,7 +94,15 @@ public class Pathfinding : MonoBehaviour {
             {
                 if (i >= _limit) return nodesInRange;
                 int step = endNode.gridY > startNode.gridY ? startNode.gridY + i : startNode.gridY - i;
-                nodesInRange.Add(grid.grid[startNode.gridX, step]);
+                Node node = grid.grid[startNode.gridX, step];
+
+                if (!node.IsWalkable && !ignoreUnwalkable)
+                    break;
+
+                if (node.occupant != null && !ignoreOccupant)
+                    break;
+
+                nodesInRange.Add(node);
             }
         } else if (startNode.gridY == endNode.gridY)
         {
@@ -103,14 +111,22 @@ public class Pathfinding : MonoBehaviour {
             {
                 if (i >= _limit) return nodesInRange;
                 int step = endNode.gridX > startNode.gridX ? startNode.gridX + i : startNode.gridX - i;
-                nodesInRange.Add(grid.grid[step, startNode.gridY]);
+                Node node = grid.grid[step, startNode.gridY];
+
+                if (!node.IsWalkable && !ignoreUnwalkable)
+                    break;
+
+                if (node.occupant != null && !ignoreOccupant)
+                    break;
+
+                nodesInRange.Add(node);
             }
         }
 
         return nodesInRange;
     }
 
-    public List<Node> CullNodes(List<Node> nodes, bool cullOccupied, bool cullUnwalkable)
+    public List<Node> CullNodes(List<Node> nodes, bool cullOccupied, bool cullUnwalkable, bool cullDoorways = false)
     {
         // Meant to be fed an output from FindPath() or FindLine(), to remove invalid nodes.
         // This separation allows me to include invalid nodes in FindPath() and FindLine() for
@@ -124,6 +140,11 @@ public class Pathfinding : MonoBehaviour {
                 continue;
 
             if (!node.IsWalkable && cullUnwalkable)
+                continue;
+
+            KeepFloor floor = node.tile.gameObject.GetComponent<KeepFloor>();
+
+            if (floor != null && floor.isDoorway && cullDoorways)
                 continue;
 
             culledNodes.Add(node);

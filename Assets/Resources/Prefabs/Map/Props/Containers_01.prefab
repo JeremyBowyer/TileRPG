@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2870456247299094148}
   - component: {fileID: 3868052454551261011}
   m_Layer: 8
-  m_Name: Containers
-  m_TagString: Untagged
+  m_Name: Containers_01
+  m_TagString: Prop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

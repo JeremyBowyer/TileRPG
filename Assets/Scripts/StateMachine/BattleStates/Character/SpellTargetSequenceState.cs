@@ -19,7 +19,7 @@ public class SpellTargetSequenceState : BattleState
             return new List<Type>
             {
             typeof(DeathSequence),
-            typeof(CheckForTurnEndState),
+            typeof(UnitTurnState),
             typeof(EnemyTurnState)
             };
         }
@@ -49,7 +49,7 @@ public class SpellTargetSequenceState : BattleState
         character.ChangeState<IdleState>();
     }
 
-    public override void InterruptTransition()
+    public override void InterruptTransition(bool finish)
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);

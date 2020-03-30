@@ -8,16 +8,32 @@ public abstract class BaseAbility {
     private string abilityName;
     private string abilityDescription;
     private Damage[] abilityDamage;
+    private int hpCost;
     private int apCost;
     private int mpCost;
     private float abilityRange;
-    public CharController character;
+    public Sprite icon;
+    public Character character;
+    public CharController controller
+    {
+        get { return character.controller; }
+    }
     public bool diag = true;
     public bool ignoreOccupant = true;
-    //public bool inProgress;
+    public bool ignoreUnwalkable = true;
     public bool isProjectile = false;
     public int mouseLayer;
-    public AbilityTypes.Intent abilityIntent;
+    public IntentTypes.Intent abilityIntent;
+
+    public BattleController bc
+    {
+        get { return controller.bc; }
+    }
+
+    public LevelController lc
+    {
+        get { return controller.lc; }
+    }
 
     public string AbilityName
     {
@@ -35,6 +51,12 @@ public abstract class BaseAbility {
     {
         get { return abilityDamage; }
         set { abilityDamage = value; }
+    }
+
+    public int HpCost
+    {
+        get { return hpCost; }
+        set { hpCost = value; }
     }
 
     public int ApCost
@@ -58,7 +80,13 @@ public abstract class BaseAbility {
     public virtual void ApplyCost(CharController _owner)
     {
         _owner.Stats.curAP = Mathf.Clamp(_owner.Stats.curAP - ApCost, 0, _owner.Stats.maxAPTemp);
+        _owner.Stats.curHP = Mathf.Clamp(_owner.Stats.curHP - HpCost, 0, _owner.Stats.maxHPTemp);
         _owner.Stats.curMP = Mathf.Clamp(_owner.Stats.curMP - MpCost, 0, _owner.Stats.maxMPTemp);
+    }
+
+    public virtual void ApplyBuildUp(CharController _owner)
+    {
+
     }
 
     public abstract void ApplyCharacterEffect(CharController _target);
@@ -70,22 +98,22 @@ public abstract class BaseAbility {
     public virtual List<Node> PathToGetInRange(CharController _target)
     {
 
-        List<Node> neighbors = character.bc.grid.GetNeighbors(_target.tile.node, diag, false, true);
+        List<Node> neighbors = controller.bc.grid.GetNeighbors(_target.tile.node, diag, false, true);
         if (neighbors.Count == 0)
             return null;
 
         Node closestNode = neighbors[0];
         foreach(Node neighbor in neighbors)
         {
-            float dist = character.bc.pathfinder.GetDistance(character.tile.node, neighbor);
-            if (dist < character.bc.pathfinder.GetDistance(character.tile.node, closestNode))
+            float dist = controller.bc.pathfinder.GetDistance(controller.tile.node, neighbor);
+            if (dist < controller.bc.pathfinder.GetDistance(controller.tile.node, closestNode))
                 closestNode = neighbor;
         }
 
 
-        List<Node> range = character.bc.pathfinder.FindRange(_target.tile.node, AbilityRange, diag, ignoreOccupant, true, false, true);
+        List<Node> range = controller.bc.pathfinder.FindRange(_target.tile.node, AbilityRange, diag, ignoreOccupant, true, false, true);
 
-        List<Node> path = character.MovementAbility.GetPath(closestNode);
+        List<Node> path = controller.MovementAbility.GetPath(closestNode);
         List<Node> shortPath = new List<Node>();
 
         foreach (Node node in path)

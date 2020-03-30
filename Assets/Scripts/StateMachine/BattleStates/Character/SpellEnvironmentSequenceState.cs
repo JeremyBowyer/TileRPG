@@ -22,7 +22,6 @@ public class SpellEnvironmentSequenceState : BattleState
             {
             typeof(SelectUnitState),
             typeof(CommandSelectionState),
-            typeof(EnemyTurnStateGlobal),
             typeof(VictorySequence),
             typeof(DeathSequence)
             };
@@ -52,15 +51,16 @@ public class SpellEnvironmentSequenceState : BattleState
         else
         {
             Vector3 facingDirection = bc.grid.GetDirection(character.tile.node, affectedArea[0]);
-            if(facingDirection == grid.forwardDirection || facingDirection == grid.backwardDirection)
+            if(facingDirection == Grid.forwardDirection || facingDirection == Grid.backwardDirection)
             {
-                sourceDirection = grid.leftDirection;
+                sourceDirection = Grid.leftDirection;
             }
             else
             {
-                sourceDirection = grid.forwardDirection;
+                sourceDirection = Grid.forwardDirection;
             }
         }
+
         for (int i = 0; i < affectedArea.Count; i++)
         {
             spell.ApplyTileEffect(affectedArea[i].tile, sourceDirection, grid);
@@ -69,7 +69,7 @@ public class SpellEnvironmentSequenceState : BattleState
         character.ChangeState<IdleState>();
     }
 
-    public override void InterruptTransition()
+    public override void InterruptTransition(bool finish)
     {
         isInterrupting = true;
         StopCoroutine(spellCoroutine);

@@ -4,32 +4,36 @@ using UnityEngine;
 
 public class Executioner : PartyMember
 {
-    public override void Init()
+
+    public Executioner() : base()
     {
-        stats.maxHP = 175;
-        stats.maxAP = 200;
-        stats.agility = 75;
-        stats.Init();
-        resists.Init();
-        buildUps.Init();
-
-        experience = 0;
-        level = 1;
-
-        cName = "Executioner";
-        cClass = "Executioner";
-
-        isInitialized = true;
-    }
-
-    public override void InitAbilities()
-    {
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new WalkMovement(controller);
+        avatar = Resources.Load<Sprite>("Sprites/Avatars/Executioner");
+        attackAbility = new SwordAttackAbility(this);
+        movementAbility = new WalkMovement(this);
         movementAbility.speed = 2f;
         movementAbility.costModifier = 3f;
 
-        spells = new List<SpellAbility>();
-        spells.Add(new ExecuteAbility(controller));
+        abilities = new List<SpellAbility>();
+        abilities.Add(new ExecuteAbility(this));
+        abilities.Add(new PommelAbility(this));
+
+        audioProfile = Resources.Load<CharacterAudioProfile>("Sounds/Audio Profiles/Character Profiles/Players/ExecutionerAudioProfile");
+    }
+
+    public override void Init()
+    {
+        stats.maxHP = 200;
+        stats.maxAP = 100;
+        stats.agility = 200;
+        stats.Init();
+        resists.Init();
+        damageBonuses.Init();
+        buildUps.Init();
+
+        cName = "Executioner";
+        cClass = "Executioner";
+        model = "Executioner";
+
+        isInitialized = true;
     }
 }

@@ -17,6 +17,7 @@ public class CommandSelectionState : BaseAbilityMenuState
             typeof(MoveTargetState),
             typeof(AttackTargetState),
             typeof(SpellSelectionState),
+            typeof(ItemSelectionState),
             typeof(SelectUnitState)
             };
         }
@@ -26,18 +27,30 @@ public class CommandSelectionState : BaseAbilityMenuState
     public override void Enter()
     {
         InTransition = true;
-        bc.cameraRig.isFollowing = true;
-        base.Enter();
-        InTransition = false;
+        if (bc.CurrentCharacter == null || bc.CurrentCharacter.IsDead)
+        {
+            InTransition = false;
+            bc.ChangeState<SelectUnitState>();
+            return;
+        }
+        else
+        {
+            base.Enter();
+            bc.FollowTarget(bc.CurrentCharacter.transform);
+            InTransition = false;
+        }
+
     }
 
     protected override void LoadMenu()
     {
         abilityMenuPanelController.Show("Commands");
         abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(bc.CurrentCharacter.MovementAbility.mName, Move), bc.CurrentCharacter.Stats.curAP > 0);
-        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(bc.CurrentCharacter.AttackAbility.AbilityName, Attack), bc.CurrentCharacter.AttackAbility.ValidateCost(bc.CurrentCharacter));
+        abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(bc.CurrentCharacter.AttackAbility.AbilityName, Attack), bc.CurrentCharacter.AttackAbility.ValidateCost(bc.CurrentCharacter), bc.CurrentCharacter.AttackAbility);
         if (bc.CurrentCharacter.Spells != null && bc.CurrentCharacter.Spells.Count > 0)
             abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("Spells", Spells), true);
+        if(bc.CurrentCharacter.HasPersonalPassive(typeof(BagAccess)))
+            abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("Use Item", Items), true);
         abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>("End Turn", EndTurn), true);
 
         /*
@@ -64,11 +77,13 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected void Move()
     {
+        GlobalAudioController.instance.Play("default_confirm_click");
         bc.ChangeState<MoveTargetState>();
     }
 
     protected void Attack()
     {
+        GlobalAudioController.instance.Play("default_confirm_click");
         StateArgs attackTargetArgs = new StateArgs
         {
             attackAbility = bc.CurrentCharacter.AttackAbility
@@ -78,12 +93,30 @@ public class CommandSelectionState : BaseAbilityMenuState
 
     protected void Spells()
     {
+        GlobalAudioController.instance.Play("default_confirm_click");
         bc.ChangeState<SpellSelectionState>();
+    }
+
+    protected void Items()
+    {
+        GlobalAudioController.instance.Play("default_confirm_click");
+        BattleController.instance.ChangeState<ItemSelectionState>();
     }
 
     protected void EndTurn()
     {
+        GlobalAudioController.instance.Play("default_cancel_click");
         bc.ChangeState<SelectUnitState>();
+    }
+
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        OutlineTargetCharacter(sender, e);
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        RemoveOutlineTargetCharacter();
     }
 
 }

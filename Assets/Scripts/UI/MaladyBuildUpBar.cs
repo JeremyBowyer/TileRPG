@@ -13,6 +13,9 @@ public class MaladyBuildUpBar : MonoBehaviour
     [SerializeField]
     private Image iconImg;
 
+    public CharacterStatusIndicator statusIndicator;
+    public bool Displaying;
+
     public void SetType(MaladyTypes.MaladyType type)
     {
         iconImg.sprite = MaladyTypes.GetIcon(type);
@@ -30,6 +33,7 @@ public class MaladyBuildUpBar : MonoBehaviour
 
     public IEnumerator FillBar(RectTransform bar, float _target, float _max, Action _callback)
     {
+        Displaying = true;
         float currentTime = 0f;
         float speed = 1f;
         float startingScale = bar.localScale.x / 100f;
@@ -47,6 +51,11 @@ public class MaladyBuildUpBar : MonoBehaviour
             _callback?.Invoke();
 
         yield return new WaitForSeconds(0.5f);
+
+        Displaying = false;
+        if (statusIndicator != null)
+            statusIndicator.buBars.Remove(this);
+
         Destroy(gameObject);
     }
 }

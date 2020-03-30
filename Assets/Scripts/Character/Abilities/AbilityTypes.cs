@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class AbilityTypes {
+public static class IntentTypes {
 
     public enum Intent { Hostile, Support, Heal };
 	

@@ -6,23 +6,25 @@ using UnityEngine;
 public class FireboltAbility : TargetSpellAbility
 {
 
-    public FireboltAbility(CharController _character)
+    public FireboltAbility(Character _character)
     {
         AbilityName = "Firebolt";
-        AbilityDescription = "Attack at range with a firebolt.";
-        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Fire, 30, MaladyTypes.MaladyType.Burn, 20) };
+        AbilityDescription = "Ranged attack that deals fire damage but applies no burning buildup.";
+        AbilityDamage = new Damage[] { new Damage(_character, DamageTypes.DamageType.Fire, 45) };
         ApCost = 25;
-        MpCost = 10;
+        //MpCost = 10;
         AbilityRange = 5f;
         diag = true;
+        isProjectile = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Hostile;
+        abilityIntent = IntentTypes.Intent.Hostile;
+        icon = Resources.Load<Sprite>("Sprites/Ability Icons/FireboltAbility");
     }
 
     public override List<Node> GetRange()
     {
-        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        List<Node> range = controller.bc.pathfinder.FindGeometricRange(controller.tile.node, AbilityRange);
         return range;
     }
 
@@ -31,17 +33,38 @@ public class FireboltAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyCharacterEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController _target)
     {
-        character.Damage(AbilityDamage);
+        foreach (Damage dmg in AbilityDamage)
+        {
+            dmg.ability = this;
+        }
+        character.controller.DealDamage(AbilityDamage, _target);
+    }
+
+    public override Vector3[] GetPath(Vector3 _target)
+    {
+        Vector3 startingPos = controller.transform.position + Vector3.up * controller.height;
+        Vector3 endPos = _target + Vector3.up * controller.height;
+
+        int steps = 100;
+        Vector3[] linePoints = new Vector3[steps];
+        for (int i = 0; i < steps; i++)
+        {
+            float step = (float)i / steps;
+            Vector3 framePos = MathCurves.Linear(startingPos, endPos, step);
+            linePoints[i] = framePos;
+        }
+
+        return linePoints;
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
-        character.animParamController.SetTrigger("cast_start");
-        character.animParamController.SetBool("cast_loop");
-        character.transform.LookAt(new Vector3(_target.transform.position.x, character.transform.position.y, _target.transform.position.z));
-        Vector3 spawnLocation = character.transform.position + Vector3.up * character.height / 2 + character.direction * 0.2f;
+        controller.animParamController.SetTrigger("cast_2_start");
+        controller.animParamController.SetBool("cast_2_loop");
+        controller.transform.LookAt(new Vector3(_target.transform.position.x, controller.transform.position.y, _target.transform.position.z));
+        Vector3 spawnLocation = controller.transform.position + Vector3.up * controller.height / 2 + controller.direction * 0.2f;
         GameObject fbPrefabClone = GameObject.Instantiate(Resources.Load("Prefabs/Abilities/FireboltPrefab") as GameObject, spawnLocation, Quaternion.identity) as GameObject;
         fbPrefabClone.gameObject.tag = "SpellTargetGO";
         Vector3 startingPos = fbPrefabClone.transform.position;
@@ -59,10 +82,10 @@ public class FireboltAbility : TargetSpellAbility
             yield return new WaitForEndOfFrame();
         }
 
-        character.animParamController.SetBool("idle");
-        character.animParamController.SetTrigger("cast_end");
+        controller.animParamController.SetBool("idle");
+        controller.animParamController.SetTrigger("cast_2_end");
         GameObject.Destroy(fbPrefabClone);
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
+        controller.transform.rotation = Quaternion.LookRotation(controller.bc.grid.GetDirection(controller.tile.node, _target.tile.node), Vector3.up);
         callback();
         yield break;
     }

@@ -18,17 +18,22 @@ public class StateMachine : MonoBehaviour
         public StateArgs args;
     }
 
-    protected State _currentState;
+    protected State _previousState;
+    public State PreviousState
+    {
+        get { return _previousState; }
+    }
 
+    protected State _currentState;
     public virtual State CurrentState
     {
         get { return _currentState; }
         set
         {
+            _previousState = _currentState;
             _currentState = value;
             if (currentStateText != null && _currentState != null)
             {
-                //Debug.Log("Entering State: " + _currentState.GetType().Name);
                 currentStateText.text = _currentState.GetType().Name;
             }
         }
@@ -130,9 +135,9 @@ public class StateMachine : MonoBehaviour
 
     public virtual T GetState<T>() where T : State
     {
-        T target = GetComponent<T>();
-        if (target == null || target.isBeingDestroyed)
-            target = gameObject.AddComponent<T>();
+        //T target = GetComponent<T>();
+        //if (target == null || target.isBeingDestroyed)
+        T target = gameObject.AddComponent<T>();
         return target;
     }
 
@@ -278,7 +283,7 @@ public class StateMachine : MonoBehaviour
             args = args
         };
         stateQueue.Add(queuedTransition);
-        if(CurrentState != null)
+        if (CurrentState != null)
             Debug.Log("Current State: " + CurrentState.GetType().Name + " Queued State: " + value.GetType().Name);
         else
             Debug.Log("Current State: NULL Queued State: " + value.GetType().Name);
@@ -299,7 +304,7 @@ public class StateMachine : MonoBehaviour
         if (_inTransition && _isInterruptable)
         {
             Debug.Log("Interrupting state: " + CurrentState.GetType().Name);
-            CurrentState.InterruptTransition();
+            CurrentState.InterruptTransition(args.finishInterruptedState);
             CurrentState.Exit();
         }
         else

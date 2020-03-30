@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 469428}
   - component: {fileID: 3398476}
   - component: {fileID: 2306930}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: LongRug
   m_TagString: Untagged
   m_Icon: {fileID: 0}

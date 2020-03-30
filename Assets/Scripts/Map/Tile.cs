@@ -19,7 +19,8 @@ public class Tile : MonoBehaviour {
     public Texture emptyTex;
     public Texture innerTex;
     public Texture filledTex;
-    public Vector3 anchorPoint;
+    public Vector3 anchorPointWorld { get { return transform.Find("AnchorPoint").transform.position; } }
+    public Vector3 anchorPointLocal { get { return transform.Find("AnchorPoint").transform.localPosition; } }
 
     public Dictionary<string, Color> colorDict;
     public Dictionary<string, Texture> textureDict;
@@ -35,7 +36,7 @@ public class Tile : MonoBehaviour {
             {
                 CharController character = value.GetComponent<CharController>();
                 if (character != null)
-                    Effect.ApplyEffect(character);
+                    Effect.OnCharEnter(character);
             }
             occupant = value;
         }
@@ -50,7 +51,8 @@ public class Tile : MonoBehaviour {
         if (projector == null)
             projector = transform.Find("AnchorPoint").transform.Find("Projector").GetComponent<Projector>();
 
-        anchorPoint = transform.Find("AnchorPoint").transform.position;
+        //anchorPointLocal = transform.Find("AnchorPoint").transform.localPosition;
+        //anchorPointWorld = transform.Find("AnchorPoint").transform.position;
         moveBlocks = new List<Grid.Position>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         originalMat = projector.material;
@@ -65,26 +67,45 @@ public class Tile : MonoBehaviour {
 
     public void FindMovementBlocks()
     {
-        Vector3 anchorPoint = transform.Find("AnchorPoint").transform.position;
-        foreach (Vector3 direction in new Vector3[] { grid.forwardDirection, grid.rightDirection, grid.backwardDirection, grid.leftDirection })
+        //Vector3 anchorPoint = transform.Find("AnchorPoint").transform.position;
+        foreach (Vector3 direction in Grid.directions)
         {
             int layerMask = (1 << LayerMask.NameToLayer("MovementBlocker"));
 
-            if (Physics.Raycast(anchorPoint, direction, 1f, layerMask))
+            if (Physics.Raycast(anchorPointWorld, direction, 1f, layerMask))
             {
 
-                if (direction == grid.forwardDirection)
+                if (direction == Grid.forwardDirection)
                 {
                     moveBlocks.Add(Grid.Position.Front);
-                } else if (direction == grid.rightDirection)
+                }
+                else if (direction == Grid.rightDirection)
                 {
                     moveBlocks.Add(Grid.Position.Right);
-                } else if (direction == grid.backwardDirection)
+                }
+                else if (direction == Grid.backwardDirection)
                 {
                     moveBlocks.Add(Grid.Position.Back);
-                } else if (direction == grid.leftDirection)
+                }
+                else if (direction == Grid.leftDirection)
                 {
                     moveBlocks.Add(Grid.Position.Left);
+                }
+                else if (direction == Grid.forwardLeftDirection)
+                {
+                    moveBlocks.Add(Grid.Position.FrontLeft);
+                }
+                else if (direction == Grid.forwardRightDirection)
+                {
+                    moveBlocks.Add(Grid.Position.FrontRight);
+                }
+                else if (direction == Grid.backwardLeftDirection)
+                {
+                    moveBlocks.Add(Grid.Position.BackLeft);
+                }
+                else if (direction == Grid.backwardRightDirection)
+                {
+                    moveBlocks.Add(Grid.Position.BackRight);
                 }
             }
         }
@@ -137,7 +158,7 @@ public class Tile : MonoBehaviour {
             colorHierarchy.Remove(set);
             colorDict.Remove(set);
             textureDict.Remove(set);
-            if(colorHierarchy.Count > 0)
+            if(colorHierarchy.Count > 0 && colorDict.ContainsKey(colorHierarchy[0]) && textureDict.ContainsKey(colorHierarchy[0]))
             {
                 ColorTile(colorDict[colorHierarchy[0]]);
                 SetProjectorTexture(textureDict[colorHierarchy[0]]);

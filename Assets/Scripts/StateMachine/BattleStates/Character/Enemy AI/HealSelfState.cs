@@ -23,8 +23,7 @@ public class HealSelfState : AIBattleState
         base.Enter();
         args.callback = InitiateTurn;
         args.targetCharacter = character;
-        aiAction.text = "Healing Self...";
-        superUI.ShowMessage(args.spell.AbilityName, 1.5f);
+        superUI.ShowMinorMessage(args.spell.AbilityName, 1.5f);
         character.ChangeState<SpellTargetSequenceState>(args);
         InTransition = false;
     }

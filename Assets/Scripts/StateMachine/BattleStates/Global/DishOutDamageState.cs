@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class DishOutDamageState : BattleState
 {
+    IEnumerator delayCoroutine;
 
     public override bool IsInterruptible
     {
@@ -22,7 +23,8 @@ public class DishOutDamageState : BattleState
         {
             return new List<Type>
             {
-            typeof(CheckForTurnEndState)
+            typeof(UnitTurnState),
+            typeof(DishOutDamageState)
             };
         }
         set { }
@@ -34,16 +36,31 @@ public class DishOutDamageState : BattleState
         if (bc.damageQueue.Count == 0)
         {
             InTransition = false;
-            bc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<UnitTurnState>();
             return;
         }
-
         KeyValuePair<CharController, Damage[]> damagePackage = bc.damageQueue.Dequeue();
-        damagePackage.Key.Damage(damagePackage.Value);
 
+        Debug.Log(damagePackage.Key.Name);
+        Debug.Log(damagePackage.Key.Stats.curHP);
+        Debug.Log(damagePackage.Key.IsDead);
+
+        if (damagePackage.Key.IsDead || !damagePackage.Key.gameObject.activeInHierarchy)
+        {
+            InTransition = false;
+            bc.ChangeState<DishOutDamageState>();
+        } else
+        {
+            bc.FollowTarget(damagePackage.Key.transform);
+            damagePackage.Key.TakeDamage(damagePackage.Value);
+            StartCoroutine(CustomUtils.DelayAction(1.5f,AfterDamage));
+        }
+    }
+
+    public void AfterDamage()
+    {
         InTransition = false;
         bc.ChangeState<DishOutDamageState>();
-
     }
 
 }

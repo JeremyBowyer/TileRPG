@@ -11,19 +11,17 @@ public class Goblin : Enemy
         stats.agility = 25;
         stats.Init();
         resists.Init();
+        damageBonuses.Init();
         buildUps.Init();
-
-        experience = 0;
-        level = 1;
 
         isInitialized = true;
 
         cName = "Rob";
         cClass = "Goblin";
 
-        spells = new List<SpellAbility>();
+        abilities = new List<SpellAbility>();
 
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new WalkMovement(controller);
+        attackAbility = new PunchAttackAbility(this);
+        movementAbility = new WalkMovement(this);
     }
 }

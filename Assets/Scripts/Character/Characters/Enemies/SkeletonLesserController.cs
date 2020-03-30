@@ -12,6 +12,5 @@ public class SkeletonLesserController : EnemyController
             controller = this
         };
         character.Init();
-        character.stats.curHP = 100;
     }
 }

@@ -18,7 +18,8 @@ public class SpellEnvironmentSplashTargetState : BattleState
             {
             typeof(CommandSelectionState),
             typeof(SpellEnvironmentSequenceState),
-            typeof(CheckForTurnEndState)
+            typeof(UnitTurnState),
+            typeof(DishOutDamageState)
             };
         }
         set { }
@@ -31,8 +32,8 @@ public class SpellEnvironmentSplashTargetState : BattleState
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
 
-        Color color = AbilityTypes.GetIntentColor(spellAbility.abilityIntent);
-        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.04f), "spellrange", "inner");
+        Color color = IntentTypes.GetIntentColor(spellAbility.abilityIntent);
+        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.25f), "spellrange", "empty");
         grid.OutlineNodes(spellRange, color);
         base.Enter();
         InTransition = false;
@@ -45,6 +46,7 @@ public class SpellEnvironmentSplashTargetState : BattleState
         grid.DeSelectNodes("spellrange");
         grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("splashzone");
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
         spellRange = null;
     }
 
@@ -56,48 +58,45 @@ public class SpellEnvironmentSplashTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
-        Tile tile = e.info.gameObject.GetComponent<Tile>();
+        OutlineTargetCharacter(sender, e);
+
+        Tile tile = events.GetTile(e.info.gameObject);
 
         if (tile == null)
             return;
 
-        if (spellRange.Contains(tile.node))
+        if (ValidateTarget(tile))
         {
-            // If spell isn't a projectile, or the projectile is validated, highlight splashzone because spell is valid
-            if (!spellAbility.isProjectile || bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, CustomColors.Hostile, true))
-            {
-                splashZone = spellAbility.GetSplashZone(tile);
-                grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "inner");
-            }
+            splashZone = spellAbility.GetSplashZone(tile);
+            grid.SelectNodes(splashZone, CustomColors.Hostile, "splashzone", "inner");
+            MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Target);
         }
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
-        Tile tile = e.info.gameObject.GetComponent<Tile>();
+        RemoveOutlineTargetCharacter();
+
+        Tile tile = events.GetTile(e.info.gameObject);
 
         if (tile == null)
             return;
+
         bc.lineRenderer.positionCount = 0;
         grid.DeSelectNodes("splashzone");
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
     {
-        Tile tile = e.info.collider.gameObject.GetComponent<Tile>();
+        Tile tile = events.GetTile(e.info.collider.gameObject);
 
         if (tile == null)
             return;
 
-        if (spellRange.Contains(tile.node))
+        if (ValidateTarget(tile))
         {
-            // If spell is a projectile and path isn't valid, return
-            if (spellAbility.isProjectile && !bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, CustomColors.Hostile, false))
-            {
-                return;
-            }
-
-                StateArgs spellArgs = new StateArgs
+            StateArgs spellArgs = new StateArgs
             {
                 targetTile = tile,
                 spell = spellAbility,
@@ -105,8 +104,17 @@ public class SpellEnvironmentSplashTargetState : BattleState
                 waitingStateMachines = new List<StateMachine> { bc }
             };
             character.ChangeState<SpellEnvironmentSequenceState>(spellArgs);
-            bc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<DishOutDamageState>();
         }
+    }
+
+    private bool ValidateTarget(Tile tile)
+    {
+        bool inRange = spellRange.Contains(tile.node);
+        bool isProjectile = spellAbility.isProjectile;
+        bool validPath = bc.pvc.ValidateProjectile(spellAbility.GetPath(tile.WorldPosition), tile.gameObject, CustomColors.Hostile, true);
+
+        return inRange && (!isProjectile || validPath);
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)

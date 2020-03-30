@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CharacterStats
@@ -8,8 +9,9 @@ public class CharacterStats
     public int maxHP = 100;
     public int maxAP = 100;
     public int maxMP = 100;
-    
+
     // Temp Max
+    private List<int> maxHpPressures;
     private int _maxHPTemp;
     public int maxHPTemp
     {
@@ -17,6 +19,7 @@ public class CharacterStats
         set { _maxHPTemp = Mathf.Clamp(value, 1, maxHP); }
     }
 
+    private List<int> maxApPressures;
     private int _maxAPTemp;
     public int maxAPTemp
     {
@@ -24,6 +27,7 @@ public class CharacterStats
         set { _maxAPTemp = Mathf.Clamp(value, 1, maxAP); }
     }
 
+    private List<int> maxMpPressures;
     private int _maxMPTemp;
     public int maxMPTemp
     {
@@ -62,7 +66,7 @@ public class CharacterStats
 
     public int moveRange
     {
-        get { return _curAP / 20; }
+        get { return _curAP / 10; }
     }
 
     public bool IsDamaged
@@ -76,6 +80,10 @@ public class CharacterStats
         _curAP = maxAP;
         _curMP = maxMP;
 
+        maxHpPressures = new List<int>();
+        maxApPressures = new List<int>();
+        maxMpPressures = new List<int>();
+
         maxHPTemp = maxHP;
         maxAPTemp = maxAP;
         maxMPTemp = maxMP;
@@ -83,7 +91,7 @@ public class CharacterStats
 
     public void Refresh()
     {
-        _curAP = maxAPTemp;
+        curAP = maxAPTemp;
     }
 
     public void Damage(int amt)
@@ -117,12 +125,23 @@ public class CharacterStats
 
     public void FillAP(int amt)
     {
-        curAP = amt;
+        curAP += amt;
     }
 
     public void FillAP()
     {
         curAP = maxAPTemp;
     }
+
+    public void FillMP(int amt)
+    {
+        curMP += amt;
+    }
+
+    public void FillMP()
+    {
+        curMP = maxMPTemp;
+    }
+
 }
 

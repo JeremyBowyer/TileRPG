@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ public class DamageTypes
             case DamageType.Bludgeon:
                 return CustomColors.Bludgeon;
             case DamageType.Physical:
-                return CustomColors.White;
+                return CustomColors.Physical;
             default:
                 return CustomColors.White;
         }
@@ -49,6 +50,14 @@ public class DamageTypes
                 return null;
             default:
                 return null;
+        }
+    }
+
+    public static IEnumerable GetTypes()
+    {
+        foreach (DamageType dType in Enum.GetValues(typeof(DamageType)))
+        {
+            yield return dType;
         }
     }
 

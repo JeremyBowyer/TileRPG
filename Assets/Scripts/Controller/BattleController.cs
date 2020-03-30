@@ -6,24 +6,37 @@ using UnityEngine.AI;
 public class BattleController : GameController
 {
     // References
+    [HideInInspector]
     public RoundController rc;
+    [HideInInspector]
     public ProjectileValidationController pvc;
+    [HideInInspector]
     public TurnQueueController turnQueue;
-    public BattleUIController battleUI { get { return lc.uiController.battleUI; } }
+    [HideInInspector]
     public Grid grid;
+    [HideInInspector]
     public Pathfinding pathfinder;
+    [HideInInspector]
+    public RewardController rewardController;
     public StatusIndicator statusIndicator;
     public AbilityMenuPanelController abilityMenuPanelController;
     public LineRenderer lineRenderer;
     public GameObject selectionCircle;
     public LevelController lc;
-    public BSPBattleRoom battleRoom;
+    public KeepBattleRoom battleRoom;
+    public BattleUIController battleUI { get { return lc.uiController.battleUI; } }
+
+    public static BattleController instance;
 
     // Directions
-    public Vector3 rightDirection { get { return lc.rightDirection; } }
-    public Vector3 leftDirection { get { return lc.leftDirection; } }
-    public Vector3 forwardDirection { get { return lc.forwardDirection; } }
-    public Vector3 backwardDirection { get { return lc.backwardDirection; } }
+    public static Vector3 rightDirection { get { return LevelController.rightDirection; } }
+    public static Vector3 leftDirection { get { return LevelController.leftDirection; } }
+    public static Vector3 forwardDirection { get { return LevelController.forwardDirection; } }
+    public static Vector3 backwardDirection { get { return LevelController.backwardDirection; } }
+    public static Vector3 forwardLeftDirection { get { return LevelController.forwardLeftDirection; } }
+    public static Vector3 forwardRightDirection { get { return LevelController.forwardRightDirection; } }
+    public static Vector3 backwardLeftDirection { get { return LevelController.backwardLeftDirection; } }
+    public static Vector3 backwardRightDirection { get { return LevelController.backwardRightDirection; } }
 
     // Variables
     private CharController currentCharacter;
@@ -37,7 +50,7 @@ public class BattleController : GameController
         {
             currentCharacter = value;
             if (battleUI != null)
-                battleUI.UpdateCurrentStats(animate: false);
+                battleUI.LoadCurrentStats(null, currentCharacter);
         }
     }
 
@@ -61,8 +74,11 @@ public class BattleController : GameController
         }
     }
 
+    [HideInInspector]
     public Tile currentTile;
+    [HideInInspector]
     public Queue<GameObject> unitsToPlace; // Queue of party members to be placed on the grid
+    [HideInInspector]
     public Queue<KeyValuePair<CharController, Damage[]>> damageQueue;
     public Vector3 protagStartPos = new Vector3(0, 0, 0);
     private bool inBattle;
@@ -73,19 +89,34 @@ public class BattleController : GameController
     }
 
     // Delegates
-    public delegate void OnUnitChange(CharController character);
+    public delegate void OnUnitChange(CharController previousCharacter, CharController currentCharacter);
     public OnUnitChange onUnitChange;
+
+    public delegate void OnUnitDie(CharController character, Damage damage);
+    public OnUnitDie onUnitDeath;
 
     public delegate void OnRoundChange();
     public OnRoundChange onRoundChange;
 
     private void Awake()
     {
-        // Assign references
-        rc = new RoundController(this);
+        instance = this;
+        AssignReferences();
+    }
+
+    void Start()
+    {
+        ChangeState<IdleState>();
+    }
+
+    public override void AssignReferences()
+    {
+        base.AssignReferences();
+
+        rewardController = new RewardController();
+        rc = new RoundController();
         pvc = new ProjectileValidationController(this);
         lineRenderer = GameObject.Find("LineRenderer").GetComponent<LineRenderer>();
-        protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
         grid = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Grid>();
         pathfinder = GameObject.FindGameObjectWithTag("Pathfinder").GetComponent<Pathfinding>();
         cameraRig = GameObject.Find("CameraTarget").GetComponent<CameraController>();
@@ -95,15 +126,9 @@ public class BattleController : GameController
         damageQueue = new Queue<KeyValuePair<CharController, Damage[]>>();
     }
 
-    void Start()
+    public void InitBattle(KeepBattleRoom _room)
     {
-        //cameraRig.FollowTarget = protag.transform;
-        //cameraTarget = protag.transform;
-        ChangeState<IdleState>();
-    }
-
-    public void Init(BSPBattleRoom _room)
-    {
+        protag = GameObject.FindGameObjectWithTag("Protag").GetComponent<ProtagonistController>();
         battleRoom = _room;
         battleRoom.GetComponent<BoxCollider>().enabled = false;
         StateArgs args = new StateArgs()
@@ -137,6 +162,7 @@ public class BattleController : GameController
 
     public void ChangePlayer(CharController character)
     {
+        onUnitChange?.Invoke(CurrentCharacter, character);
         CurrentCharacter = character;
         FollowTarget(character.transform);
 
@@ -151,17 +177,26 @@ public class BattleController : GameController
 
         if (character is PlayerController)
             projector.material.SetColor("_Color", CustomColors.PlayerUI);
-
-        onUnitChange?.Invoke(character);
     }
 
-    public void OnUnitDeath(CharController character)
+    public void OnUnitDeath(CharController character, Damage damage)
     {
         characters.Remove(character.gameObject);
         lc.characters.Remove(character.gameObject);
         rc.RemoveCharacter(character);
         turnQueue.HideEntry(character);
-        turnQueue.UpdateQueue(character);
+        turnQueue.UpdateQueue(null, character);
+        onUnitDeath?.Invoke(character, damage);
+
+        if (character is EnemyController)
+        {
+            enemies.Remove(character.gameObject);
+            lc.enemies.Remove(character.gameObject);
+        }
+
+        if (CurrentCharacter == character)
+            CurrentCharacter = null;
+
         CheckEndCondition();
     }
 
@@ -180,7 +215,7 @@ public class BattleController : GameController
 
     public void TerminateBattle()
     {
-        lc.bspController.ShowAllRooms();
+        //lc.bspController.ShowAllRooms();
         grid.ClearGrid();
         characters.Clear();
         selectionCircle.gameObject.transform.parent = null;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public abstract class BattleState : State
 {
-    public BattleController bc;
+    public BattleController bc { get { return BattleController.instance; } }
     public CameraController cameraRig { get { return bc.cameraRig; } }
     public BattleUIController battleUI { get { return bc.battleUI; } }
     public SuperUIController superUI { get { return bc.lc.superUI; } }
@@ -17,7 +17,6 @@ public abstract class BattleState : State
     protected override void Awake()
     {
         base.Awake();
-        bc = GameObject.Find("BattleController").GetComponent<BattleController>();
     }
 
     public override void Enter()
@@ -57,6 +56,25 @@ public abstract class BattleState : State
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)
     {
+    }
+
+    protected void OutlineTargetCharacter(object sender, InfoEventArgs<GameObject> e)
+    {
+        CharController target = e.info.gameObject.GetComponent<CharController>();
+
+        if (target != null)
+        {
+            events.LoadTargetCharacter(target);
+            Color clr = target is EnemyController ? CustomColors.Hostile : CustomColors.Heal;
+            if (target != bc.CurrentCharacter)
+                events.OutlineCharacter(target, clr, _mode: Outline.Mode.OutlineAndSilhouette, _width: 2f);
+        }
+    }
+
+    protected void RemoveOutlineTargetCharacter()
+    {
+        events.UnloadTargetCharacter();
+        events.RemoveOutlines();
     }
 
 }

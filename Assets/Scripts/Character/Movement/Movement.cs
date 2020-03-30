@@ -11,7 +11,12 @@ public abstract class Movement
     public float endValue = 1f;
     public float costModifier = 2f;
     public string mName;
-    protected CharController controller;
+    public string mDescription;
+    public Character character;
+    protected CharController controller
+    {
+        get { return character.controller; }
+    }
     protected BattleController bc
     {
         get { return controller.bc; }
@@ -24,12 +29,13 @@ public abstract class Movement
     public abstract bool ignoreUnwalkable { get; set; }
     public abstract bool ignoreOccupant { get; set; }
     public abstract bool ignoreMoveBlock { get; set; }
+    public virtual bool includeOrigin { get { return false; } set { includeOrigin = value; } }
     public abstract bool isPath { get; set; }
     public abstract float Speed { get; set; }
 
-    public Movement(CharController _character)
+    public Movement(Character _character)
     {
-        controller = _character;
+        character = _character;
     }
 
     public virtual List<Node> GetNodesInRange()
@@ -40,7 +46,7 @@ public abstract class Movement
             diag,
             ignoreOccupant,
             ignoreUnwalkable,
-            false,
+            includeOrigin,
             ignoreMoveBlock,
             costModifier);
 
@@ -57,7 +63,7 @@ public abstract class Movement
             diag,
             ignoreOccupant,
             ignoreUnwalkable,
-            false,
+            includeOrigin,
             ignoreMoveBlock,
             costModifier);
 

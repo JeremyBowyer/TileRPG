@@ -6,11 +6,11 @@ public class PartyMemberController : PlayerController
 {
     //public new PartyMember character;
 
-    public override void Die()
+    public override void Die(Damage _damage)
     {
         ProtagonistController protag = bc.protag;
         PartyMember pm = character as PartyMember;
-        protag.partyMembers.Remove(pm);
-        base.Die();
+        PersistentObjects.party.RemoveMember(pm);
+        base.Die(_damage);
     }
 }

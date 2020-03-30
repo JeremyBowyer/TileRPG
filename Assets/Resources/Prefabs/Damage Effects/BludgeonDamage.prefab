@@ -5739,6 +5739,7 @@ GameObject:
   - component: {fileID: 6349952653149220779}
   - component: {fileID: 6546528914628190997}
   - component: {fileID: 6547894765091415647}
+  - component: {fileID: 4636533076676618036}
   m_Layer: 0
   m_Name: BludgeonDamage
   m_TagString: Untagged
@@ -10487,6 +10488,26 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &4636533076676618036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6349952653149454343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Bludgeon
+  soundGroup: 0
+  clip: {fileID: 8300000, guid: 96bbf34d7aee725449bb8a5f1a46bfbb, type: 3}
+  volume: 0.5
+  pitch: 1
+  loop: 0
+  playOnAwake: 1
+  source: {fileID: 0}
 --- !u!1 &6349952653149479431
 GameObject:
   m_ObjectHideFlags: 0

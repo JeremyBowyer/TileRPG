@@ -19,22 +19,42 @@ public class MovementBlockerEditor : Editor
 
         if (GUILayout.Button("Front"))
         {
-            blocker.SpawnBlocker(Vector3.forward);
+            blocker.SpawnBlocker(Grid.forwardDirection);
         }
 
         if (GUILayout.Button("Back"))
         {
-            blocker.SpawnBlocker(Vector3.back);
+            blocker.SpawnBlocker(Grid.backwardDirection);
         }
 
         if (GUILayout.Button("Left"))
         {
-            blocker.SpawnBlocker(Vector3.left);
+            blocker.SpawnBlocker(Grid.leftDirection);
         }
 
         if (GUILayout.Button("Right"))
         {
-            blocker.SpawnBlocker(Vector3.right);
+            blocker.SpawnBlocker(Grid.rightDirection);
+        }
+
+        if (GUILayout.Button("Front Left"))
+        {
+            blocker.SpawnBlocker(Grid.forwardLeftDirection);
+        }
+
+        if (GUILayout.Button("Front Right"))
+        {
+            blocker.SpawnBlocker(Grid.forwardRightDirection);
+        }
+
+        if (GUILayout.Button("Back Left"))
+        {
+            blocker.SpawnBlocker(Grid.backwardLeftDirection);
+        }
+
+        if (GUILayout.Button("Back Right"))
+        {
+            blocker.SpawnBlocker(Grid.backwardRightDirection);
         }
 
         if (GUILayout.Button("Clear All"))

@@ -35,7 +35,6 @@ public class ProjectileValidationController
             {
                 if (col.gameObject != target)
                 {
-                    Debug.Log(col.gameObject.name);
                     if(display)
                         DisplayTrajectory(validPath, Color.gray);
                     return false;

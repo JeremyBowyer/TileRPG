@@ -19,15 +19,11 @@ public class AudioController : MonoBehaviour
     {
         foreach (Sound s in sounds)
         {
-            s.source = gameObject.AddComponent<AudioSource>();
-            s.source.clip = s.clip;
-            s.source.volume = s.volume;
-            s.source.pitch = s.pitch;
-            s.source.loop = s.loop;
-            s.source.playOnAwake = s.playOnAwake;
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            s.LoadSource(source);
             AddSoundToGroup(s);
 
-            if (s.source.playOnAwake)
+            if (s.playOnAwake)
                 Play(s);
 
         }
@@ -47,32 +43,49 @@ public class AudioController : MonoBehaviour
         }
     }
 
-    public void Play(Sound sound)
+    public void Play(string name)
     {
-        if (sound.source == null)
+        Sound s = GetSound(name);
+        if (s == null)
         {
-            Debug.LogWarning("Sound: " + sound.soundName + " on " + gameObject.name + " has no audio source.");
+            Debug.LogWarning("Sound: " + name + " not found on " + gameObject.name);
             return;
         }
-        sound.source.Play();
+        Play(s);
     }
 
-    public void Play (string name)
+    public void Play(Sound sound)
+    {
+        if (sound == null)
+        {
+            Debug.LogWarning("Sound not found on " + gameObject.name);
+            return;
+        }
+        sound.Play();
+    }
+
+    public void Stop(Sound sound)
+    {
+        sound.Stop();
+    }
+
+    protected Sound GetSound(string name)
     {
         Sound s = Array.Find(sounds, sound => sound.soundName == name);
 
         if (s == null)
         {
             Debug.LogWarning("Sound: " + name + " not found on " + gameObject.name);
-            return;
+            return null;
         }
 
-        if(s.source == null)
-        {
-            Debug.LogWarning("Sound: " + name + " on " + gameObject.name + " has no audio source.");
-            return;
-        }
-        Play(s);
+        return s;
+    }
+
+    public void Stop(string name)
+    {
+        Sound s = GetSound(name);
+        Stop(s);
     }
 
     public void PlayRandomFromGroup(Sound.SoundGroup group)
@@ -81,7 +94,52 @@ public class AudioController : MonoBehaviour
             return;
 
         Sound[] sounds = soundGroups[group];
-        int idx = GlobalRandom.GetRandom(0, sounds.Length);
+        int idx = CustomUtils.GetRandom(0, sounds.Length);
         Play(sounds[idx]);
+    }
+
+    public void CreateSoundFromClip(AudioClip clip, string name)
+    {
+        CreateSoundFromClip(clip, name, 0.5f, Sound.SoundGroup.None, Sound.SoundType.Misc);
+    }
+
+    public void CreateSoundFromClip(AudioClip clip, string name, float volume, Sound.SoundGroup group, Sound.SoundType type)
+    {
+        if (clip == null || name == null)
+            return;
+
+        Sound s = gameObject.AddComponent<Sound>();
+        s.soundName = name;
+        s.clip = clip;
+        AudioSource source = gameObject.AddComponent<AudioSource>();
+        s.LoadSource(source);
+
+        List<Sound> soundsList = new List<Sound>(sounds);
+        soundsList.Add(s);
+        sounds = soundsList.ToArray();
+    }
+
+    public void PlayClip(AudioClip clip)
+    {
+        if (clip == null)
+            return;
+
+        StartCoroutine(PlayThenDestroy(clip));
+    }
+
+    public IEnumerator PlayThenDestroy(AudioClip clip)
+    {
+        Sound s = gameObject.AddComponent<Sound>();
+        s.clip = clip;
+        yield return new WaitForEndOfFrame();
+
+        s.Play();
+
+        while (s.isPlaying)
+            yield return new WaitForEndOfFrame();
+
+        s.source.Stop();
+        Destroy(s.source);
+        Destroy(s);
     }
 }

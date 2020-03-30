@@ -8,38 +8,59 @@ public class BurnTileEffect : TileEffect
     private int countdown;
     private GameObject go;
     private GameObject prefab;
-    private Damage dmg = new Damage(DamageTypes.DamageType.Fire, 20, MaladyTypes.MaladyType.Burn, 50);
+    private Damage Damage;
 
-    public override void ApplyEffect(CharController _target)
+    public override void OnCharEnter(CharController _target, bool queue = false)
     {
         if (_target == null)
             return;
 
-        _target.Damage(dmg);
+        if (_target.HasMalady(MaladyTypes.MaladyType.Burn))
+            return;
+
+        if (queue)
+        {
+            bc.damageQueue.Enqueue(new KeyValuePair<CharController, Damage[]>(_target, new Damage[] { Damage }));
+        }
+        else
+        {
+            _target.TakeDamage(Damage);
+        }
     }
 
-    public override void TurnTick(CharController _currentCharacter)
+    public override void OnCharExit(CharController _target, bool queue = false)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
     public override void RoundTick()
     {
-        ApplyEffect(tile.occupant);
+        OnCharEnter(tile.occupant, true);
         if (countdown <= 0)
             RemoveEffect();
         countdown -= 1;
     }
 
-    public override void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid)
+    public override void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid, Character _source)
     {
-        base.Init(_tile, _sourceDirection, _grid);
+        base.Init(_tile, _sourceDirection, _grid, _source);
 
-        go = Instantiate(Resources.Load("Prefabs/Tile Effects/BurningEffectTile")) as GameObject;
-        PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();
-        go.transform.position = _tile.anchorPoint;
-        go.transform.parent = _tile.gameObject.transform;
-        psUpdater.UpdateMeshEffect(_tile.gameObject);
+        tName = "a burning tile";
 
+        source = _source;
+        Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Fire, 500, MaladyTypes.MaladyType.Burn, 100);
+        go = Instantiate(AssetController.GetAsset("burn_tile"), _tile.gameObject.transform) as GameObject;
+        go.transform.localPosition = _tile.anchorPointLocal;
+        //go.transform.parent = _tile.gameObject.transform;
+        countdown = MaxIterations;
+    }
+
+    public override void RefreshEffect()
+    {
         countdown = MaxIterations;
     }
 
@@ -47,12 +68,5 @@ public class BurnTileEffect : TileEffect
     {
         Destroy(go);
         base.RemoveEffect();
-    }
-
-    public override void ApplyToOccupant()
-    {
-        CharController occupant = tile.Occupant;
-        if (occupant != null)
-            ApplyEffect(occupant);
     }
 }

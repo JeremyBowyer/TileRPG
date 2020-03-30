@@ -16,10 +16,8 @@ public class Protagonist : PartyMember
         stats.agility = 75;
         stats.Init();
         resists.Init();
+        damageBonuses.Init();
         buildUps.Init();
-
-        experience = 0;
-        level = 1;
 
         cName = "Protagonist";
         cClass = "Handsome";
@@ -30,15 +28,5 @@ public class Protagonist : PartyMember
         inventory.Add(new Potion());
 
         isInitialized = true;
-    }
-
-    public override void InitAbilities()
-    {
-        spells = new List<SpellAbility>();
-        spells.Add(new MagmaBallAbility(controller));
-        spells.Add(new FireboltAbility(controller));
-
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new WalkMovement(controller);
     }
 }

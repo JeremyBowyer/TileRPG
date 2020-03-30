@@ -13,9 +13,10 @@ public class TeleportMovement : Movement
     public override bool ignoreMoveBlock{ get { return true; } set { ignoreMoveBlock = value; } }
     public override float Speed { get { return 1 / speed; } set { speed = value; } }
 
-    public TeleportMovement(CharController controller) : base(controller)
+    public TeleportMovement(Character character) : base(character)
     {
         mName = "Teleport";
+        mDescription = "Teleport directly to target location, unhindered by movement blockers and avoiding elemental damage.";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)

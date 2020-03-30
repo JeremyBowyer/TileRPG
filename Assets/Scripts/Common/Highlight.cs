@@ -4,29 +4,72 @@ using UnityEngine;
 
 public class Highlight : MonoBehaviour
 {
-    public Material originalMat;
+    public Projector projector;
     public CharController controller;
-
+    public Color previousColor;
 
     public void HighlightObject(Color _color)
     {
-        controller = gameObject.GetComponent<CharController>();
+        AssignController();
+        AssignProjector();
 
-        if (controller == null)
+        if (controller == null || projector == null)
             return;
 
-        if(originalMat == null)
-            originalMat = controller.mesh.material;
+        projector.enabled = true;
+        projector.material.SetColor("_Color", _color);
+    }
 
-        controller.mesh.material = new Material(originalMat);
-        controller.mesh.material.color = _color;
+    public void RemoveHighlight()
+    {
+        projector.enabled = false;
+    }
+
+    public void FlashObject(Color _color)
+    {
+        AssignController();
+        AssignProjector();
+
+        if (controller == null || projector == null)
+            return;
+
+        StartCoroutine(Flash(_color));
+    }
+
+    public void AssignController()
+    {
+        if (controller != null)
+            return;
+
+        controller = GetComponentInParent<CharController>();
+    }
+
+    public void AssignProjector()
+    {
+        if (projector != null)
+            return;
+
+        projector = GetComponent<Projector>();
+    }
+
+    private IEnumerator Flash(Color _color)
+    {
+        previousColor = projector.material.GetColor("_Color");
+
+        projector.enabled = true;
+        projector.material.SetColor("_Color", _color);
+
+        yield return new WaitForSeconds(0.25f);
+
+        projector.material.SetColor("_Color", previousColor);
+        RemoveHighlight();
     }
 
     private void OnDestroy()
     {
-        if (controller != null)
+        if (projector != null)
         {
-            controller.mesh.material = originalMat;
+            projector.gameObject.SetActive(false);
         }
     }
 }

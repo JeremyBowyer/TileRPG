@@ -28,12 +28,27 @@ public class Grid : MonoBehaviour {
     public Vector3 centerPoint;
 
     // Directions
-    public Vector3 rightDirection { get { return bc.rightDirection; } }
-    public Vector3 leftDirection { get { return bc.leftDirection; } }
-    public Vector3 forwardDirection { get { return bc.forwardDirection; } }
-    public Vector3 backwardDirection { get { return bc.backwardDirection; } }
+    public static Vector3 rightDirection { get { return BattleController.rightDirection; } }
+    public static Vector3 leftDirection { get { return BattleController.leftDirection; } }
+    public static Vector3 forwardDirection { get { return BattleController.forwardDirection; } }
+    public static Vector3 backwardDirection { get { return BattleController.backwardDirection; } }
+    public static Vector3 forwardLeftDirection { get { return BattleController.forwardLeftDirection; } }
+    public static Vector3 forwardRightDirection { get { return BattleController.forwardRightDirection; } }
+    public static Vector3 backwardLeftDirection { get { return BattleController.backwardLeftDirection; } }
+    public static Vector3 backwardRightDirection { get { return BattleController.backwardRightDirection; } }
+    public static Vector3[] directions = new Vector3[] {
+            forwardDirection,
+            rightDirection,
+            backwardDirection,
+            leftDirection,
+            forwardLeftDirection,
+            forwardRightDirection,
+            backwardLeftDirection,
+            backwardRightDirection
+        };
 
-    public enum Position { Front, Back, Left, Right, Diagonal};
+
+    public enum Position { Front, Back, Left, Right, FrontLeft, FrontRight, BackLeft, BackRight, SamePosition };
 
 	int gridSizeX, gridSizeY;
     public int MaxSize
@@ -72,7 +87,7 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public IEnumerator GenerateGrid(BSPRoom room, Action callback)
+    public IEnumerator GenerateGrid(KeepRoom room, Action callback)
     {
         gridSizeX = Mathf.RoundToInt(room.GetXSize());
         gridSizeY = Mathf.RoundToInt(room.GetZSize());
@@ -85,7 +100,7 @@ public class Grid : MonoBehaviour {
         {
             cnt++;
             Tile tile = floorGO.GetComponent<Tile>();
-            BSPFloor floor = floorGO.GetComponent<BSPFloor>();
+            KeepFloor floor = floorGO.GetComponent<KeepFloor>();
             floorGO.layer = LayerMask.NameToLayer("GridClick");
             tiles.Add(floorGO);
             int x = floor.x;
@@ -109,7 +124,7 @@ public class Grid : MonoBehaviour {
                 node.tile = tile;
 
                 // Is tile walkable?
-                Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
+                Collider[] alertColliders = Physics.OverlapSphere(anchorPoint + Vector3.up * nodeRadius, nodeRadius * 0.75f, UnWalkableLayerMask, QueryTriggerInteraction.UseGlobal);
                 if (alertColliders != null && alertColliders.Length != 0)
                 {
                     tile.isWalkable = false;
@@ -125,8 +140,7 @@ public class Grid : MonoBehaviour {
                 yield return null;
         }
 
-        if (callback != null)
-            callback();
+        callback?.Invoke();
         yield break;
     }
 
@@ -264,44 +278,158 @@ public class Grid : MonoBehaviour {
 
     public Position CompareDirection(Node fromNode, Node toNode, Vector3 targetFacingDirection)
     {
-        // Check for back position
-        if ((targetFacingDirection == forwardDirection && fromNode.gridY < toNode.gridY) ||
-            (targetFacingDirection == backwardDirection && fromNode.gridY > toNode.gridY) ||
-            (targetFacingDirection == leftDirection && fromNode.gridX < toNode.gridX) ||
-            (targetFacingDirection == rightDirection && fromNode.gridX > toNode.gridX))
+        // Facing Forward
+        if (targetFacingDirection == forwardDirection)
         {
-            return Position.Back;
+            // Some sort of "back"
+            if (fromNode.gridY < toNode.gridY)
+            {
+                if (fromNode.gridX == toNode.gridX)
+                    return Position.Back;
+
+                if (fromNode.gridX > toNode.gridX)
+                    return Position.BackRight;
+
+                if (fromNode.gridX < toNode.gridX)
+                    return Position.BackLeft;
+            }
+
+            // Some sort of "front"
+            if (fromNode.gridY > toNode.gridY)
+            {
+                if (fromNode.gridX == toNode.gridX)
+                    return Position.Front;
+
+                if (fromNode.gridX > toNode.gridX)
+                    return Position.FrontRight;
+
+                if (fromNode.gridX < toNode.gridX)
+                    return Position.FrontLeft;
+            }
+
+            // Diagonals handled above
+            if (fromNode.gridX > toNode.gridX)
+                return Position.Right;
+
+            if (fromNode.gridX < toNode.gridX)
+                return Position.Left;
         }
 
-        // Check for front position
-        if ((targetFacingDirection == backwardDirection && fromNode.gridY < toNode.gridY) ||
-            (targetFacingDirection == forwardDirection && fromNode.gridY > toNode.gridY) ||
-            (targetFacingDirection == leftDirection && fromNode.gridX > toNode.gridX) ||
-            (targetFacingDirection == rightDirection && fromNode.gridX < toNode.gridX))
+        // Facing Backward
+        if (targetFacingDirection == backwardDirection)
         {
-            return Position.Front;
+            // Some sort of "back"
+            if (fromNode.gridY > toNode.gridY)
+            {
+                if (fromNode.gridX == toNode.gridX)
+                    return Position.Back;
+
+                if (fromNode.gridX < toNode.gridX)
+                    return Position.BackRight;
+
+                if (fromNode.gridX > toNode.gridX)
+                    return Position.BackLeft;
+            }
+
+            // Some sort of "front"
+            if (fromNode.gridY < toNode.gridY)
+            {
+                if (fromNode.gridX == toNode.gridX)
+                    return Position.Front;
+
+                if (fromNode.gridX < toNode.gridX)
+                    return Position.FrontRight;
+
+                if (fromNode.gridX > toNode.gridX)
+                    return Position.FrontLeft;
+            }
+
+            // Diagonals handled above
+            if (fromNode.gridX < toNode.gridX)
+                return Position.Right;
+
+            if (fromNode.gridX > toNode.gridX)
+                return Position.Left;
         }
 
-        // Check for left position
-        if ((targetFacingDirection == backwardDirection && fromNode.gridX < toNode.gridX) ||
-            (targetFacingDirection == forwardDirection && fromNode.gridX > toNode.gridX) ||
-            (targetFacingDirection == leftDirection && fromNode.gridY < toNode.gridY) ||
-            (targetFacingDirection == rightDirection && fromNode.gridY > toNode.gridY))
+        // Facing Right
+        if (targetFacingDirection == rightDirection)
         {
-            return Position.Right;
+            // Some sort of "back"
+            if (fromNode.gridX < toNode.gridX)
+            {
+                if (fromNode.gridY == toNode.gridY)
+                    return Position.Back;
+
+                if (fromNode.gridY < toNode.gridY)
+                    return Position.BackRight;
+
+                if (fromNode.gridY > toNode.gridY)
+                    return Position.BackLeft;
+            }
+
+            // Some sort of "front"
+            if (fromNode.gridX > toNode.gridX)
+            {
+                if (fromNode.gridY == toNode.gridY)
+                    return Position.Front;
+
+                if (fromNode.gridY < toNode.gridY)
+                    return Position.FrontRight;
+
+                if (fromNode.gridY > toNode.gridY)
+                    return Position.FrontLeft;
+            }
+
+            // Diagonals handled above
+            if (fromNode.gridY < toNode.gridY)
+                return Position.Right;
+
+            if (fromNode.gridY > toNode.gridY)
+                return Position.Left;
         }
 
-        // Check for right position
-        if ((targetFacingDirection == backwardDirection && fromNode.gridX > toNode.gridX) ||
-            (targetFacingDirection == forwardDirection && fromNode.gridX < toNode.gridX) ||
-            (targetFacingDirection == leftDirection && fromNode.gridY > toNode.gridY) ||
-            (targetFacingDirection == rightDirection && fromNode.gridY < toNode.gridY))
+        // Facing Left
+        if (targetFacingDirection == leftDirection)
         {
-            return Position.Left;
+            // Some sort of "back"
+            if (fromNode.gridX > toNode.gridX)
+            {
+                if (fromNode.gridY == toNode.gridY)
+                    return Position.Back;
+
+                if (fromNode.gridY > toNode.gridY)
+                    return Position.BackRight;
+
+                if (fromNode.gridY < toNode.gridY)
+                    return Position.BackLeft;
+            }
+
+            // Some sort of "front"
+            if (fromNode.gridX < toNode.gridX)
+            {
+                if (fromNode.gridY == toNode.gridY)
+                    return Position.Front;
+
+                if (fromNode.gridY > toNode.gridY)
+                    return Position.FrontRight;
+
+                if (fromNode.gridY < toNode.gridY)
+                    return Position.FrontLeft;
+            }
+
+            // Diagonals handled above
+            if (fromNode.gridY > toNode.gridY)
+                return Position.Right;
+
+            if (fromNode.gridY < toNode.gridY)
+                return Position.Left;
         }
 
-        return Position.Diagonal;
+        if (fromNode.gridX == toNode.gridX && fromNode.gridY == toNode.gridY)
+            return Position.SamePosition;
 
+        throw new Exception("Compare direction logic incomplete. From: X: " + fromNode.gridX + " Y: " + fromNode.gridY + " To: X: " + toNode.gridX + " Y: " + toNode.gridY);
     }
 
     public Node FindNearestNode(Vector3 worldPosition, float lowestDistance = 5f, bool ignoreOccupant = true)

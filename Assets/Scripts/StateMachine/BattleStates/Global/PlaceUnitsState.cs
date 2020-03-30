@@ -32,8 +32,6 @@ public class PlaceUnitsState : BattleState
         GameObject unit = bc.unitsToPlace.Dequeue();
         unit.gameObject.transform.localScale = Vector3.one / 2;
         CharController character = unit.GetComponent<CharController>();
-        character.InitBattle();
-
         StateArgs placeUnitArgs = new StateArgs()
         {
             character = character

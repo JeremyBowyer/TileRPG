@@ -13,10 +13,11 @@ public class WalkMovement : Movement
     public override bool ignoreMoveBlock { get { return false; } set { ignoreMoveBlock = value; } }
     public override float Speed { get { return speed; } set { speed = value; } }
 
-    public WalkMovement(CharController controller) : base(controller)
+    public WalkMovement(Character _character) : base(_character)
     {
         Speed = 4f;
         mName = "Walk";
+        mDescription = "Travel to your destination on foot.";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)
@@ -48,7 +49,7 @@ public class WalkMovement : Movement
                 controller.transform.position = new Vector3(newX, newY, newZ);
                 yield return new WaitForEndOfFrame();
             }
-            if(node != path[path.Count-1])
+            if(node != path[path.Count - 1])
                 controller.PassThrough(node.tile);
         }
 

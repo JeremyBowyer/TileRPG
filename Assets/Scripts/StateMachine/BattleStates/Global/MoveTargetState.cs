@@ -17,7 +17,7 @@ public class MoveTargetState : BattleState
             {
             typeof(MoveSequenceState),
             typeof(CommandSelectionState),
-            typeof(CheckForTurnEndState)
+            typeof(UnitTurnState)
             };
         }
         set { }
@@ -30,7 +30,7 @@ public class MoveTargetState : BattleState
         mover = bc.CurrentCharacter.MovementAbility;
         player = bc.CurrentCharacter as PlayerController;
         moveRange = mover.GetNodesInRange();
-        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.04f), "moverange", "inner");
+        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.25f), "moverange", "empty");
         grid.OutlineNodes(moveRange, CustomColors.MovementRange);
         InTransition = false;
     }
@@ -42,7 +42,7 @@ public class MoveTargetState : BattleState
         grid.DeSelectNodes("movepath");
         grid.DeSelectNodes("moverange");
         grid.RemoveOutline(moveRange);
-        battleUI.SetApCost();
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
         moveRange = null;
     }
 
@@ -71,7 +71,7 @@ public class MoveTargetState : BattleState
                 waitingStateMachines = new List<StateMachine> { bc }
             };
             bc.CurrentCharacter.ChangeState<MoveSequenceState>(moveArgs);
-            bc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<CommandSelectionState>();
         }
         else
         {
@@ -81,6 +81,8 @@ public class MoveTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
+        OutlineTargetCharacter(sender, e);
+
         Tile tile = e.info.gameObject.GetComponent<Tile>();
 
         if (tile == null || !tile.isWalkable)
@@ -99,11 +101,14 @@ public class MoveTargetState : BattleState
             {
                 grid.SelectNodes(path[path.Count - 1], CustomColors.MovementPath, "movepath", "inner");
             }
+            MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Target);
         }
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
+        RemoveOutlineTargetCharacter();
+
         Tile tile = e.info.gameObject.transform.GetComponent<Tile>();
 
         if (tile == null)
@@ -113,7 +118,7 @@ public class MoveTargetState : BattleState
         {
             grid.DeSelectNodes("movepath");
             bc.lineRenderer.positionCount = 0;
-            battleUI.SetApCost();
+            MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
         }
     }
 

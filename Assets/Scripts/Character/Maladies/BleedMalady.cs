@@ -6,18 +6,18 @@ public class BleedMalady : Malady
 {
     private int countdown;
     private const int MaxIterations = 3;
-    private Damage Damage = new Damage(DamageTypes.DamageType.Pierce, 20, true);
+    private Damage Damage;
     public override MaladyTypes.MaladyType Type
     {
         get { return MaladyTypes.MaladyType.Bleed; }
     }
 
-    public override void ApplyMalady(CharController _target)
+    public override void ApplyMalady(CharController _target, bool queue = false)
     {
         if (_target == null)
             return;
 
-        _target.Damage(Damage);
+        _target.TakeDamage(Damage);
         _target.bc.battleUI.UpdateCurrentStats(_target.bc.CurrentCharacter == _target);
     }
 
@@ -26,7 +26,7 @@ public class BleedMalady : Malady
         countdown = MaxIterations;
     }
 
-    public override void TurnTick(CharController currentCharacter)
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
@@ -38,9 +38,11 @@ public class BleedMalady : Malady
         ApplyMalady(target);
     }
 
-    public override void Init(CharController _target)
+    public override void Init(Character _source, CharController _target)
     {
-        base.Init(_target);
+        base.Init(_source, _target);
+        mName = "a bleed";
+        Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Pierce, 20, true, _malady: this);
         countdown = MaxIterations;
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/BleedEffectPlayer")) as GameObject;
         go.transform.parent = _target.gameObject.transform;

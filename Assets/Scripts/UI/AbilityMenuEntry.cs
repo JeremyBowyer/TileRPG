@@ -2,16 +2,24 @@
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class AbilityMenuEntry : MonoBehaviour
 {
-    [SerializeField] Text label;
+    [SerializeField] TextMeshProUGUI label;
+    [SerializeField] TextMeshProUGUI cost;
     [SerializeField] Button button;
 
     public string Title
     {
         get { return label.text; }
         set { label.text = value; }
+    }
+
+    public string Cost
+    {
+        get { return cost.text; }
+        set { cost.text = value; }
     }
 
     [System.Flags]

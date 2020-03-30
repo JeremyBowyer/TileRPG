@@ -16,6 +16,7 @@ public class SpellSelectionState : BaseAbilityMenuState
             typeof(CommandSelectionState),
             typeof(SpellCharacterTargetState),
             typeof(SpellEnvironmentSplashTargetState),
+            typeof(SpellEmanationCharacterTargetState),
             typeof(SpellEnvironmentPathTargetState)
             };
         }
@@ -31,33 +32,22 @@ public class SpellSelectionState : BaseAbilityMenuState
             bool canCast = spell.ValidateCost(bc.CurrentCharacter);
             if (spell is EnvironmentSplashSpellAbility)
             {
-                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentSplash(spell as EnvironmentSplashSpellAbility)), canCast);
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentSplash(spell as EnvironmentSplashSpellAbility)), canCast, spell);
             } else if (spell is EnvironmentPathSpellAbility)
             {
-                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentPath(spell as EnvironmentPathSpellAbility)), canCast);
-            } else if (spell is TargetSpellAbility)
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEnvironmentPath(spell as EnvironmentPathSpellAbility)), canCast, spell);
+            }
+            else if (spell is TargetSpellAbility)
             {
-                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellTarget(spell as TargetSpellAbility)), canCast);
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellTarget(spell as TargetSpellAbility)), canCast, spell);
+            }
+            else if (spell is EmanationSpellAbility)
+            {
+                abilityMenuPanelController.AddEntry(new KeyValuePair<string, UnityAction>(spellName, () => SpellEmanation(spell as EmanationSpellAbility)), canCast, spell);
             }
 
         }
 
-        /*
-        menuTitle = "Spells";
-        menuOptions = new Dictionary<string, UnityAction>();
-        foreach (SpellAbility spell in gc.currentCharacter.Spells)
-        {
-            if (spell is EnvironmentSpellAbility)
-            {
-                menuOptions.Add(spell.AbilityName, () => SpellEnvironment(spell as EnvironmentSpellAbility));
-            } else if (spell is TargetSpellAbility)
-            {
-                menuOptions.Add(spell.AbilityName, () => SpellTarget(spell as TargetSpellAbility));
-            }
-
-        }
-        abilityMenuPanelController.Show(menuTitle, menuOptions);
-        */
     }
 
     protected override void Confirm()
@@ -78,6 +68,15 @@ public class SpellSelectionState : BaseAbilityMenuState
         bc.ChangeState<SpellCharacterTargetState>(spellTargetArgs);
     }
 
+    protected void SpellEmanation(EmanationSpellAbility spell)
+    {
+        StateArgs spellTargetArgs = new StateArgs
+        {
+            spell = spell
+        };
+        bc.ChangeState<SpellEmanationCharacterTargetState>(spellTargetArgs);
+    }
+
     protected void SpellEnvironmentPath(EnvironmentPathSpellAbility spell)
     {
         StateArgs spellTargetArgs = new StateArgs
@@ -94,6 +93,16 @@ public class SpellSelectionState : BaseAbilityMenuState
             spell = spell
         };
         bc.ChangeState<SpellEnvironmentSplashTargetState>(spellTargetArgs);
+    }
+
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        OutlineTargetCharacter(sender, e);
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        RemoveOutlineTargetCharacter();
     }
 
 }

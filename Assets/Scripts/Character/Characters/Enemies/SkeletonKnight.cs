@@ -4,30 +4,39 @@ using UnityEngine;
 
 public class SkeletonKnight : Enemy
 {
+
+    public SkeletonKnight() : base()
+    {
+        avatar = Resources.Load<Sprite>("Sprites/Avatars/SkeletonKnight");
+
+        abilities = new List<SpellAbility>();
+        abilities.Add(new StabAbility(this));
+
+        attackAbility = new SwordAttackAbility(this);
+        movementAbility = new WalkMovement(this);
+        movementAbility.Speed = 2.0f;
+
+        audioProfile = Resources.Load<CharacterAudioProfile>("Sounds/Audio Profiles/Character Profiles/Enemies/SkeletonKnightAudioProfile");
+    }
+
     public override void Init()
     {
-        stats.maxHP = 10;
         stats.maxAP = 75;
         stats.agility = 15;
         stats.Init();
-        resists.Init();
+        //stats.curHP = 1;
+
+        resists.Init(new Dictionary<DamageTypes.DamageType, float>()
+        {
+            {DamageTypes.DamageType.Fire, 0.5f }
+        });
+
+        damageBonuses.Init();
         buildUps.Init();
-
-        resists.SetResistance(DamageTypes.DamageType.Fire, 0.5f);
-
-        experience = 0;
-        level = 1;
 
         isInitialized = true;
 
-        cName = "Fatso";
+        cName = "Skeleton Knight";
         cClass = "Skeleton Knight";
-
-        spells = new List<SpellAbility>();
-        spells.Add(new CorruptedBladeAbility(controller));
-
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new WalkMovement(controller);
-        movementAbility.Speed = 2.5f;
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Thinksquirrel.CShake;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour {
 
     // References
     private Transform followTarget;
-	public Transform FollowTarget
+    public Transform FollowTarget
     {
         get
         {
@@ -24,10 +26,12 @@ public class CameraController : MonoBehaviour {
     }
     public GameController gc;
     private Camera _camera;
+    public static CameraController instance;
 
     //  Fields
     public bool isFollowing;
-	private Vector3 _min, _max;
+    public bool isPaused;
+    private Vector3 _min, _max;
     public Vector3 Margin, Smoothing;
     private Vector3 mouseStartingPos;
     private Vector3 mouseNewPos;
@@ -61,9 +65,9 @@ public class CameraController : MonoBehaviour {
         set { _camera.orthographicSize = Mathf.Clamp(value, minSize, maxSize); }
     }
 
-	// Use this for initialization
-	void Awake () {
-		isFollowing = true;
+    // Use this for initialization
+    void Awake() {
+        isFollowing = true;
         _camera = GameObject.Find("Camera").GetComponent<Camera>();
         minSize = 2f;
         maxSize = 3f;
@@ -71,6 +75,7 @@ public class CameraController : MonoBehaviour {
         mouseEdgeHeight = Screen.height - boundary;
         aspectRatio = mouseEdgeWidth / mouseEdgeHeight;
         CameraSize = minSize;
+        instance = this;
     }
 
     public void LateUpdate()
@@ -79,22 +84,28 @@ public class CameraController : MonoBehaviour {
         AddTransparency();
         */
 
+        if (isPaused)
+            return;
+
         // Zoom Camera
-        if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        if (!CursorOverUI())
         {
-            Zoom(CameraSize + 1, minSize, maxSize);
-        }
+            if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                Zoom(CameraSize + 0.5f, minSize, maxSize, 5f);
+            }
 
-        if (Input.GetAxis("Mouse ScrollWheel") > 0)
-        {
-            Zoom(CameraSize - 1, minSize, maxSize);
-        }
+            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            {
+                Zoom(CameraSize - 0.5f, minSize, maxSize, 5f);
+            }
 
-        // Rotate Camera
-        if (Input.GetMouseButton(2))
-        {
-            _camera.transform.LookAt(transform);
-            _camera.transform.RotateAround(transform.position, Vector3.up, Input.GetAxis("Mouse X") * _rotateSpeed);
+            // Rotate Camera
+            if (Input.GetMouseButton(2))
+            {
+                _camera.transform.LookAt(transform);
+                _camera.transform.RotateAround(transform.position, Vector3.up, Input.GetAxis("Mouse X") * _rotateSpeed);
+            }
         }
 
         // Follow Target
@@ -120,10 +131,35 @@ public class CameraController : MonoBehaviour {
             }
         }
 
-	}
+    }
+
+    public void Shake()
+    {
+        CameraShake.ShakeAll();
+    }
+
+    public bool CursorOverUI()
+    {
+        //https://www.youtube.com/watch?v=ptmum1FXiLE
+        //return EventSystem.current.IsPointerOverGameObject();
+
+        return false;
+    }
+
+    public void WarpToTarget()
+    {
+        WarpToTarget(FollowTarget);
+    }
+
+    public void WarpToTarget(Transform target)
+    {
+        transform.position = target.transform.position;
+    }
 
     public void ScreenEdgeMovement(float x, float y)
     {
+        return;
+
         if (Input.GetMouseButton(2))
             return;
 
@@ -206,11 +242,22 @@ public class CameraController : MonoBehaviour {
         return normDelta;
     }
 
-    public void Zoom(float targetSize, float _minSize, float _maxSize)
+    public void SetConstraints(float _minSize, float _maxSize)
+    {
+        minSize = _minSize;
+        maxSize = _maxSize;
+
+        if (CameraSize > _maxSize || CameraSize < _minSize)
+        {
+            Zoom(Mathf.Clamp(CameraSize, minSize, maxSize), minSize, maxSize);
+        }
+    }
+
+    public void Zoom(float targetSize, float _minSize, float _maxSize, float _speed = 0.5f)
     {
         if (zoomCoroutine != null)
             StopCoroutine(zoomCoroutine);
-        zoomCoroutine = ZoomCamera(targetSize, _minSize, _maxSize);
+        zoomCoroutine = ZoomCamera(targetSize, _minSize, _maxSize, _speed);
         StartCoroutine(zoomCoroutine);
     }
 

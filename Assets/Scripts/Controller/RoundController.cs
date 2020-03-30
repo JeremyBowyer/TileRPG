@@ -5,16 +5,16 @@ using UnityEngine;
 public class RoundController
 {
     public List<CharController> roundChars;
-    public BattleController bc;
+    BattleController bc { get { return BattleController.instance; } }
 
-    public RoundController(BattleController _bc)
+    public RoundController()
     {
-        bc = _bc;
+        roundChars = new List<CharController>();
     }
 
     public void InitRound(List<GameObject> characters)
     {
-        roundChars = new List<CharController>();
+        roundChars.Clear();
         foreach(GameObject go in characters)
         {
             CharController controller = go.GetComponent<CharController>();

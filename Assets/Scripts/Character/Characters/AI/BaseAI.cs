@@ -25,8 +25,6 @@ public class BaseAI : MonoBehaviour {
     private TargetSpellAbility maxHostileSpell;
     private TargetSpellAbility maxHealSpell;
 
-    private Text aiAction;
-
     public bool EndOfTurn
     {
         get { return CheckForEnd(); }
@@ -41,13 +39,11 @@ public class BaseAI : MonoBehaviour {
     {
         character = GetComponent<CharController>();
         bc = character.bc;
-        aiAction = bc.battleUI.aiAction;
         SortAndValidateSpells();
     }
 
     public virtual void ConsiderOptions()
     {
-        aiAction.gameObject.SetActive(true);
         SortAndValidateSpells();
         ClearTargets();
         AcquireTargets();
@@ -112,10 +108,10 @@ public class BaseAI : MonoBehaviour {
 
         foreach (SpellAbility spell in character.Spells)
         {
-            if (spell.abilityIntent == AbilityTypes.Intent.Hostile && spell.ValidateCost(character))
+            if (spell.abilityIntent == IntentTypes.Intent.Hostile && spell.ValidateCost(character))
             {
                 hostileSpells.Add(spell);
-            } else if (spell.abilityIntent == AbilityTypes.Intent.Heal && spell.ValidateCost(character))
+            } else if (spell.abilityIntent == IntentTypes.Intent.Heal && spell.ValidateCost(character))
             {
                 healSpells.Add(spell);
             }
@@ -200,7 +196,6 @@ public class BaseAI : MonoBehaviour {
 
     private void EndTurn()
     {
-        aiAction.gameObject.SetActive(false);
         bc.ChangeState<SelectUnitState>();
     }
 
@@ -294,13 +289,12 @@ public class BaseAI : MonoBehaviour {
         float minCost = Mathf.Min(new float[] {
             character.AttackAbility.ApCost,
             maxHostileSpell == null ? curAP+1 : maxHostileSpell.ApCost,
-            maxHealSpell == null ? curAP+1 : maxHealSpell.ApCost
+            maxHealSpell == null ? curAP+1 : maxHealSpell.ApCost,
+            character.MovementAbility.costModifier*10
         });
-        float distanceFromTarget = bc.pathfinder.GetDistance(character.tile.node, enemyTarget.tile.node);
-        if ((curAP < minCost & distanceFromTarget < 20) | curAP <= 10)
-        {
+
+        if (curAP < minCost)
             return true;
-        }
         return false;
     }
 

@@ -9,7 +9,12 @@ public class InitBattleState : BattleState
     private List<GameObject> startingTilesPlayer;
     private List<GameObject> startingTilesEnemy;
     private ProtagonistController protag;
-    private BSPRoom room;
+    private KeepBattleRoom room;
+
+    private bool surveyDone = false;
+    private bool gridDone = false;
+    private bool setupDone = false;
+
     public override bool IsInterruptible
     {
         get { return false; }
@@ -35,47 +40,77 @@ public class InitBattleState : BattleState
         UserInputController.AddLayer(LayerMask.NameToLayer("Character"));
 
         // Get args
-        room = args.room;
-        // Show Message
-        superUI.ShowMessage("Battle Start", 2f);
+        room = args.room as KeepBattleRoom;
 
         // Start Coroutines
         StartCoroutine(grid.GenerateGrid(room, OnCreateGrid));
-        bc.cameraRig.Zoom(5f, 2f, 5f);
+        StartCoroutine(SurveyBattleGrid());
+        StartCoroutine(WaitForTasks());
+    }
+
+    public IEnumerator SurveyBattleGrid()
+    {
+        float duration = 1f;
+        // Show Message
+        superUI.ShowMinorMessage("Battle Start", room.enemies.Length * duration);
+
+        float maxSize = Mathf.Max(new float[] { room.xSize, room.zSize });
+        maxSize = Mathf.Max(new float[] { maxSize / 2.5f, 2f });
+        bc.cameraRig.Zoom(2f, 1f, maxSize, 0.5f);
+
+        foreach (GameObject enemyGO in room.enemies)
+        {
+            EnemyController enemy = enemyGO.GetComponent<EnemyController>();
+            if (enemy.room != room)
+                continue;
+
+            bc.FollowTarget(enemy.transform);
+            yield return new WaitForSeconds(duration);
+        }
+
+        surveyDone = true;
     }
 
     public void OnCreateGrid()
     {
-        bc.EnableRBs(false);
-        battleUI.gameObject.SetActive(true);
+        SetUpObjects();
+        gridDone = true;
+    }
+
+    public void SetUpObjects()
+    {
+        //UIController.instance.SwitchTo("battle");
+        //battleUI.ShowPanel("combat");
 
         // Re-position protag
         // Set up protag
         protag = bc.protag;
         protag.transform.position = new Vector3(protag.transform.position.x, grid.FindHeightPoint(protag.transform.position), protag.transform.position.z);
         bc.protagStartPos = protag.transform.position;
-        
-        // Place protag
-        Node protagNode = bc.grid.FindNearestNode(protag.transform.position);
-        protag.Place(protagNode.tile);
+        protag.protagAgent.enabled = false;
+
+        //protag.tile = frontNode.tile;
         protag.InitBattle();
         bc.unitsToPlace.Enqueue(protag.gameObject);
 
-        protag.InstantiatePartyMembers();
-
         bc.players.Add(protag.gameObject);
         bc.characters.Add(protag.gameObject);
+
         // Place party members on protag tile, to be moved in next state
-        foreach (PartyMember member in protag.partyMembers)
+        foreach (PartyMember member in PersistentObjects.party.GetMembers())
         {
-            member.controller.Place(protagNode.tile);
+            if (member == protag.character)
+                continue;
+            //member.controller.tile = frontNode.tile;
+            member.controller.transform.position = bc.protagStartPos;
+            member.controller.InitController();
             bc.players.Add(member.controller.gameObject);
             bc.characters.Add(member.controller.gameObject);
             bc.unitsToPlace.Enqueue(member.controller.gameObject);
         }
 
         // Setup Nearby Enemies
-        foreach (GameObject enemyGO in GameObject.FindGameObjectsWithTag("Enemy"))
+        foreach (GameObject enemyGO in room.enemies)
         {
             EnemyController enemy = enemyGO.GetComponent<EnemyController>();
             if (enemy.room != room)
@@ -85,26 +120,43 @@ public class InitBattleState : BattleState
             if (node != null)
             {
                 enemy = enemyGO.GetComponent<EnemyController>();
-                enemyGO.gameObject.transform.rotation = Quaternion.LookRotation(bc.grid.backwardDirection, Vector3.up);
+                enemyGO.gameObject.transform.rotation = Quaternion.LookRotation(Grid.backwardDirection, Vector3.up);
                 enemy.Place(node.tile);
                 enemy.InitBattle();
                 BaseAI enemyAI = enemyGO.GetComponent<BaseAI>();
                 enemyAI.Init();
                 bc.enemies.Add(enemyGO);
                 bc.characters.Add(enemyGO);
+                room.enemyGroup.AddMember(enemy.character);
             }
         }
 
         // Add delegates for units in battle
         foreach (GameObject character in bc.characters)
         {
-            bc.onUnitChange += character.GetComponent<CharController>().OnTurnEnd;
+            bc.onUnitChange += character.GetComponent<CharController>().OnUnitChange;
+            bc.onRoundChange += character.GetComponent<CharController>().OnRoundChange;
         }
         bc.onUnitChange += bc.turnQueue.UpdateQueue;
         bc.protag.gameObject.transform.localScale = Vector3.zero;
 
         // Initiate round
-        bc.rc.InitRound(bc.characters);
+        //bc.rc.InitRound(bc.characters);
+
+        setupDone = true;
+    }
+
+    public IEnumerator WaitForTasks()
+    {
+        while (!gridDone || !setupDone || !surveyDone)
+        {
+            yield return null;
+        }
+
+        bc.EnableRBs(false);
+        battleUI.gameObject.SetActive(true);
+        UIController.instance.SwitchTo("battle");
+        battleUI.ShowPanel("combat");
 
         // Instantiate Turn Entries
         foreach (GameObject go in bc.characters)
@@ -117,6 +169,18 @@ public class InitBattleState : BattleState
         bc.ChangeState<PlaceUnitsState>();
     }
 
+    protected override void OnKeyDown(object sender, InfoEventArgs<KeyCode> e)
+    {
+        if (e.info == KeyCode.V)
+            battleUI.ShowCharUIs(true);
+    }
+
+    protected override void OnKeyUp(object sender, InfoEventArgs<KeyCode> e)
+    {
+        if (e.info == KeyCode.V)
+            battleUI.ShowCharUIs(false);
+    }
+
     public override void Exit()
     {
         base.Exit();
@@ -126,19 +190,6 @@ public class InitBattleState : BattleState
     protected override void OnDestroy()
     {
         //RemoveListeners();
-    }
-
-    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
-    {
-        CharController target = e.info.gameObject.GetComponent<CharController>();
-
-        if (target != null)
-            events.LoadTargetCharacter(target);
-    }
-
-    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
-    {
-        events.UnloadTargetCharacter();
     }
 
 }

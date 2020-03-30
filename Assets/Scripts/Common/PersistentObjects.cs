@@ -5,33 +5,19 @@ using UnityEngine;
 public class PersistentObjects
 {
     // Protag and co.
-    public static Character protagonist;
-    public static List<PartyMember> partyMembers;
-    public static Inventory inventory;
+    public static PartyMember protagonist = new Executioner();
+    public static Party party = new Party();
+    public static Roster roster = new Roster();
+    public static Inventory bag = new Inventory();
+    public static Inventory vault = new Inventory() { capacity = 999 };
     public static Vector3 protagonistLocation;
-
-    // Enemies
-    public static string enemyName;
-    public static Enemy battleInitiator;
 
     // Generic
     public static List<string> deadObjects;
 
-    public static void SaveProtagonist(GameController gc)
+    public static void SaveProtagonist(ProtagonistController protag)
     {
-        protagonist = gc.protag.character;
-        partyMembers = gc.protag.partyMembers;
-        inventory = gc.protag.inventory;
+        protagonist = protag.character as PartyMember;
+        bag = protag.inventory;
     }
-
-    public static void RemoveObject(string id)
-    {
-        if (deadObjects == null)
-        {
-            deadObjects = new List<string>();
-        }
-
-        deadObjects.Add(id);
-    }
-
 }

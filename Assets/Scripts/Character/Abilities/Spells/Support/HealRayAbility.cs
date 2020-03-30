@@ -6,7 +6,7 @@ using UnityEngine;
 public class HealRayAbility : TargetSpellAbility
 {
 
-    public HealRayAbility(CharController _character)
+    public HealRayAbility(Character _character)
     {
         AbilityName = "Heal Ray Ability";
         AbilityDescription = "Heal an ally for a moderate amount from range.";
@@ -17,12 +17,12 @@ public class HealRayAbility : TargetSpellAbility
         diag = true;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Heal;
+        abilityIntent = IntentTypes.Intent.Heal;
     }
 
     public override List<Node> GetRange()
     {
-        List<Node> range = character.bc.pathfinder.FindGeometricRange(character.tile.node, AbilityRange);
+        List<Node> range = controller.bc.pathfinder.FindGeometricRange(controller.tile.node, AbilityRange);
         return range;
     }
 
@@ -33,20 +33,20 @@ public class HealRayAbility : TargetSpellAbility
 
     public override void ApplyCharacterEffect(CharController character)
     {
-        character.Heal(50);
+        character.Heal(50, true);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
-        character.transform.LookAt(new Vector3(_target.tile.transform.position.x, character.transform.position.y, _target.tile.transform.position.z));
-        character.animParamController.SetTrigger("cast_start");
-        character.animParamController.SetBool("cast_loop");
+        controller.transform.LookAt(new Vector3(_target.tile.transform.position.x, controller.transform.position.y, _target.tile.transform.position.z));
+        controller.animParamController.SetTrigger("cast_start");
+        controller.animParamController.SetBool("cast_loop");
         yield return new WaitForSeconds(1f);
 
         // Clean up
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        character.animParamController.SetBool("idle");
-        character.animParamController.SetTrigger("cast_end");
+        controller.transform.rotation = Quaternion.LookRotation(controller.bc.grid.GetDirection(controller.tile.node, _target.tile.node), Vector3.up);
+        controller.animParamController.SetBool("idle");
+        controller.animParamController.SetTrigger("cast_end");
         callback();
         yield break;
     }

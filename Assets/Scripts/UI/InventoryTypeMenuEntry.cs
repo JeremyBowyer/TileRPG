@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,14 +8,17 @@ using UnityEngine.UI;
 public class InventoryTypeMenuEntry : MonoBehaviour
 {
 
-    [SerializeField] public Text mType;
+    [SerializeField] public Text mName;
     [SerializeField] public Text mCount;
     [SerializeField] Button button;
 
-    public string Type
+    public Type type;
+    public WorldMenuPanelController wmpController;
+
+    public string Name
     {
-        get { return mType.text; }
-        set { mType.text = value; }
+        get { return mName.text; }
+        set { mName.text = value; }
     }
 
     public string Count
@@ -64,7 +68,7 @@ public class InventoryTypeMenuEntry : MonoBehaviour
 
             if (IsLocked)
             {
-                mType.color = Color.gray;
+                mName.color = Color.gray;
             }
             else if (IsSelected)
             {
@@ -88,6 +92,11 @@ public class InventoryTypeMenuEntry : MonoBehaviour
     {
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(action);
+    }
+
+    public void OnHover()
+    {
+        //wmpController.OnHoverInventoryItem(this);
     }
 
     public void Reset()

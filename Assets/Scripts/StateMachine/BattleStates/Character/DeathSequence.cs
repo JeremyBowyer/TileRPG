@@ -9,6 +9,7 @@ public class DeathSequence : BattleState
     private List<Node> path;
     private CharController character;
     private State stateToNotify;
+    private Damage damage;
     //public override bool IsMaster
     //{
     //    get { return true; }
@@ -22,8 +23,7 @@ public class DeathSequence : BattleState
             return new List<Type>
             {
             typeof(SelectUnitState),
-            typeof(CommandSelectionState),
-            typeof(EnemyTurnStateGlobal)
+            typeof(CommandSelectionState)
             };
         }
         set { }
@@ -33,18 +33,20 @@ public class DeathSequence : BattleState
     {
         InTransition = true;
         base.Enter();
-        //character = args.character;
+        damage = args.damage;
         character = GetComponent<CharController>();
         character.animParamController.SetTrigger("die", OnAnimationFinish);
+        //character.animParamController.SetBool("idle", false);
+        character.audioController.Play("death");
     }
 
     public void OnAnimationFinish()
     {
-        character.AfterDeath();
+        character.AfterDeath(damage);
         InTransition = false;
     }
 
-    public override void InterruptTransition()
+    public override void InterruptTransition(bool finish)
     {
         isInterrupting = true;
         OnAnimationFinish();

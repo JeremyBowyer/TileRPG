@@ -49,7 +49,7 @@ public class InitiateBattle : MonoBehaviour
                     SceneManager.LoadScene("Battle");
                     */
                     EnemyController controller = col.GetComponent<EnemyController>();
-                    BSPBattleRoom battleRoom = controller.room as BSPBattleRoom;
+                    KeepBattleRoom battleRoom = controller.room as KeepBattleRoom;
                     character.lc.StartBattle(battleRoom);
                 }
             }

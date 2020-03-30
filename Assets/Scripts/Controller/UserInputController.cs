@@ -13,6 +13,7 @@ public class UserInputController : MonoBehaviour {
     public static event EventHandler<InfoEventArgs<Vector3>> moveMouseEvent;
     public static event EventHandler<InfoEventArgs<int>> cancelEvent;
     public static event EventHandler<InfoEventArgs<KeyCode>> keyDownEvent;
+    public static event EventHandler<InfoEventArgs<KeyCode>> keyUpEvent;
     public static LayerMask mouseLayer;
     private static List<LayerMask> mouseLayers;
     private static int layers;
@@ -20,7 +21,20 @@ public class UserInputController : MonoBehaviour {
     private GameObject lastHit;
     private GameObject currentHit;
     private Camera _camera;
-    public PauseMenu pauseMenu;
+
+    private static bool useExtraLayers;
+    public static bool UseExtraLayers
+    {
+        get { return useExtraLayers; }
+        set
+        {
+            useExtraLayers = value;
+            if (useExtraLayers)
+                CalculateLayer();
+            else
+                layers = 0;
+        }
+    }
 
     private void Awake()
     {
@@ -37,6 +51,7 @@ public class UserInputController : MonoBehaviour {
         moveMouseEvent = null;
         cancelEvent = null;
         keyDownEvent = null;
+        keyUpEvent = null;
     }
 
     public static void ResetLayers()
@@ -47,17 +62,53 @@ public class UserInputController : MonoBehaviour {
 
     void Update() {
 
-        // Escape (cancel)
+        string keys = Input.inputString;
+
+        if (keys != "")
+        {
+            Debug.Log(keys);
+        }
+
+        // Key Down Events
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Use this for testing various things
+            //CameraController.instance.Shake();
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             cancelEvent?.Invoke(this, new InfoEventArgs<int>(1));
         }
-        
-        // Key Down Event
+
         if (Input.GetKeyDown(KeyCode.M))
         {
             keyDownEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.M));
         }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            keyDownEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.I));
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            keyDownEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.P));
+        }
+
+        if (Input.GetKeyDown(KeyCode.V) || Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            keyDownEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.V));
+        }
+
+
+        // Key Up Events
+        if (Input.GetKeyUp(KeyCode.V) || Input.GetKeyUp(KeyCode.LeftAlt))
+        {
+            keyUpEvent?.Invoke(this, new InfoEventArgs<KeyCode>(KeyCode.V));
+        }
+
+
 
         // Move Event
         float x = Input.GetAxis("Horizontal");
@@ -72,8 +123,7 @@ public class UserInputController : MonoBehaviour {
         /* - Mouse Events - */
         /* - MUST BE LAST - */
         /* ---------------- */
-        if (moveMouseEvent != null)
-            moveMouseEvent(this, new InfoEventArgs<Vector3>(Input.mousePosition));
+        moveMouseEvent?.Invoke(this, new InfoEventArgs<Vector3>(Input.mousePosition));
 
         // Making the cursor invisible is used to ignore click/hover events.
         if (!Cursor.visible)
@@ -82,17 +132,20 @@ public class UserInputController : MonoBehaviour {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         int layer = (1 << mouseLayer) | layers;
 
+        // TODO: Change to RaycastAll and loop through all hits. Will need to figure out how to handle lastHit and currentHit logic
         bool wasHit = Physics.Raycast(ray, out hit, 100f, layer);
-
+        
         if (wasHit && (hoverExitEvent != null || hoverEnterEvent != null || clickEvent != null))
         {
             currentHit = hit.collider.gameObject;
             if (currentHit != lastHit)
             {
-                if(lastHit != null && hoverExitEvent != null)
+                //
+                // EXIT/ENTER ORDER MATTERS for some operations.
+                //
+                if (lastHit != null && hoverExitEvent != null)
                     hoverExitEvent(this, new InfoEventArgs<GameObject>(lastHit));
-                if(hoverEnterEvent != null)
-                    hoverEnterEvent(this, new InfoEventArgs<GameObject>(currentHit)); // Enter should run after Exit, if highlighting tiles
+                hoverEnterEvent?.Invoke(this, new InfoEventArgs<GameObject>(currentHit));
                 lastHit = currentHit;
             }
 

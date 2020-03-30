@@ -31,6 +31,7 @@ public class PSMeshRendererUpdater : MonoBehaviour
         alpha = 0;
         prevAlpha = 0;
         IsActive = true;
+        UpdateMeshEffect();
     }
 
     float alpha;

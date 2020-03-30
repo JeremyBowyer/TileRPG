@@ -32,29 +32,70 @@ public class VictorySequence : BattleState
     {
         InTransition = true;
         base.Enter();
+        CombatLogController.instance.RemoveEntries();
+        battleUI.victoryScreenController.confirmAction = OnConfirm;
 
+        battleUI.ShowPanel("victory");
+        Dictionary<Character, int> expDict = bc.rewardController.GatherExperience();
+        StartCoroutine(battleUI.victoryScreenController.AddExperiences(expDict));
+    }
+
+    public void OnConfirm()
+    {
         // Hide party members
         ProtagonistController protag = bc.protag;
         protag.TerminateBattle();
-        foreach (PartyMember member in protag.partyMembers)
+        protag.protagAgent.enabled = true;
+        foreach (PartyMember member in PersistentObjects.party.GetMembers())
         {
+            if (member == protag.character)
+                continue;
             member.controller.gameObject.transform.localScale = Vector3.zero;
             member.controller.TerminateBattle();
         }
-
-        PersistentObjects.SaveProtagonist(bc);
-        //SceneManager.LoadScene("World");
+        battleUI.victoryScreenController.ClearEntries();
+        SpawnRewardChest();
+        battleUI.ShowPanel("none");
 
         bc.TerminateBattle();
-
         InTransition = false;
         bc.ChangeState<IdleState>();
         bc.lc.ChangeState<WorldExploreState>();
     }
 
+    public void SpawnRewardChest()
+    {
+        List<Node> range = bc.pathfinder.FindRange(bc.protag.tile.node, float.MaxValue, true, true, true, false, true);
+        range = bc.pathfinder.CullNodes(range, true, true, true);
+
+        Node closestNode = range[0];
+        float dist = Vector3.Distance(bc.protag.tile.anchorPointWorld, closestNode.tile.anchorPointWorld);
+        foreach (Node node in range)
+        {
+            float newDist = Vector3.Distance(bc.protag.tile.anchorPointWorld, node.tile.anchorPointWorld);
+            if (newDist < dist)
+            {
+                dist = newDist;
+                closestNode = node;
+            }
+        }
+
+        List<Item> rewards = bc.rewardController.GatherRewards();
+        Currency currency = bc.rewardController.GatherCurrency();
+        rewards.Add(currency);
+        bc.rewardController.Reset();
+
+        GameObject chestGO = Instantiate(Resources.Load<GameObject>("Prefabs/Map/Props/ItemChest"));
+        chestGO.transform.position = closestNode.tile.anchorPointWorld;
+        ItemChest chest = chestGO.GetComponent<ItemChest>();
+
+        chest.LoadItems(rewards);
+    }
+
     public override void Exit()
     {
         base.Exit();
+        UserInputController.ResetEvents();
     }
 
 }

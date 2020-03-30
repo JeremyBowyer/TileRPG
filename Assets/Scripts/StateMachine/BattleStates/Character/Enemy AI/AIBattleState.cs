@@ -5,14 +5,12 @@ using UnityEngine.UI;
 
 public class AIBattleState : BattleState
 {
-    public Text aiAction;
     protected CharController character;
     protected BaseAI enemyAI;
 
     protected override void Awake()
     {
         base.Awake();
-        aiAction = bc.battleUI.aiAction;
     }
 
     public override void Enter()

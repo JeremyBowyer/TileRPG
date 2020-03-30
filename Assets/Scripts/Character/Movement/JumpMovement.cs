@@ -17,9 +17,10 @@ public class JumpMovement : Movement
     private float jumpHeight;
     private float jumpSpeed;
 
-    public JumpMovement(CharController controller) : base(controller)
+    public JumpMovement(Character character) : base(character)
     {
         mName = "Jump";
+        mDescription = "Leap through the air, unhindered by movement blockers and avoiding environmental damage.";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)

@@ -6,18 +6,20 @@ public class BurnMalady : Malady
 {
     private int countdown;
     private const int MaxIterations = 2;
-    private Damage Damage = new Damage(DamageTypes.DamageType.Fire, 20);
+    private Damage Damage;
     public override MaladyTypes.MaladyType Type
     {
         get { return MaladyTypes.MaladyType.Burn; }
     }
 
-    public override void ApplyMalady(CharController _target)
+    public override void ApplyMalady(CharController _target, bool queue = false)
     {
         if (_target == null)
             return;
-
-        _target.Damage(new Damage[] { Damage });
+        if (queue)
+            bc.damageQueue.Enqueue(new KeyValuePair<CharController, Damage[]>(_target, new Damage[] { Damage }));
+        else
+            _target.TakeDamage(Damage);
     }
 
     public override void RefreshMalady()
@@ -25,21 +27,23 @@ public class BurnMalady : Malady
         countdown = MaxIterations;
     }
 
-    public override void TurnTick(CharController currentCharacter)
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
     public override void RoundTick()
     {
+        ApplyMalady(target, true);
         if (countdown <= 0)
             RemoveMalady();
         countdown -= 1;
-        ApplyMalady(target);
     }
 
-    public override void Init(CharController _target)
+    public override void Init(Character _source, CharController _target)
     {
-        base.Init(_target);
+        base.Init(_source, _target);
+        mName = "a burn";
+        Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Fire, 100, _malady: this);
         countdown = MaxIterations;
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/BurningEffectPlayer")) as GameObject;
         PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();

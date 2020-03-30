@@ -4668,6 +4668,7 @@ GameObject:
   - component: {fileID: 4588732729394393504}
   - component: {fileID: 4425766417940386998}
   - component: {fileID: 4426556238711667936}
+  - component: {fileID: -2968444930096431260}
   m_Layer: 0
   m_Name: VoltaicDamage
   m_TagString: Untagged
@@ -9415,6 +9416,26 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &-2968444930096431260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4588732729394467192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Voltaic
+  soundGroup: 0
+  clip: {fileID: 8300000, guid: b1acecdf352627048b995eca86c0f8ec, type: 3}
+  volume: 0.5
+  pitch: 1
+  loop: 0
+  playOnAwake: 1
+  source: {fileID: 0}
 --- !u!1 &4588732729394630600
 GameObject:
   m_ObjectHideFlags: 0

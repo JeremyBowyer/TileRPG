@@ -11,7 +11,7 @@ public class ShockMalady : Malady
         get { return MaladyTypes.MaladyType.Shock; }
     }
 
-    public override void ApplyMalady(CharController _target)
+    public override void ApplyMalady(CharController _target, bool queue = false)
     {
         if (_target == null)
             return;
@@ -23,7 +23,7 @@ public class ShockMalady : Malady
         countdown = MaxIterations;
     }
 
-    public override void TurnTick(CharController currentCharacter)
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
@@ -34,10 +34,11 @@ public class ShockMalady : Malady
         countdown -= 1;
     }
 
-    public override void Init(CharController _target)
+    public override void Init(Character _source, CharController _target)
     {
-        base.Init(_target);
+        base.Init(_source, _target);
         countdown = MaxIterations;
+        mName = "a shock";
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/ShockEffectPlayer")) as GameObject;
         PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();
         go.transform.parent = _target.gameObject.transform;

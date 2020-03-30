@@ -9,7 +9,7 @@ public class TurnQueueController : MonoBehaviour
     public GameObject hideSlot;
     public List<TurnEntry> entries;
 
-    public void UpdateQueue(CharController character)
+    public void UpdateQueue(CharController previousCharacter, CharController currentCharacter)
     {
         int maxSlots = slots.Count;
         for(int i=0; i < bc.rc.roundChars.Count; i++)
@@ -45,7 +45,7 @@ public class TurnQueueController : MonoBehaviour
     {
         foreach(TurnEntry entry in entries)
         {
-            if (entry.character = controller)
+            if (entry.character == controller)
                 HideEntry(entry);
         }
     }

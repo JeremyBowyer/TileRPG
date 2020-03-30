@@ -5,6 +5,7 @@ using System.Collections;
 
 public class PartyMenuEntry : MonoBehaviour
 {
+    [SerializeField] public Image mAvatar;
     [SerializeField] public Text mName;
     [SerializeField] public Text mClass;
     [SerializeField] public Text mLevel;
@@ -13,7 +14,9 @@ public class PartyMenuEntry : MonoBehaviour
     [SerializeField] public Text mStamina;
     [SerializeField] Button button;
 
-    public PartyMember member;
+    public PartyMember character;
+
+    private WorldMenuPanelController wmpController { get { return WorldMenuPanelController.instance; } }
 
     public string Name
     {
@@ -21,76 +24,35 @@ public class PartyMenuEntry : MonoBehaviour
         set { mName.text = value; }
     }
 
-    [System.Flags]
-    enum States
-    {
-        None = 0,
-        Selected = 1 << 0,
-        Locked = 1 << 1
-    }
-
-    public bool IsLocked
-    {
-        get { return (State & States.Locked) != States.None; }
-        set
-        {
-            if (value)
-                State |= States.Locked;
-            else
-                State &= ~States.Locked;
-        }
-    }
-    public bool IsSelected
-    {
-        get { return (State & States.Selected) != States.None; }
-        set
-        {
-            if (value)
-                State |= States.Selected;
-            else
-                State &= ~States.Selected;
-        }
-    }
-    States State
-    {
-        get { return state; }
-        set
-        {
-            if (state == value)
-                return;
-            state = value;
-
-            if (IsLocked)
-            {
-                mName.color = Color.gray;
-            }
-            else if (IsSelected)
-            {
-                //label.color = new Color32(249, 210, 118, 255);
-            }
-            else
-            {
-                //label.color = Color.white;
-            }
-        }
-    }
-
-    States state;
-
-
     void Awake()
     {
     }
 
-    public void setOnClick(UnityAction action)
+    public void SetOnClick(UnityAction action)
     {
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(action);
     }
 
-    public void Reset()
+    public void LoadMember(PartyMember _member)
     {
-        State = States.None;
+        mAvatar.sprite = _member.avatar;
+        mName.text = _member.cName;
+        mClass.text = _member.cClass;
+        mHp.text = _member.stats.curHP.ToString() + " / " + _member.stats.maxHPTemp.ToString() + " / " + _member.stats.maxHP.ToString();
+        mMana.text = _member.stats.curMP.ToString() + " / " + _member.stats.maxMPTemp.ToString() + " / " + _member.stats.maxMP.ToString();
+        mStamina.text = _member.stats.curAP.ToString() + " / " + _member.stats.maxAPTemp.ToString() + " / " + _member.stats.maxAP.ToString();
+        mLevel.text = _member.level.ToString();
+        character = _member;
     }
 
+    public void OnHoverEnter()
+    {
+        wmpController.OnHoverEnterMember(this);
+    }
+
+    public void OnHoverExit()
+    {
+        wmpController.OnHoverExitMember(this);
+    }
 }

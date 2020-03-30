@@ -20,7 +20,8 @@ public class SpellEnvironmentPathTargetState : BattleState
             {
             typeof(CommandSelectionState),
             typeof(SpellEnvironmentSequenceState),
-            typeof(CheckForTurnEndState)
+            typeof(UnitTurnState),
+            typeof(DishOutDamageState)
             };
         }
         set { }
@@ -33,8 +34,8 @@ public class SpellEnvironmentPathTargetState : BattleState
         character = bc.CurrentCharacter;
         spellRange = spellAbility.GetRange();
 
-        Color color = AbilityTypes.GetIntentColor(spellAbility.abilityIntent);
-        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.04f), "spellrange", "inner");
+        Color color = IntentTypes.GetIntentColor(spellAbility.abilityIntent);
+        grid.SelectNodes(spellRange, CustomColors.ChangeAlpha(color, 0.25f), "spellrange", "empty");
         grid.OutlineNodes(spellRange, color);
         base.Enter();
         InTransition = false;
@@ -47,6 +48,7 @@ public class SpellEnvironmentPathTargetState : BattleState
         grid.RemoveOutline(spellRange);
         grid.DeSelectNodes("startnode");
         grid.DeSelectNodes("abilitypath");
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
         spellRange = null;
     }
 
@@ -58,6 +60,8 @@ public class SpellEnvironmentPathTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
+        OutlineTargetCharacter(sender, e);
+
         Tile tile = e.info.gameObject.GetComponent<Tile>();
 
         if (tile == null)
@@ -84,11 +88,14 @@ public class SpellEnvironmentPathTargetState : BattleState
                     grid.SelectNodes(abilityPath, CustomColors.Support, "abilitypath", "inner");
                 }
             }
+            MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Target);
         }
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
+        RemoveOutlineTargetCharacter();
+
         Tile tile = e.info.gameObject.GetComponent<Tile>();
 
         if (tile == null)
@@ -100,6 +107,7 @@ public class SpellEnvironmentPathTargetState : BattleState
         {
             grid.DeSelectNodes("abilitypath");
         }
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
@@ -128,7 +136,7 @@ public class SpellEnvironmentPathTargetState : BattleState
                     waitingStateMachines = new List<StateMachine> { bc }
                 };
                 character.ChangeState<SpellEnvironmentSequenceState>(spellArgs);
-                bc.ChangeState<CheckForTurnEndState>();
+                bc.ChangeState<DishOutDamageState>();
             }
         }
     }

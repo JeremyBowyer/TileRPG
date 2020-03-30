@@ -9,30 +9,39 @@ public class WallOfStoneTileEffect : TileEffect
     private GameObject go;
     private bool wasWalkable;
 
-    public override void ApplyEffect(CharController _target)
+    public override void OnCharEnter(CharController _target, bool queue = false)
     {
     }
 
-    public override void TurnTick(CharController _currentCharacter)
+    public override void OnCharExit(CharController _target, bool queue = false)
+    {
+    }
+
+    public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
     {
     }
 
     public override void RoundTick()
     {
-        ApplyEffect(tile.occupant);
+        OnCharEnter(tile.occupant);
         if (countdown <= 0)
             RemoveEffect();
         countdown -= 1;
     }
 
-    public override void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid)
+    public override void Init(Tile _tile, Vector3 _sourceDirection, Grid _grid, Character _source)
     {
-        base.Init(_tile, _sourceDirection, _grid);
+        base.Init(_tile, _sourceDirection, _grid, _source);
         wasWalkable = _tile.isWalkable;
         _tile.isWalkable = false;
 
         StartCoroutine(SpawnWall(_tile, _sourceDirection, _grid));
 
+        countdown = MaxIterations;
+    }
+
+    public override void RefreshEffect()
+    {
         countdown = MaxIterations;
     }
 
@@ -44,10 +53,6 @@ public class WallOfStoneTileEffect : TileEffect
         base.RemoveEffect();
     }
 
-    public override void ApplyToOccupant()
-    {
-    }
-
     public IEnumerator SpawnWall(Tile _tile, Vector3 direction, Grid _grid)
     {
         GameObject wallPrefab = Resources.Load("Prefabs/Abilities/WallOfStone") as GameObject;
@@ -55,14 +60,14 @@ public class WallOfStoneTileEffect : TileEffect
         float xMod = go.GetComponent<BoxCollider>().bounds.extents.x;
         go.transform.localScale = new Vector3(go.transform.localScale.x / xMod * 0.5f, go.transform.localScale.y / xMod * 0.5f, go.transform.localScale.z / xMod * 0.5f);
 
-        if (direction == _grid.leftDirection || direction == _grid.rightDirection)
+        if (direction == Grid.leftDirection || direction == Grid.rightDirection)
         {
-            go.transform.position += _grid.rightDirection * 0.5f;
+            go.transform.position += Grid.rightDirection * 0.5f;
         }
-        else if (direction == _grid.forwardDirection || direction == _grid.backwardDirection)
+        else if (direction == Grid.forwardDirection || direction == Grid.backwardDirection)
         {
             go.transform.Rotate(new Vector3(0f, -90f, 0f));
-            go.transform.position += _grid.forwardDirection * 0.5f;
+            go.transform.position += Grid.forwardDirection * 0.5f;
         }
 
         // Raise from ground

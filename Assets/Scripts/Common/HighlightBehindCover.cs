@@ -23,20 +23,30 @@ public class HighlightBehindCover : MonoBehaviour
             _color = CustomColors.Heal;
 
         AddOutline();
+        SetOutlineOptions();
     }
 
     public void AddOutline()
     {
         _ol = gameObject.AddComponent<Outline>();
-        _ol.OutlineMode = Outline.Mode.OutlineHidden;
-        _ol.OutlineColor = _color;
-        _ol.OutlineWidth = 1f;
-
         _ol.enabled = false;
+    }
+
+    public void SetOutlineOptions()
+    {
+        if(_ol != null)
+        {
+            _ol.OutlineMode = Outline.Mode.OutlineHidden;
+            _ol.OutlineColor = _color;
+            _ol.OutlineWidth = 1f;
+        }
     }
 
     void Update()
     {
+        if (_controller.outline)
+            return;
+
         if(_ol == null)
             AddOutline();
 
@@ -62,10 +72,11 @@ public class HighlightBehindCover : MonoBehaviour
 
             if (hit.collider.tag == "Wall")
             {
+                SetOutlineOptions();
                 _ol.enabled = true;
                 return;
             }
         }
-        _ol.enabled = false;
+        _ol.enabled = _controller.outline || false;
     }
 }

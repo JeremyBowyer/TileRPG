@@ -26,12 +26,16 @@ public class UnitPlacementState : BattleState
         InTransition = true;
         base.Enter();
         character = args.character;
-
+        Node frontNode = bc.grid.FindNearestNode(bc.protagStartPos);
+        character.Place(frontNode.tile);
+        character.InitBattle();
         bc.FollowTarget(character.transform);
+        battleUI.LoadCurrentStats(null, character);
+        //bc.CurrentCharacter = character;
 
-        mover = character.MovementAbility;
+        mover = new PlaceUnitMovement(character.character);
         moveRange = mover.GetNodesInRange();
-        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.04f), "moverange", "inner");
+        grid.SelectNodes(moveRange, CustomColors.ChangeAlpha(CustomColors.MovementRange, 0.25f), "moverange", "empty");
         grid.OutlineNodes(moveRange, CustomColors.MovementRange);
         InTransition = false;
     }
@@ -43,7 +47,6 @@ public class UnitPlacementState : BattleState
         grid.DeSelectNodes("movepath");
         grid.RemoveOutline(moveRange);
         moveRange = null;
-        battleUI.SetApCost();
     }
 
     protected override void AddListeners()
@@ -65,12 +68,9 @@ public class UnitPlacementState : BattleState
         {
             List<Node> path = mover.GetPath(tile.node);
 
-            StateArgs moveArgs = new StateArgs
-            {
-                path = path,
-                waitingStateMachines = new List<StateMachine> { bc }
-            };
-            character.ChangeState<MoveSequenceState>(moveArgs);
+            character.Place(tile);
+            character.gameObject.transform.localScale = Vector3.one / 2;
+
             bc.ChangeState<PlaceUnitsState>();
             return;
         }
@@ -82,6 +82,8 @@ public class UnitPlacementState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
+        OutlineTargetCharacter(sender, e);
+
         Tile tile = e.info.gameObject.GetComponent<Tile>();
 
         if (tile == null)
@@ -103,6 +105,8 @@ public class UnitPlacementState : BattleState
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
+        RemoveOutlineTargetCharacter();
+
         Tile tile = e.info.gameObject.transform.GetComponent<Tile>();
 
         if (tile == null)
@@ -111,7 +115,6 @@ public class UnitPlacementState : BattleState
         if (moveRange.Contains(tile.node))
         {
             grid.DeSelectNodes("movepath");
-            battleUI.SetApCost();
         }
     }
 

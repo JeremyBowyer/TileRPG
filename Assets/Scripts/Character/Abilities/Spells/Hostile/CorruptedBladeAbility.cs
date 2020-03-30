@@ -6,23 +6,24 @@ using UnityEngine;
 public class CorruptedBladeAbility : TargetSpellAbility
 {
 
-    public CorruptedBladeAbility(CharController _character)
+    public CorruptedBladeAbility(Character _character)
     {
         AbilityName = "Corrupted Blade";
         AbilityDescription = "Melee attack that does corruption damage and applies rot.";
-        AbilityDamage = new Damage[] { new Damage(DamageTypes.DamageType.Corruption, 25, MaladyTypes.MaladyType.Rot, 100) };
+        AbilityDamage = new Damage[] { new Damage(_character, DamageTypes.DamageType.Corruption, 25, MaladyTypes.MaladyType.Rot, 100) };
         ApCost = 60;
         MpCost = 10;
         AbilityRange = 1f;
         diag = false;
         character = _character;
         mouseLayer = LayerMask.NameToLayer("Character");
-        abilityIntent = AbilityTypes.Intent.Hostile;
+        abilityIntent = IntentTypes.Intent.Hostile;
+        icon = Resources.Load<Sprite>("Sprites/Ability Icons/CorruptedBladeAbility");
     }
 
     public override List<Node> GetRange()
     {
-        List<Node> range = character.bc.pathfinder.FindRange(character.tile.node, AbilityRange, diag, true, false, false, false);
+        List<Node> range = controller.bc.pathfinder.FindRange(controller.tile.node, AbilityRange, diag, true, false, false, false);
         return range;
     }
 
@@ -31,18 +32,22 @@ public class CorruptedBladeAbility : TargetSpellAbility
         return _owner.Stats.curAP >= ApCost && _owner.Stats.curMP >= MpCost;
     }
 
-    public override void ApplyCharacterEffect(CharController character)
+    public override void ApplyCharacterEffect(CharController _target)
     {
-        character.Damage(AbilityDamage);
+        foreach (Damage dmg in AbilityDamage)
+        {
+            dmg.ability = this;
+        }
+        character.controller.DealDamage(AbilityDamage, _target);
     }
 
     public override IEnumerator Initiate(CharController _target, Action callback)
     {
-        if (character is EnemyController)
+        if (controller is EnemyController)
             yield return new WaitForSeconds(2f);
-        character.transform.rotation = Quaternion.LookRotation(character.bc.grid.GetDirection(character.tile.node, _target.tile.node), Vector3.up);
-        character.animParamController.SetTrigger("stab", callback);
-        character.animParamController.SetBool("idle");
+        controller.transform.rotation = Quaternion.LookRotation(controller.bc.grid.GetDirection(controller.tile.node, _target.tile.node), Vector3.up);
+        controller.animParamController.SetTrigger("stab_attack", callback);
+        controller.animParamController.SetBool("idle");
         yield break;
     }
 }

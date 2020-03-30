@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8619637201953005253}
   - component: {fileID: 8928662256814386632}
   - component: {fileID: 4967989813408088694}
+  - component: {fileID: 5464162519910668203}
   m_Layer: 9
   m_Name: CharacterAudio
   m_TagString: Untagged
@@ -48,6 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sounds: []
+  charController: {fileID: 0}
 --- !u!114 &4501141025205447517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,11 +64,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundName: Malady
   soundGroup: 0
+  soundType: 0
   clip: {fileID: 8300000, guid: 74a1348463bfd4c8491417ce496ef3b9, type: 3}
   volume: 0.5
   pitch: 1.5
   loop: 0
   playOnAwake: 0
+  playOnEnable: 0
   source: {fileID: 0}
 --- !u!114 &8619637201953005253
 MonoBehaviour:
@@ -82,11 +86,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundName: Run_01
   soundGroup: 1
+  soundType: 0
   clip: {fileID: 8300000, guid: 03b9f3c6dfda041a3848fed9ead95b8b, type: 3}
   volume: 0.5
   pitch: 1.5
   loop: 0
   playOnAwake: 0
+  playOnEnable: 0
   source: {fileID: 0}
 --- !u!114 &8928662256814386632
 MonoBehaviour:
@@ -102,11 +108,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundName: Run_02
   soundGroup: 1
+  soundType: 0
   clip: {fileID: 8300000, guid: b96913c1cddd5463f8ece564361ff4e7, type: 3}
   volume: 0.5
   pitch: 1.5
   loop: 0
   playOnAwake: 0
+  playOnEnable: 0
   source: {fileID: 0}
 --- !u!114 &4967989813408088694
 MonoBehaviour:
@@ -122,9 +130,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundName: Run_03
   soundGroup: 1
+  soundType: 0
   clip: {fileID: 8300000, guid: 0949c01424dd8446abda2f813285e617, type: 3}
   volume: 0.5
   pitch: 1.5
   loop: 0
   playOnAwake: 0
+  playOnEnable: 0
+  source: {fileID: 0}
+--- !u!114 &5464162519910668203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969900136421738850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: ChargeMalady
+  soundGroup: 0
+  soundType: 0
+  clip: {fileID: 8300000, guid: bc9fb96d4c4193f46a063513f93b48e2, type: 3}
+  volume: 0.5
+  pitch: 1.5
+  loop: 0
+  playOnAwake: 0
+  playOnEnable: 0
   source: {fileID: 0}

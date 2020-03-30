@@ -46,4 +46,14 @@ public class ExploreBattleState : BattleState
         cameraRig.ScreenEdgeMovement(e.info.x, e.info.y);
     }
 
+    protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
+    {
+        OutlineTargetCharacter(sender, e);
+    }
+
+    protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
+    {
+        RemoveOutlineTargetCharacter();
+    }
+
 }

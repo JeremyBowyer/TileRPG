@@ -15,7 +15,7 @@ public class PopupText : MonoBehaviour
         if (duration == 0)
             duration = 1.5f;
 
-        speed += speed * (GlobalRandom.GetRandom(-25, 25) / 100f);
+        speed += speed * (CustomUtils.GetRandom(-25, 25) / 100f);
         StartCoroutine(FloatUp());
     }
 
@@ -26,8 +26,8 @@ public class PopupText : MonoBehaviour
 
     IEnumerator FloatUp()
     {
-        float offsetStart = GlobalRandom.GetRandom(-50, 50) / 100f;
-        float offsetAngle = GlobalRandom.GetRandom(-10, 10) / 100f;
+        float offsetStart = CustomUtils.GetRandom(-50, 50) / 100f;
+        float offsetAngle = CustomUtils.GetRandom(-10, 10) / 100f;
         transform.position = new Vector3(transform.position.x + offsetStart, transform.position.y, transform.position.z);
         while (duration > 0)
         {

@@ -26,6 +26,13 @@ public class ChaseState : AIBattleState
         target = args.targetCharacter;
 
         List<Node> path = character.AttackAbility.PathToGetInRange(target);
+
+        if (path.Count == 0)
+        {
+            path = character.MovementAbility.GetPath(target.tile.node);
+            Debug.Log("Couldn't get in range, going straight for target instead");
+        }
+
         if (path.Count == 0)
         {
             Debug.Log("couldn't find path from " + character.name + " to " + target.name);
@@ -35,7 +42,6 @@ public class ChaseState : AIBattleState
         }
         else
         {
-            aiAction.text = "Chasing...";
             StateArgs moveArgs = new StateArgs
             {
                 path = path,

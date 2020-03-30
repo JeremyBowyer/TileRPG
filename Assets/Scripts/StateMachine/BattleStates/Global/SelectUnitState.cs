@@ -12,8 +12,7 @@ public class SelectUnitState : BattleState
         {
             return new List<Type>
             {
-            typeof(CommandSelectionState),
-            typeof(IdleState)
+            typeof(DishOutDamageState)
             };
         }
         set { }
@@ -24,19 +23,7 @@ public class SelectUnitState : BattleState
         InTransition = true;
         base.Enter();
         bc.NextPlayer();
-        if (bc.CurrentCharacter is PlayerController)
-        {
-            InTransition = false;
-            bc.ChangeState<CommandSelectionState>();
-            return;
-        }
-        else if (bc.CurrentCharacter is EnemyController)
-        {
-            InTransition = false;
-            bc.CurrentCharacter.ChangeState<EnemyTurnState>();
-            bc.ChangeState<IdleState>();
-            return;
-        }
         InTransition = false;
+        bc.ChangeState<DishOutDamageState>();
     }
 }

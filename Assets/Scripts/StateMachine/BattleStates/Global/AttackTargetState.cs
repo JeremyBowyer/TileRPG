@@ -7,7 +7,7 @@ public class AttackTargetState : BattleState
 {
     List<Node> attackRange;
     CharController character;
-    List<GameObject> outlinedEnemies = new List<GameObject>();
+    List<CharController> outlinedEnemies = new List<CharController>();
     public AttackAbility attackAbility;
 
     public override List<Type> AllowedTransitions
@@ -18,7 +18,8 @@ public class AttackTargetState : BattleState
             {
             typeof(AttackSequenceState),
             typeof(CommandSelectionState),
-            typeof(CheckForTurnEndState)
+            typeof(UnitTurnState),
+            typeof(DishOutDamageState)
             };
         }
         set { }
@@ -30,7 +31,7 @@ public class AttackTargetState : BattleState
         character = bc.CurrentCharacter;
         attackAbility = args.attackAbility;
         attackRange = attackAbility.GetRange();
-        grid.SelectNodes(attackRange, CustomColors.ChangeAlpha(CustomColors.AttackRange, 0.04f), "attackrange", "inner");
+        grid.SelectNodes(attackRange, CustomColors.ChangeAlpha(CustomColors.AttackRange, 0.25f), "attackrange", "empty");
         grid.OutlineNodes(attackRange, CustomColors.AttackRange);
     }
 
@@ -40,13 +41,9 @@ public class AttackTargetState : BattleState
         grid.DeSelectNodes("attackrange");
         grid.RemoveOutline(attackRange);
 
-        foreach(GameObject go in outlinedEnemies)
-        {
-            if (go == null)
-                return;
-            Destroy(go.GetComponent<Highlight>());
-        }
-        outlinedEnemies = new List<GameObject>();
+        ClearOutlines();
+        RemoveOutlineTargetCharacter();
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
         attackRange = null;
     }
 
@@ -58,6 +55,8 @@ public class AttackTargetState : BattleState
 
     protected override void OnHoverEnter(object sender, InfoEventArgs<GameObject> e)
     {
+        OutlineTargetCharacter(sender, e);
+
         EnemyController enemy = e.info.gameObject.GetComponent<EnemyController>();
 
         if (enemy == null || enemy.tile == null)
@@ -65,26 +64,23 @@ public class AttackTargetState : BattleState
 
         if (attackRange.Contains(enemy.tile.node) && attackAbility.ValidateTarget(enemy))
         {
-            GameObject go = enemy.gameObject;
-            Highlight hl = go.AddComponent<Highlight>();
-            hl.HighlightObject(CustomColors.Hostile);
-            outlinedEnemies.Add(go);
+            enemy.Highlight(CustomColors.Hostile);
+            outlinedEnemies.Add(enemy);
+            MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Target);
         }
     }
 
     protected override void OnHoverExit(object sender, InfoEventArgs<GameObject> e)
     {
+        RemoveOutlineTargetCharacter();
+
         EnemyController enemy = e.info.gameObject.GetComponent<EnemyController>();
 
         if (enemy == null)
             return;
 
-        Highlight hl = enemy.gameObject.GetComponent<Highlight>();
-
-        if (hl == null)
-            return;
-
-        Destroy(hl);
+        enemy.RemoveHighlight();
+        MouseCursorController.instance.ShowCursor(MouseCursorController.CursorType.Default);
     }
 
     protected override void OnClick(object sender, InfoEventArgs<RaycastHit> e)
@@ -104,8 +100,20 @@ public class AttackTargetState : BattleState
                 attackAbility = attackAbility
             };
             character.ChangeState<AttackSequenceState>(attackArgs);
-            bc.ChangeState<CheckForTurnEndState>();
+            bc.ChangeState<DishOutDamageState>();
         }
+    }
+
+    public void ClearOutlines()
+    {
+        foreach (CharController character in outlinedEnemies)
+        {
+            if (character == null)
+                return;
+            character.RemoveHighlight();
+        }
+        outlinedEnemies = new List<CharController>();
+
     }
 
     protected override void OnCancel(object sender, InfoEventArgs<int> e)

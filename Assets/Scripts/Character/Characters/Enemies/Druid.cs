@@ -11,18 +11,16 @@ public class Druid : Enemy
         stats.agility = 40;
         stats.Init();
         resists.Init();
+        damageBonuses.Init();
         buildUps.Init();
-
-        experience = 0;
-        level = 1;
 
         cName = "Druid";
         cClass = "Druid";
 
-        spells = new List<SpellAbility>();
-        spells.Add(new HealRayAbility(controller));
+        abilities = new List<SpellAbility>();
+        abilities.Add(new HealRayAbility(this));
 
-        attackAbility = new ArrowAbility(controller);
-        movementAbility = new WalkMovement(controller);
+        attackAbility = new ArrowAbility(this);
+        movementAbility = new WalkMovement(this);
     }
 }

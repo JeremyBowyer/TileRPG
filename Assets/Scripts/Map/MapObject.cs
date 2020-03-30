@@ -5,5 +5,5 @@ using UnityEngine;
 public class MapObject : MonoBehaviour
 {
     public Vector3 startingPos;
-    public BSPArea area;
+    public KeepArea area;
 }

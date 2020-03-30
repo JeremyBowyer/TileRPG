@@ -4,30 +4,38 @@ using UnityEngine;
 
 public class SkeletonLesser : Enemy
 {
+
+    public SkeletonLesser() : base()
+    {
+        avatar = Resources.Load<Sprite>("Sprites/Avatars/LesserSkeleton");
+
+        abilities = new List<SpellAbility>();
+        abilities.Add(new CudgelAbility(this));
+
+        attackAbility = new PunchAttackAbility(this);
+        movementAbility = new WalkMovement(this);
+        movementAbility.Speed = 1.5f;
+
+        audioProfile = Resources.Load<CharacterAudioProfile>("Sounds/Audio Profiles/Character Profiles/Enemies/LesserSkeletonAudioProfile");
+    }
+
     public override void Init()
     {
-        stats.maxHP = 10;
         stats.maxAP = 115;
         stats.agility = 25;
         stats.Init();
-        resists.Init();
+        //stats.curHP = 1;
+
+        resists.Init(new Dictionary<DamageTypes.DamageType, float>()
+        {
+            {DamageTypes.DamageType.Fire, 0.5f }
+        });
+        damageBonuses.Init();
         buildUps.Init();
-
-        controller.SetResistance(DamageTypes.DamageType.Fire, 0.5f);
-
-        experience = 0;
-        level = 1;
 
         isInitialized = true;
 
-        cName = "Boner";
+        cName = "Lesser Skeleton";
         cClass = "Lesser Skeleton";
-
-        spells = new List<SpellAbility>();
-        spells.Add(new CudgelAbility(controller));
-
-        attackAbility = new MeleeAbility(controller);
-        movementAbility = new WalkMovement(controller);
-        movementAbility.Speed = 1.5f;
     }
 }

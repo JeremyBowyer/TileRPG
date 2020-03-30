@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8861636755758733827}
   - component: {fileID: 8661738162700264741}
   - component: {fileID: 8661386270158145643}
+  - component: {fileID: 6700671963025038574}
   m_Layer: 0
   m_Name: PierceDamage
   m_TagString: Untagged
@@ -4755,6 +4756,28 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &6700671963025038574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8858798850639466239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08aac4d60d9fcb548a24716059569614, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: Pierce
+  soundGroup: 0
+  soundType: 0
+  clip: {fileID: 8300000, guid: f81d1e3a640dbeb4f84c3a0bd99b8f62, type: 3}
+  volume: 0.5
+  pitch: 1
+  loop: 0
+  playOnAwake: 1
+  playOnEnable: 0
+  source: {fileID: 0}
 --- !u!1 &8858801821294784667
 GameObject:
   m_ObjectHideFlags: 0
@@ -34032,7 +34055,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_SortMode: 2
   m_MinParticleSize: 0
   m_MaxParticleSize: 8

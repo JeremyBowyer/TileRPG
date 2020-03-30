@@ -24,7 +24,6 @@ public class MathCurves
 
     public static Vector3 Bezier(Vector3 start, Vector3 end, Vector3 cp1, Vector3 cp2, float t)
     {
-
         Vector3 mid = Mathf.Pow(1 - t, 3) * start + 3 * Mathf.Pow(1 - t, 2) * t * cp1 + 3 * (1 - t) * Mathf.Pow(t, 2) * cp2 + Mathf.Pow(t, 3) * end;
 
         return mid;
@@ -32,10 +31,14 @@ public class MathCurves
 
     public static Vector3 Bezier(Vector3 start, Vector3 end, Vector3 cp1, float t)
     {
-
         Vector3 mid = Mathf.Pow(1 - t, 2) * start + 2 * (1 - t) * t * cp1 + Mathf.Pow(t, 2) * end;
 
         return mid;
+    }
+
+    public static Vector3 Linear(Vector3 start, Vector3 end, float t)
+    {
+        return Vector3.Lerp(start, end, t);
     }
 
 }

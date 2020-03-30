@@ -22,8 +22,7 @@ public class HostileTargetSpellState : AIBattleState
         InTransition = true;
         base.Enter();
         args.callback = InitiateTurn;
-        aiAction.text = "Casting Spell...";
-        superUI.ShowMessage(args.spell.AbilityName, 1.5f);
+        superUI.ShowMinorMessage(args.spell.AbilityName, 1.5f);
         character.ChangeState<SpellTargetSequenceState>(args);
         InTransition = false;
     }

@@ -29,23 +29,22 @@ public class MovementBlockerController : MonoBehaviour
         blocker.transform.position = midPoint + direction * width * 0.85f;
         blocker.transform.parent = transform.parent;
         blocker.gameObject.layer = LayerMask.NameToLayer("MovementBlocker");
-        blocker.AddComponent<NavMeshObstacle>().carving = true;
+        //blocker.AddComponent<NavMeshObstacle>().carving = true;
         blocker.AddComponent<MovementBlocker>();
         blocker.name = "MovementBlocker";
         blockers.Add(blocker);
 
-        float zScale = blocker.transform.localScale.z * 1f;
-        float xScale = blocker.transform.localScale.x * 1f;
+        float zScale = blocker.transform.localScale.z * 0.15f;
+        float xScale = blocker.transform.localScale.x * 0.3f;
 
-        if(direction == Vector3.forward || direction == Vector3.back)
-        {
-            zScale = blocker.transform.localScale.z * 0.15f;
-            xScale = blocker.transform.localScale.x * 0.9f;
-        } else if(direction == Vector3.left || direction == Vector3.right)
-        {
-            zScale = blocker.transform.localScale.z * 0.9f;
-            xScale = blocker.transform.localScale.x * 0.15f;
-        }
+        if (direction == Grid.leftDirection || direction == Grid.rightDirection)
+            blocker.transform.Rotate(0f, -90f, 0f);
+
+        if (direction == Grid.forwardLeftDirection || direction == Grid.backwardRightDirection)
+            blocker.transform.Rotate(0f, -45f, 0f);
+
+        if (direction == Grid.forwardRightDirection || direction == Grid.backwardLeftDirection)
+            blocker.transform.Rotate(0f, 45f, 0f);
 
         blocker.transform.localScale = new Vector3(xScale, blocker.transform.localScale.y, zScale);
     }
