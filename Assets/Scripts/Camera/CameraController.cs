@@ -42,6 +42,7 @@ public class CameraController : MonoBehaviour {
     private IEnumerator zoomCoroutine;
 
     // Camera Zoom parameters
+    private float targetSize;
     public float minSize;
     public float maxSize;
 
@@ -75,6 +76,7 @@ public class CameraController : MonoBehaviour {
         mouseEdgeHeight = Screen.height - boundary;
         aspectRatio = mouseEdgeWidth / mouseEdgeHeight;
         CameraSize = minSize;
+        targetSize = minSize;
         instance = this;
     }
 
@@ -253,19 +255,23 @@ public class CameraController : MonoBehaviour {
         }
     }
 
-    public void Zoom(float targetSize, float _minSize, float _maxSize, float _speed = 0.5f)
+    public void Zoom(float _targetSize, float _minSize, float _maxSize, float _speed = 0.5f)
     {
         if (zoomCoroutine != null)
+        {
+            CameraSize = targetSize;
             StopCoroutine(zoomCoroutine);
-        zoomCoroutine = ZoomCamera(targetSize, _minSize, _maxSize, _speed);
+        }
+        zoomCoroutine = ZoomCamera(_targetSize, _minSize, _maxSize, _speed);
         StartCoroutine(zoomCoroutine);
     }
 
-    private IEnumerator ZoomCamera(float targetSize, float _minSize, float _maxSize, float _speed = 5f)
+    private IEnumerator ZoomCamera(float _targetSize, float _minSize, float _maxSize, float _speed = 5f)
     {
-        targetSize = Mathf.Clamp(targetSize, _minSize, _maxSize);
+        targetSize = _targetSize;
+        _targetSize = Mathf.Clamp(_targetSize, _minSize, _maxSize);
 
-        float deltaSize = targetSize - CameraSize;
+        float deltaSize = _targetSize - CameraSize;
         float startSize = CameraSize;
         minSize = _minSize;
         maxSize = _maxSize;

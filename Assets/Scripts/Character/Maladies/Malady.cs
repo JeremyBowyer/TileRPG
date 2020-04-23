@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Malady : MonoBehaviour, IDamageSource
+public abstract class Malady : MonoBehaviour, IDamageSource, ICondition
 {
     public Character source;
-    public string mName = "a malady";
     public CharController target;
     protected BattleController bc;
+
+    protected int roundTicks = -1;
+    protected int turnTicks = -1;
 
     public abstract void TurnTick(CharController previousCharacter, CharController currentCharacter);
     public abstract void RoundTick();
@@ -54,7 +56,7 @@ public abstract class Malady : MonoBehaviour, IDamageSource
 
     public virtual string GetSourceName()
     {
-        return mName;
+        return MaladyTypes.GetName(this);
     }
 
     public virtual Character GetCharacterSource()
@@ -62,4 +64,28 @@ public abstract class Malady : MonoBehaviour, IDamageSource
         return source;
     }
 
+    public string GetConditionName()
+    {
+        return MaladyTypes.GetName(this);
+    }
+
+    public string GetConditionDescription()
+    {
+        return MaladyTypes.GetDescription(this);
+    }
+
+    public Sprite GetIcon()
+    {
+        return MaladyTypes.GetIcon(this);
+    }
+
+    public int GetRemainingRoundTicks()
+    {
+        return roundTicks;
+    }
+
+    public int GetRemainingTurnTicks()
+    {
+        return turnTicks;
+    }
 }

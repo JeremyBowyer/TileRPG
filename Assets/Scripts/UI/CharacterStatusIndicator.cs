@@ -9,22 +9,10 @@ public class CharacterStatusIndicator : StatusIndicator
 {
     private GameObject popupText;
     private GameObject buPrefab;
-    private GameObject maladyPrefab;
-    private GameObject maladyChargePrefab;
-    private Dictionary<MaladyTypes.MaladyType, GameObject> maladyGOs;
-    private Dictionary<MaladyTypes.MaladyType, GameObject> maladyChargeGOs;
     private IEnumerator HideCoroutine;
 
     [SerializeField]
     protected GameObject maladyBuildUps;
-    [SerializeField]
-    protected GameObject maladiesApplied;
-    [SerializeField]
-    protected GameObject maladiesCharged;
-    [SerializeField]
-    protected TextMeshProUGUI maladyNameApplied;
-    [SerializeField]
-    protected TextMeshProUGUI maladyNameCharged;
     [SerializeField]
     private GameObject holder;
 
@@ -51,15 +39,14 @@ public class CharacterStatusIndicator : StatusIndicator
         }
     }
 
-    public void Start()
+    public override void Start()
     {
+        base.Start();
         popupText = Resources.Load("Prefabs/UI/PopupText") as GameObject;
         buPrefab = Resources.Load("Prefabs/UI/MaladyBuildup") as GameObject;
-        maladyPrefab = Resources.Load("Prefabs/UI/Battle/CharacterMaladyApplied") as GameObject;
+        conditionPrefab = Resources.Load("Prefabs/UI/Battle/CharacterCondition") as GameObject;
         maladyChargePrefab = Resources.Load("Prefabs/UI/Battle/CharacterMaladyCharged") as GameObject;
-
-        maladyGOs = new Dictionary<MaladyTypes.MaladyType, GameObject>();
-        maladyChargeGOs = new Dictionary<MaladyTypes.MaladyType, GameObject>();
+        
         buBars = new List<MaladyBuildUpBar>();
 
         if(holder == null)
@@ -76,88 +63,6 @@ public class CharacterStatusIndicator : StatusIndicator
         buBars.Add(buBar);
         buBar.SetType(type);
         buBar.SetBU(_cur, _target, _callback);
-    }
-
-    public void AddMaladyCharges(List<MaladyTypes.MaladyType> _maladyCharges)
-    {
-        RemoveMaladyCharges();
-        foreach (MaladyTypes.MaladyType malady in _maladyCharges)
-        {
-            AddMaladyCharge(malady);
-        }
-    }
-
-    public void AddMaladyCharge(MaladyTypes.MaladyType _malady, bool display = false)
-    {
-        GameObject maladychargeGO = Instantiate(maladyChargePrefab, maladiesCharged.transform);
-        maladyChargeGOs[_malady] = maladychargeGO;
-        Image icon = maladychargeGO.transform.Find("Icon").GetComponent<Image>();
-        icon.sprite = MaladyTypes.GetIcon(_malady);
-
-        if (display)
-            StartCoroutine(DisplayMaladyName(MaladyTypes.GetName(_malady) + " - Charged", maladyNameCharged));
-    }
-
-    public void AddMaladies(List<MaladyTypes.MaladyType> _maladies)
-    {
-        RemoveMaladies();
-        foreach (MaladyTypes.MaladyType malady in _maladies)
-        {
-            AddMalady(malady);
-        }
-    }
-
-    public void AddMalady(MaladyTypes.MaladyType _malady, bool display = false)
-    {
-        GameObject maladyGO = Instantiate(maladyPrefab, maladiesApplied.transform);
-        maladyGOs[_malady] = maladyGO;
-        Image icon = maladyGO.GetComponent<Image>();
-        icon.sprite = MaladyTypes.GetIcon(_malady);
-
-        if (display)
-            StartCoroutine(DisplayMaladyName(MaladyTypes.GetName(_malady) + " - Applied", maladyNameApplied));
-    }
-
-    public void RemoveMaladies()
-    {
-        if (maladyGOs.Count == 0)
-            return;
-
-        foreach (GameObject maladyGO in maladyGOs.Values)
-        {
-            Destroy(maladyGO);
-        }
-        maladyGOs = new Dictionary<MaladyTypes.MaladyType, GameObject>();
-    }
-
-    public void RemoveMalady(MaladyTypes.MaladyType _malady)
-    {
-        if (maladyGOs.ContainsKey(_malady))
-        {
-            Destroy(maladyGOs[_malady]);
-            maladyGOs.Remove(_malady);
-        }
-    }
-
-    public void RemoveMaladyCharges()
-    {
-        if (maladyChargeGOs.Count == 0)
-            return;
-
-        foreach (GameObject maladyChargeGO in maladyChargeGOs.Values)
-        {
-            Destroy(maladyChargeGO);
-        }
-        maladyChargeGOs = new Dictionary<MaladyTypes.MaladyType, GameObject>();
-    }
-
-    public void RemoveMaladyCharge(MaladyTypes.MaladyType _malady)
-    {
-        if (maladyChargeGOs.ContainsKey(_malady))
-        {
-            Destroy(maladyChargeGOs[_malady]);
-            maladyChargeGOs.Remove(_malady);
-        }
     }
 
     public void FloatText(int amt, Color color, float duration = 1.5f)
@@ -213,18 +118,6 @@ public class CharacterStatusIndicator : StatusIndicator
             StopCoroutine(HideCoroutine);
         HideCoroutine = HideAfterDelay(delay);
         StartCoroutine(HideCoroutine);
-    }
-
-    public IEnumerator DisplayMaladyName(string _name, TextMeshProUGUI _nameObj, float fadeDelay = 2f)
-    {
-        if (!gameObject.activeInHierarchy)
-            yield break;
-
-        _nameObj.gameObject.SetActive(true);
-        _nameObj.text = _name;
-        yield return new WaitForSeconds(fadeDelay);
-        _nameObj.gameObject.SetActive(false);
-        yield return null;
     }
 
     public IEnumerator HideAfterDelay(float delay = 3f)

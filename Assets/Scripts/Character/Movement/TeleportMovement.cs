@@ -16,7 +16,7 @@ public class TeleportMovement : Movement
     public TeleportMovement(Character character) : base(character)
     {
         mName = "Teleport";
-        mDescription = "Teleport directly to target location, unhindered by movement blockers and avoiding elemental damage.";
+        mDescription = "Teleport directly to target location, unhindered by movement blockers and avoiding elemental damage along the way to your destination.";
     }
 
     public override IEnumerator Traverse(List<Node> path, Action callback)

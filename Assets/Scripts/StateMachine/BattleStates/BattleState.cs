@@ -10,7 +10,6 @@ public abstract class BattleState : State
     public SuperUIController superUI { get { return bc.lc.superUI; } }
     public Grid grid { get { return bc.grid; } }
     public Pathfinding pathfinder { get { return bc.pathfinder; } }
-    public AbilityMenuPanelController abilityMenuPanelController { get { return bc.abilityMenuPanelController; } }
     public List<GameObject> characters { get { return bc.characters; } }
 
     // Methods

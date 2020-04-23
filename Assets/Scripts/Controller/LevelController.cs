@@ -27,13 +27,13 @@ public class LevelController : GameController
     public static LevelController instance;
 
     // Directions
-    public static Vector3 rightDirection { get { return Vector3.right; } }
-    public static Vector3 leftDirection { get { return Vector3.left; } }
-    public static Vector3 forwardDirection { get { return Vector3.forward; } }
-    public static Vector3 backwardDirection { get { return Vector3.back; } }
-    public static Vector3 forwardLeftDirection { get { return new Vector3(-0.5f, 0f, 0.5f); } }
-    public static Vector3 forwardRightDirection { get { return new Vector3(0.5f, 0f, 0.5f); } }
-    public static Vector3 backwardLeftDirection { get { return new Vector3(-0.5f, 0f, -0.5f); } }
+    public static Vector3 rightDirection         { get { return Vector3.right; } }
+    public static Vector3 leftDirection          { get { return Vector3.left; } }
+    public static Vector3 forwardDirection       { get { return Vector3.forward; } }
+    public static Vector3 backwardDirection      { get { return Vector3.back; } }
+    public static Vector3 forwardLeftDirection   { get { return new Vector3(-0.5f, 0f, 0.5f); } }
+    public static Vector3 forwardRightDirection  { get { return new Vector3(0.5f, 0f, 0.5f); } }
+    public static Vector3 backwardLeftDirection  { get { return new Vector3(-0.5f, 0f, -0.5f); } }
     public static Vector3 backwardRightDirection { get { return new Vector3(0.5f, 0f, -0.5f); } }
 
     public void Awake()

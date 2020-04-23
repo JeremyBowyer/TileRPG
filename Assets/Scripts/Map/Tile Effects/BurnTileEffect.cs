@@ -52,7 +52,7 @@ public class BurnTileEffect : TileEffect
         tName = "a burning tile";
 
         source = _source;
-        Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Fire, 500, MaladyTypes.MaladyType.Burn, 100);
+        Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Fire, 25, MaladyTypes.MaladyType.Burn, 100);
         go = Instantiate(AssetController.GetAsset("burn_tile"), _tile.gameObject.transform) as GameObject;
         go.transform.localPosition = _tile.anchorPointLocal;
         //go.transform.parent = _tile.gameObject.transform;

@@ -159,11 +159,7 @@ public class InitBattleState : BattleState
         battleUI.ShowPanel("combat");
 
         // Instantiate Turn Entries
-        foreach (GameObject go in bc.characters)
-        {
-            CharController controller = go.GetComponent<CharController>();
-            bc.turnQueue.InstantiateEntry(controller);
-        }
+        //bc.turnQueue.InstantiateEntries(bc.characters);
 
         InTransition = false;
         bc.ChangeState<PlaceUnitsState>();

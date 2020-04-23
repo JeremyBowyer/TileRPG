@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DamageTypes
 {
-    public enum DamageType { Fire, Voltaic, Cold, Corruption, Pierce, Bludgeon, Physical };
+    public enum DamageType { None, Fire, Voltaic, Cold, Corruption, Pierce, Bludgeon, Physical };
 
     public static Color GetColor(DamageType type)
     {
@@ -50,6 +50,27 @@ public class DamageTypes
                 return null;
             default:
                 return null;
+        }
+    }
+
+    public static DamageType GetType(MaladyTypes.MaladyType _maladyType)
+    {
+        switch (_maladyType)
+        {
+            case MaladyTypes.MaladyType.Burn:
+                return DamageType.Fire;
+            case MaladyTypes.MaladyType.Shock:
+                return DamageType.Voltaic;
+            case MaladyTypes.MaladyType.Frost:
+                return DamageType.Cold;
+            case MaladyTypes.MaladyType.Rot:
+                return DamageType.Corruption;
+            case MaladyTypes.MaladyType.Bleed:
+                return DamageType.Pierce;
+            case MaladyTypes.MaladyType.Concussion:
+                return DamageType.Bludgeon;
+            default:
+                return DamageType.None;
         }
     }
 

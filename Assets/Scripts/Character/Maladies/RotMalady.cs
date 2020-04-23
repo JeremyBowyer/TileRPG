@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class RotMalady : Malady
 {
-    private int countdown;
-    private const int MaxIterations = 2;
+    private const int MAX_ITERATIONS = 2;
 
     public override MaladyTypes.MaladyType Type
     {
@@ -26,7 +25,7 @@ public class RotMalady : Malady
 
     public override void RefreshMalady()
     {
-        countdown = MaxIterations;
+        roundTicks = MAX_ITERATIONS;
     }
 
     public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
@@ -35,17 +34,16 @@ public class RotMalady : Malady
 
     public override void RoundTick()
     {
-        if (countdown <= 0)
+        if (roundTicks <= 0)
             RemoveMalady();
-        countdown -= 1;
+        roundTicks -= 1;
         ApplyMalady(target);
     }
 
     public override void Init(Character _source, CharController _target)
     {
         base.Init(_source, _target);
-        countdown = MaxIterations;
-        mName = "a rot";
+        roundTicks = MAX_ITERATIONS;
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/RotEffectPlayer")) as GameObject;
         PSMeshRendererUpdater psUpdater = go.GetComponent<PSMeshRendererUpdater>();
         go.transform.parent = _target.gameObject.transform;

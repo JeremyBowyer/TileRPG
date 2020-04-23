@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ConcussionMalady : Malady
 {
-    private int countdown;
-    private const int MaxIterations = 999;
+    private const int MAX_ITERATIONS = 999;
     public override MaladyTypes.MaladyType Type
     {
         get { return MaladyTypes.MaladyType.Concussion; }
@@ -21,7 +20,7 @@ public class ConcussionMalady : Malady
 
     public override void RefreshMalady()
     {
-        countdown = MaxIterations;
+        roundTicks = MAX_ITERATIONS;
     }
 
     public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
@@ -30,16 +29,15 @@ public class ConcussionMalady : Malady
 
     public override void RoundTick()
     {
-        if (countdown <= 0)
+        if (roundTicks <= 0)
             RemoveMalady();
-        countdown -= 1;
+        roundTicks -= 1;
     }
 
     public override void Init(Character _source, CharController _target)
     {
         base.Init(_source, _target);
-        mName = "a concussion";
-        countdown = MaxIterations;
+        roundTicks = MAX_ITERATIONS;
         ApplyMalady(_target);
     }
 

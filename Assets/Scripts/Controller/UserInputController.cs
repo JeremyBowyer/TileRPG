@@ -66,7 +66,7 @@ public class UserInputController : MonoBehaviour {
 
         if (keys != "")
         {
-            Debug.Log(keys);
+            //Debug.Log(keys);
         }
 
         // Key Down Events

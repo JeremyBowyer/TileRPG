@@ -41,10 +41,6 @@ public class DishOutDamageState : BattleState
         }
         KeyValuePair<CharController, Damage[]> damagePackage = bc.damageQueue.Dequeue();
 
-        Debug.Log(damagePackage.Key.Name);
-        Debug.Log(damagePackage.Key.Stats.curHP);
-        Debug.Log(damagePackage.Key.IsDead);
-
         if (damagePackage.Key.IsDead || !damagePackage.Key.gameObject.activeInHierarchy)
         {
             InTransition = false;

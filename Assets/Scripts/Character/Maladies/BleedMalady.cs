@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class BleedMalady : Malady
 {
-    private int countdown;
-    private const int MaxIterations = 3;
+    private const int MAX_ITERATIONS = 3;
     private Damage Damage;
     public override MaladyTypes.MaladyType Type
     {
@@ -23,7 +22,7 @@ public class BleedMalady : Malady
 
     public override void RefreshMalady()
     {
-        countdown = MaxIterations;
+        roundTicks = MAX_ITERATIONS;
     }
 
     public override void TurnTick(CharController previousCharacter, CharController currentCharacter)
@@ -32,18 +31,17 @@ public class BleedMalady : Malady
 
     public override void RoundTick()
     {
-        if (countdown <= 0)
+        if (roundTicks <= 0)
             RemoveMalady();
-        countdown -= 1;
+        roundTicks -= 1;
         ApplyMalady(target);
     }
 
     public override void Init(Character _source, CharController _target)
     {
         base.Init(_source, _target);
-        mName = "a bleed";
         Damage = new Damage(this as IDamageSource, DamageTypes.DamageType.Pierce, 20, true, _malady: this);
-        countdown = MaxIterations;
+        roundTicks = MAX_ITERATIONS;
         go = Instantiate(Resources.Load("Prefabs/Malady Effects/BleedEffectPlayer")) as GameObject;
         go.transform.parent = _target.gameObject.transform;
     }

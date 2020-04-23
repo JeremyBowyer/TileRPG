@@ -10,7 +10,6 @@ public class BattleController : GameController
     public RoundController rc;
     [HideInInspector]
     public ProjectileValidationController pvc;
-    [HideInInspector]
     public TurnQueueController turnQueue;
     [HideInInspector]
     public Grid grid;
@@ -18,11 +17,12 @@ public class BattleController : GameController
     public Pathfinding pathfinder;
     [HideInInspector]
     public RewardController rewardController;
-    public StatusIndicator statusIndicator;
-    public AbilityMenuPanelController abilityMenuPanelController;
+    [HideInInspector]
     public LineRenderer lineRenderer;
     public GameObject selectionCircle;
+    [HideInInspector]
     public LevelController lc;
+    [HideInInspector]
     public KeepBattleRoom battleRoom;
     public BattleUIController battleUI { get { return lc.uiController.battleUI; } }
 
@@ -49,11 +49,24 @@ public class BattleController : GameController
         set
         {
             currentCharacter = value;
-            if (battleUI != null)
-                battleUI.LoadCurrentStats(null, currentCharacter);
         }
     }
-
+    /*
+    This is redundant, because BattleUIController's LoadCharacter() subscribes to the onUnitChange delegate
+    public CharController CurrentCharacter
+    {
+        get
+        {
+            return currentCharacter;
+        }
+        set
+        {
+            currentCharacter = value;
+            if (battleUI != null)
+                battleUI.LoadCharacter(null, currentCharacter);
+        }
+    }
+    */
     private CharController targetCharacter;
     public CharController TargetCharacter
     {
@@ -97,6 +110,9 @@ public class BattleController : GameController
 
     public delegate void OnRoundChange();
     public OnRoundChange onRoundChange;
+
+    public delegate void OnBattleEnd();
+    public OnBattleEnd onBattleEnd;
 
     private void Awake()
     {
@@ -144,7 +160,7 @@ public class BattleController : GameController
         // If there is a currenct character, invoke relevant methods
         if (CurrentCharacter != null)
         {
-            turnQueue.HideEntry(CurrentCharacter.turnEntry);
+            turnQueue.RemoveEntry(CurrentCharacter);
             rc.CharacterTurnEnd(CurrentCharacter);
             CurrentCharacter.OnTurnEnd();
         }
@@ -153,6 +169,7 @@ public class BattleController : GameController
         if (rc.roundChars.Count < 1)
         {
             rc.InitRound(characters);
+            turnQueue.InstantiateEntries(rc.roundChars);
         }
 
         // Determine turn order, to find next character
@@ -184,7 +201,7 @@ public class BattleController : GameController
         characters.Remove(character.gameObject);
         lc.characters.Remove(character.gameObject);
         rc.RemoveCharacter(character);
-        turnQueue.HideEntry(character);
+        turnQueue.RemoveEntry(character);
         turnQueue.UpdateQueue(null, character);
         onUnitDeath?.Invoke(character, damage);
 
@@ -216,11 +233,11 @@ public class BattleController : GameController
     public void TerminateBattle()
     {
         //lc.bspController.ShowAllRooms();
+        onBattleEnd?.Invoke();
         grid.ClearGrid();
         characters.Clear();
         selectionCircle.gameObject.transform.parent = null;
         selectionCircle.SetActive(false);
-        turnQueue.EndBattle();
         battleRoom.GetComponent<BoxCollider>().enabled = true;
 
         // Set protag as camera target

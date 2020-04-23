@@ -84,6 +84,26 @@ public abstract class CharController : StateMachine {
         get { return character.boons; }
     }
 
+    public List<ICondition> Conditions
+    {
+        get
+        {
+            List<ICondition> conditions = new List<ICondition>();
+
+            foreach(Malady malady in Maladies)
+            {
+                conditions.Add(malady as ICondition);
+            }
+
+            foreach(Boon boon in Boons)
+            {
+                conditions.Add(boon as ICondition);
+            }
+
+            return conditions;
+        }
+    }
+
     public List<SpellAbility> Spells
     {
         get { return character.abilities; }
@@ -168,8 +188,11 @@ public abstract class CharController : StateMachine {
             return;
 
         BuildUps.onChargeActive += (type) => statusIndicator.AddMaladyCharge(type, true);
+        BuildUps.onChargeActive += (type) => { if (bc.CurrentCharacter == this) bc.battleUI.currentStatusIndicator.AddMaladyCharge(type, true); };
         BuildUps.onChargeActive += ChargeMalady;
+
         BuildUps.onChargeDeactive += statusIndicator.RemoveMaladyCharge;
+        BuildUps.onChargeDeactive += (type) => { if (bc.CurrentCharacter == this) bc.battleUI.currentStatusIndicator.RemoveMaladyCharge(type); };
         delegatesAssigned = true;
     }
 
@@ -188,6 +211,16 @@ public abstract class CharController : StateMachine {
         foreach (PersonalPassive passive in PersonalPassives)
         {
             if (passive.GetType() == _passive)
+                return true;
+        }
+        return false;
+    }
+
+    public bool HasPersonalPassiveInterface(Type _interface)
+    {
+        foreach (PersonalPassive passive in PersonalPassives)
+        {
+            if (_interface.IsAssignableFrom(passive.GetType()))
                 return true;
         }
         return false;
@@ -242,7 +275,7 @@ public abstract class CharController : StateMachine {
     public void RemoveMalady(Malady _malady)
     {
         Maladies.Remove(_malady);
-        statusIndicator.RemoveMalady(MaladyTypes.GetType(_malady));
+        statusIndicator.RemoveCondition(_malady);
     }
     
     public virtual void HideCharacter()
@@ -425,8 +458,8 @@ public abstract class CharController : StateMachine {
 
         if(adjDmg.maladyType != null)
         {
-            MaladyTypes.MaladyType type = (MaladyTypes.MaladyType)adjDmg.maladyType;
-            if (BuildUps.IsCharged(type))
+            MaladyTypes.MaladyType type = MaladyTypes.GetType((DamageTypes.DamageType)adjDmg.damageType);
+            if (BuildUps.IsCharged(type) && adjDmg.damageAmount > 0f)
             {
                 _target.ApplyMalady(type, character);
                 BuildUps.SetBU(type, 0f);
@@ -561,8 +594,8 @@ public abstract class CharController : StateMachine {
     public void ApplyMalady(MaladyTypes.MaladyType type, Character _source)
     {
         audioController.Play("Malady");
-        MaladyTypes.ApplyMalady(type, _source, this);
-        statusIndicator.AddMalady(type, true);
+        Malady malady = MaladyTypes.ApplyMalady(type, _source, this);
+        statusIndicator.AddCondition(malady);
     }
 
     public void Heal(int amt, bool show = false)

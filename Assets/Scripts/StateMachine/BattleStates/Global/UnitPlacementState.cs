@@ -30,7 +30,7 @@ public class UnitPlacementState : BattleState
         character.Place(frontNode.tile);
         character.InitBattle();
         bc.FollowTarget(character.transform);
-        battleUI.LoadCurrentStats(null, character);
+        battleUI.LoadCurrentStats(character);
         //bc.CurrentCharacter = character;
 
         mover = new PlaceUnitMovement(character.character);
